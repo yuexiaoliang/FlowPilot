@@ -48,16 +48,29 @@ Core concepts:
 
 Exact dependency versions are pinned by the lockfile. Agents must not casually replace framework choices; architecture changes require an ADR.
 
+## Development model
+
+FlowPilot is **document-driven, not Issue-driven**.
+
+The canonical implementation sequence is defined by [docs/DEVELOPMENT-PLAN.md](./docs/DEVELOPMENT-PLAN.md), and completion is defined by [docs/ACCEPTANCE.md](./docs/ACCEPTANCE.md).
+
+GitHub Issues are optional coordination/tracking artifacts. They may mirror parts of the plan, but are not required for development and are not the source of truth.
+
 ## Repository documentation
 
 Read these before development:
 
 - [AGENTS.md](./AGENTS.md) — mandatory rules for coding agents.
+- [docs/DEVELOPMENT-PLAN.md](./docs/DEVELOPMENT-PLAN.md) — canonical implementation sequence and milestone dependencies.
+- [docs/ACCEPTANCE.md](./docs/ACCEPTANCE.md) — canonical definition of completion and milestone acceptance.
+- [docs/AGENT-WORKFLOW.md](./docs/AGENT-WORKFLOW.md) — how agents select, implement, validate, and hand off work.
+- [docs/TECH-STACK.md](./docs/TECH-STACK.md) — technology choices and replacement boundaries.
 - [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) — system boundaries and module responsibilities.
 - [docs/WORKFLOW-IR.md](./docs/WORKFLOW-IR.md) — canonical workflow model.
-- [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md) — development, testing, branching, and review rules.
+- [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md) — engineering, testing, branching, and review rules.
 - [docs/SECURITY.md](./docs/SECURITY.md) — session, secret, remote-content, and automation safety rules.
-- [docs/ROADMAP.md](./docs/ROADMAP.md) — staged delivery plan.
+- [docs/ROADMAP.md](./docs/ROADMAP.md) — strategic phase summary; DEVELOPMENT-PLAN.md is authoritative for implementation order.
+- [docs/adr/](./docs/adr/) — durable architecture decisions.
 
 ## MVP success condition
 
@@ -72,8 +85,10 @@ The MVP is complete when FlowPilot can:
 7. validate the repaired route, create a new Flow version, and complete the run.
 8. Pause safely for security challenges or user confirmation.
 
+Detailed acceptance criteria live in [docs/ACCEPTANCE.md](./docs/ACCEPTANCE.md).
+
 Do not broaden the MVP until this loop works reliably.
 
 ## Status
 
-Planning baseline established. Implementation should follow the roadmap and repository rules before feature expansion.
+Planning baseline established. Implementation should follow DEVELOPMENT-PLAN.md and ACCEPTANCE.md before feature expansion.
