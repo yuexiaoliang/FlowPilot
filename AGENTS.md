@@ -2,6 +2,14 @@
 
 This file is mandatory reading for every coding agent working on FlowPilot.
 
+Before coding, also read:
+- `docs/DEVELOPMENT-PLAN.md`
+- `docs/ACCEPTANCE.md`
+- `docs/AGENT-WORKFLOW.md`
+- relevant architecture/security/domain documentation and ADRs
+
+FlowPilot is **document-driven, not Issue-driven**. GitHub Issues are optional coordination artifacts and are not the source of truth for implementation order or acceptance.
+
 ## Mission
 
 Build FlowPilot as a reliable desktop workflow runtime. The product learns web workflows with AI, persists them, executes them deterministically, and repairs only the failed region when websites change.
@@ -23,8 +31,21 @@ The architecture must remain usable without any particular LLM vendor, browser a
 11. **No architecture drift without an ADR.** Changing Electron, React, WebContentsView, BrowserDriver boundaries, persistence model, or Workflow IR requires a documented Architecture Decision Record.
 12. **Do not broaden the MVP until the learn → run → fail → repair → rerun loop is proven.**
 13. **Do not add microservices, Redis, cloud infrastructure, or a remote database for the local MVP without an approved requirement.**
-14. **Prefer boring dependencies.** Add a dependency only when it removes meaningful complexity; record why in the PR.
+14. **Prefer boring dependencies.** Add a dependency only when it removes meaningful complexity; record why in the PR/handoff.
 15. **No hidden fallback.** If a validator, repair, or browser action is uncertain, surface a typed failure rather than pretending success.
+
+## Source-of-truth order
+
+When instructions conflict, use this order:
+
+1. direct maintainer decision
+2. accepted ADR
+3. `docs/ACCEPTANCE.md`
+4. `docs/DEVELOPMENT-PLAN.md`
+5. architecture/security/domain documentation
+6. GitHub Issues or task notes
+
+An Issue may add scope or stricter criteria, but must not silently weaken canonical acceptance rules.
 
 ## Layer boundaries
 
@@ -93,12 +114,15 @@ Never edit an applied migration. Add a new migration. The app must either migrat
 
 Before ending work, leave the repository in a state another agent can understand:
 - tests/lint/typecheck status reported
-- unfinished work recorded in an issue/TODO with context
+- completed acceptance criteria mapped to `docs/ACCEPTANCE.md`
+- unfinished work documented in the handoff, plan note, or optionally an Issue
 - no unexplained generated files
 - no secrets/auth state committed
 - architecture-affecting decisions documented
 - README/docs updated when behavior or commands change
 
+Follow the handoff format in `docs/AGENT-WORKFLOW.md`.
+
 ## Definition of done
 
-A task is done only when implementation, tests, validation, failure behavior, and documentation agree. "Works on my machine" is not sufficient.
+A task is done only when implementation, tests, validation, failure behavior, documentation, and the applicable acceptance criteria agree. "Works on my machine" is not sufficient.
