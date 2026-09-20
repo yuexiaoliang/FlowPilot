@@ -132,9 +132,19 @@ Never use a live production account in CI.
 
 ## Agent execution
 
-Follow `docs/AGENT-OPERATING-PROTOCOL.md` and `dev-agents/README.md`.
+FlowPilot development automation targets **OpenAI Codex by default**.
 
-Default bounded development loop:
+Prefer Codex-native mechanisms for agent behavior:
+- repository instructions in `AGENTS.md`
+- project subagents in `.codex/agents/*.toml`
+- project configuration in `.codex/config.toml`
+- Codex skills/MCP/hooks only when they solve a concrete recurring need
+
+Do not create parallel custom agent frameworks when Codex already provides the required mechanism.
+
+Follow `docs/AGENT-OPERATING-PROTOCOL.md`.
+
+Default bounded development loop using the project Codex subagents:
 
 ```
 Plan Guard → Builder → Gatekeeper → State Keeper
