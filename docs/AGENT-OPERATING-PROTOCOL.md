@@ -10,7 +10,7 @@ A capable Main Agent should be able to enter with no chat history, identify the 
 
 ## Minimal control loop
 
-Use the four development roles in `dev-agents/`:
+Use the four project-level Codex custom agents in `.codex/agents/`:
 
 ```
 Plan Guard
@@ -28,7 +28,7 @@ Normally:
 - Plan Guard, Gatekeeper, and State Keeper provide separation of concerns
 - do not add permanent specialist roles unless there is demonstrated need
 
-See `dev-agents/README.md`.
+These are native Codex custom agents, loaded from project-level TOML definitions. Keep the role set intentionally small.
 
 ## Required reading order
 
@@ -56,7 +56,7 @@ Before implementation, determine:
 
 If an assigned task conflicts with the current gate or canonical docs, stop and report the conflict.
 
-Plan Guard does not implement code.
+Use the Codex custom agent named `plan_guard`. It does not implement code.
 
 ## Step 2 — Builder
 
@@ -71,11 +71,11 @@ Rules:
 - run applicable validation
 - report actual validation only
 
-A strong general-purpose Builder is the default. Do not create permanent technology-specific agents as routine process.
+Use the Codex custom agent named `builder` when delegation is useful, or let the main Codex thread perform the Builder role. A strong general-purpose Builder is the default. Do not create permanent technology-specific agents as routine process.
 
 ## Step 3 — Gatekeeper
 
-Gatekeeper independently checks the actual artifacts/diff against the selected acceptance criteria.
+Use the Codex custom agent named `gatekeeper`. It independently checks the actual artifacts/diff against the selected acceptance criteria.
 
 Gatekeeper returns only:
 - PASS
@@ -87,7 +87,7 @@ A later slice/gate cannot begin while required acceptance items fail.
 
 ## Step 4 — State Keeper
 
-Run State Keeper only after Gatekeeper PASS.
+Use the Codex custom agent named `state_keeper` only after Gatekeeper PASS.
 
 State Keeper:
 - updates `PROJECT-STATE.md` when current truth changed
