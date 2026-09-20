@@ -6,6 +6,9 @@ Before coding, also read:
 - `docs/DEVELOPMENT-PLAN.md`
 - `docs/ACCEPTANCE.md`
 - `docs/AGENT-WORKFLOW.md`
+- `docs/PRODUCT-MODEL.md`
+- `docs/NATURAL-LANGUAGE-UX.md`
+- `docs/TASK-SOURCE-RUNTIME.md`
 - relevant architecture/security/domain documentation and ADRs
 
 FlowPilot is **document-driven, not Issue-driven**. GitHub Issues are optional coordination artifacts and are not the source of truth for implementation order or acceptance.
@@ -33,6 +36,12 @@ The architecture must remain usable without any particular LLM vendor, browser a
 13. **Do not add microservices, Redis, cloud infrastructure, or a remote database for the local MVP without an approved requirement.**
 14. **Prefer boring dependencies.** Add a dependency only when it removes meaningful complexity; record why in the PR/handoff.
 15. **No hidden fallback.** If a validator, repair, or browser action is uncertain, surface a typed failure rather than pretending success.
+16. **Users write semantics; the system stores references.** Ordinary users must not be required to author internal IDs, `@goal/...`, `@source/...`, cron syntax, selectors, or another FlowPilot DSL.
+17. **Keep Goal, Task, Source, Flow, and Run separate.** Goal = outcome; Task = timing/policy; Source = authorized data boundary; Flow = executable strategy; Run = one concrete execution.
+18. **Resolve Source data before execution.** A Run executes against an immutable InputBundle; never silently reread changing files mid-run.
+19. **Scheduled irreversible actions must be idempotent.** Implement deterministic deduplication/consumption semantics before repeated publishing is considered safe.
+20. **Source permissions are scoped and explicit.** Natural-language references never grant arbitrary filesystem/repository access.
+21. **UI is contextual, not configuration-first.** Prefer natural-language authoring plus review/clarification and contextual UI primitives over permanent forms for machine-level configuration.
 
 ## Source-of-truth order
 
@@ -42,8 +51,9 @@ When instructions conflict, use this order:
 2. accepted ADR
 3. `docs/ACCEPTANCE.md`
 4. `docs/DEVELOPMENT-PLAN.md`
-5. architecture/security/domain documentation
-6. GitHub Issues or task notes
+5. product model / natural-language UX / task-source runtime documentation
+6. architecture/security/domain documentation
+7. GitHub Issues or task notes
 
 An Issue may add scope or stricter criteria, but must not silently weaken canonical acceptance rules.
 
