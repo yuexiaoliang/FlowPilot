@@ -20,15 +20,21 @@ Normal runs should not require an LLM. AI is invoked when a workflow is being le
 
 Core concepts:
 
-- **Flow** — a persisted, versioned workflow.
+- **Goal** — the outcome the user wants, authored primarily in natural language/Markdown.
+- **Task** — when and under what rules a Goal should run.
+- **Source** — an explicitly authorized boundary from which Task data may be resolved.
+- **InputBundle** — immutable inputs resolved for one Run.
+- **Flow** — a persisted, versioned executable strategy for achieving a Goal.
 - **Step** — an atomic transition with preconditions, action, and expected result.
-- **Run** — one execution of a Flow.
+- **Run** — one concrete execution binding exact Goal/Task/Flow revisions and input provenance.
 - **Driver** — browser abstraction used by the runtime.
 - **Discovery** — AI-assisted process that learns a new Flow.
 - **Repair** — AI-assisted local patch of a failed portion of a Flow.
 - **Validator** — verifies state before and after steps.
 - **Account** — isolated browser/session identity for a platform.
 - **Human Takeover** — first-class pause/resume mechanism for login, CAPTCHA, MFA, security checks, or ambiguous operations.
+
+Human-facing sources should remain natural language. Users write semantics; FlowPilot stores internal references and structured plans. Internal IDs/DSL syntax must not be required in ordinary authoring.
 
 ## Technology baseline
 
@@ -50,7 +56,7 @@ Exact dependency versions are pinned by the lockfile. Agents must not casually r
 
 ## Development model
 
-FlowPilot is **document-driven, not Issue-driven**.
+FlowPilot is **document-driven, not Issue-driven**, and **intent-first, not configuration-first**.
 
 The canonical implementation sequence is defined by [docs/DEVELOPMENT-PLAN.md](./docs/DEVELOPMENT-PLAN.md), and completion is defined by [docs/ACCEPTANCE.md](./docs/ACCEPTANCE.md).
 
@@ -64,6 +70,9 @@ Read these before development:
 - [docs/DEVELOPMENT-PLAN.md](./docs/DEVELOPMENT-PLAN.md) — canonical implementation sequence and milestone dependencies.
 - [docs/ACCEPTANCE.md](./docs/ACCEPTANCE.md) — canonical definition of completion and milestone acceptance.
 - [docs/AGENT-WORKFLOW.md](./docs/AGENT-WORKFLOW.md) — how agents select, implement, validate, and hand off work.
+- [docs/PRODUCT-MODEL.md](./docs/PRODUCT-MODEL.md) — Goal / Task / Source / Flow / Run model and compilation layers.
+- [docs/NATURAL-LANGUAGE-UX.md](./docs/NATURAL-LANGUAGE-UX.md) — intent-first UX principles; natural language is the control plane.
+- [docs/TASK-SOURCE-RUNTIME.md](./docs/TASK-SOURCE-RUNTIME.md) — scheduling, Sources, immutable InputBundles, provenance, and idempotency.
 - [docs/TECH-STACK.md](./docs/TECH-STACK.md) — technology choices and replacement boundaries.
 - [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) — system boundaries and module responsibilities.
 - [docs/WORKFLOW-IR.md](./docs/WORKFLOW-IR.md) — canonical workflow model.
