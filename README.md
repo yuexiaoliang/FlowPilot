@@ -56,8 +56,10 @@ Start here:
 - [docs/PROJECT-STATE.md](./docs/PROJECT-STATE.md) — current phase and next recommended slice
 - [docs/DEVELOPMENT-PLAN.md](./docs/DEVELOPMENT-PLAN.md) — canonical delivery order
 - [docs/ACCEPTANCE.md](./docs/ACCEPTANCE.md) — gate/definition of done
-- [docs/AGENT-OPERATING-PROTOCOL.md](./docs/AGENT-OPERATING-PROTOCOL.md) — multi-agent execution protocol
-- [docs/AGENT-START-PROMPT.md](./docs/AGENT-START-PROMPT.md) — minimal prompt for a new agent
+- [.codex/agents/](./.codex/agents/) — Codex-native project subagents: Plan Guard, Builder, Gatekeeper, State Keeper
+- [.codex/config.toml](./.codex/config.toml) — minimal project-level Codex multi-agent config
+- [docs/AGENT-OPERATING-PROTOCOL.md](./docs/AGENT-OPERATING-PROTOCOL.md) — how the Codex subagents are orchestrated
+- [docs/AGENT-START-PROMPT.md](./docs/AGENT-START-PROMPT.md) — minimal prompt for a Codex session
 - [docs/TASK-PACKET-TEMPLATE.md](./docs/TASK-PACKET-TEMPLATE.md) — bounded assignment template
 - [docs/HANDOFF-TEMPLATE.md](./docs/HANDOFF-TEMPLATE.md) — agent handoff format
 
@@ -92,6 +94,6 @@ See `PROJECT-STATE.md` for the current gate.
 
 You should be able to give a repository-aware agent only this:
 
-> Continue FlowPilot according to the repository plan. Read AGENTS.md and the canonical project documents first, determine the current phase from docs/PROJECT-STATE.md, complete one bounded unfinished slice, validate it against docs/ACCEPTANCE.md, update project state if needed, and leave a handoff.
+> Continue FlowPilot according to the repository plan. Read AGENTS.md and the canonical documents first. Use the project Codex subagents in .codex/agents/ with the Plan Guard → Builder → Gatekeeper → State Keeper loop. Complete one bounded current slice, update state only after Gatekeeper PASS, and leave a handoff.
 
 The maintainer should not need to restate project history or technology choices.
