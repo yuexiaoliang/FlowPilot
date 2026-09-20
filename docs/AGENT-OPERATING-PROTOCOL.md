@@ -1,162 +1,188 @@
 # FlowPilot Agent Operating Protocol
 
-This document defines how independent coding/design agents coordinate through the repository without relying on chat history.
+This protocol exists to keep development moving safely across different main agents and sessions.
 
 ## Principle
 
 **The repository is the shared memory.**
 
-An agent must be able to enter with no prior conversation context, inspect the repository, determine the current approved direction, complete one bounded slice, validate it, and leave enough evidence for the next agent.
+A capable Main Agent should be able to enter with no chat history, identify the current approved slice, implement it, obtain an independent acceptance verdict, update project state, and hand off cleanly.
 
-## Canonical control loop
+## Minimal control loop
+
+Use the four development roles in `dev-agents/`:
 
 ```
-Read rules
-→ Read project state
-→ Read development plan
-→ Read acceptance
-→ Choose one bounded slice
-→ Implement
-→ Validate
-→ Update project state
-→ Leave handoff
+Plan Guard
+   ↓
+Builder
+   ↓
+Gatekeeper
+   ↓
+State Keeper
 ```
 
-Do not skip directly from "read request" to "write code".
+Normally:
+- the Main Agent orchestrates the loop
+- the Main Agent may perform the Builder role itself
+- Plan Guard, Gatekeeper, and State Keeper provide separation of concerns
+- do not add permanent specialist roles unless there is demonstrated need
+
+See `dev-agents/README.md`.
 
 ## Required reading order
 
-Every agent must read, in order:
+Before starting:
 
 1. `AGENTS.md`
 2. `docs/PROJECT-STATE.md`
 3. `docs/DEVELOPMENT-PLAN.md`
 4. `docs/ACCEPTANCE.md`
-5. `docs/PRODUCT-MODEL.md`
-6. `docs/NATURAL-LANGUAGE-UX.md`
-7. relevant design/architecture/security documents
-8. relevant ADRs
+5. current Task Packet if assigned
+6. relevant product/design/architecture/security documents
+7. relevant ADRs
 
-The agent may then inspect code/tests/history.
+Do not rely on chat history when repository truth exists.
 
-## Task selection
+## Step 1 — Plan Guard
 
-Unless the maintainer explicitly assigns a different task, the agent should:
+Before implementation, determine:
 
-1. identify the current phase from PROJECT-STATE.md
-2. find the first incomplete gate/slice in DEVELOPMENT-PLAN.md
-3. verify prerequisites are satisfied
-4. choose the smallest coherent deliverable that can be completed and validated
-5. create/use a Task Packet based on TASK-PACKET-TEMPLATE.md
+- current phase
+- smallest correct unfinished slice
+- prerequisites
+- applicable acceptance criteria
+- explicit out-of-scope work
 
-Do not jump ahead because a later feature is more interesting.
+If an assigned task conflicts with the current gate or canonical docs, stop and report the conflict.
+
+Plan Guard does not implement code.
+
+## Step 2 — Builder
+
+Implement one bounded slice.
+
+Rules:
+- solve the complete slice, not isolated file fragments
+- do not start adjacent future work
+- do not modify acceptance to make implementation pass
+- do not introduce speculative abstractions
+- preserve design, architecture, security, and product boundaries
+- run applicable validation
+- report actual validation only
+
+A strong general-purpose Builder is the default. Do not create permanent technology-specific agents as routine process.
+
+## Step 3 — Gatekeeper
+
+Gatekeeper independently checks the actual artifacts/diff against the selected acceptance criteria.
+
+Gatekeeper returns only:
+- PASS
+- FAIL with blocking gaps
+
+A later slice/gate cannot begin while required acceptance items fail.
+
+"Looks good" and Builder self-approval are not evidence.
+
+## Step 4 — State Keeper
+
+Run State Keeper only after Gatekeeper PASS.
+
+State Keeper:
+- updates `PROJECT-STATE.md` when current truth changed
+- advances phase/slice only when verified
+- maintains `work/` as a small short-term queue
+- removes/retire completed packets
+- creates/refines only the next 1–3 useful packets when needed
+
+State Keeper does not implement product code or redesign planning.
+
+## Task Packets
+
+Task Packets are optional execution aids.
+
+Use `docs/TASK-PACKET-TEMPLATE.md` when:
+- scope could be misunderstood
+- multiple agents may work independently
+- acceptance mapping needs to be explicit
+
+`work/` is not a second roadmap. It should be reconstructable from canonical docs.
 
 ## Change size
 
-One agent run should usually produce one reviewable vertical slice.
+One loop should normally deliver one reviewable vertical slice.
 
-Good examples:
-- finalize Intent Home screen spec + states + interaction rules
-- implement mock Intent Editor → Understanding Review interaction
-- implement LocalFolderSource read-only adapter + tests
-- implement one BrowserDriver contract method end-to-end
+Good:
+- finalize one design-contract layer
+- implement Intent → Understanding mock interaction
+- implement LocalFolderSource + tests
+- implement a BrowserDriver contract slice end-to-end
 
-Bad examples:
+Bad:
 - "build the whole app"
-- redesign UI + replace storage + add WeChat integration in one task
-- broad refactor unrelated to acceptance criteria
+- combine redesign + storage migration + real platform integration
+- broad cleanup unrelated to current acceptance
 
-## Roles
+## Temporary research/review subagents
 
-An agent can act in one of three roles.
+A Builder may use a temporary subagent only when there is a concrete benefit:
+- focused security review
+- isolated investigation of uncertain Electron/CDP/library behavior
+- independent second opinion on a high-risk decision
+- large isolated analysis that would pollute Builder context
 
-### Builder
-Implements a bounded Task Packet.
-
-### Reviewer
-Validates an existing change against repository rules and ACCEPTANCE.md. Reviewer should not silently redesign the feature while reviewing.
-
-### Planner
-May refine PROJECT-STATE, DEVELOPMENT-PLAN, design specs, acceptance criteria, or create Task Packets. Planner must not weaken acceptance to make existing code pass.
-
-A single agent may perform multiple roles sequentially, but the handoff must say which role(s) it performed.
-
-## Gate discipline
-
-A later phase may begin only when the current gate's acceptance criteria have evidence.
-
-"Looks good" is not evidence.
-
-Evidence examples:
-- screenshots of the interactive prototype
-- automated test output
-- fixture run logs
-- exact build/typecheck/lint commands
-- screen-spec-to-implementation review
-- recorded structured output
-- versioned artifact committed to the repository
-
-## Repository updates
-
-After completing a slice, update PROJECT-STATE.md if:
-- phase status changed
-- a gate passed
-- a blocker appeared/disappeared
-- a material decision was made
-- next recommended slice changed
-
-Do not turn PROJECT-STATE.md into a diary. Keep only current truth plus recent material context.
+Temporary helpers:
+- do not own roadmap state
+- do not update acceptance
+- do not become permanent role files by default
+- return findings to the Builder/Main Agent for integration
 
 ## Architecture/design drift
 
-If implementation conflicts with a canonical design or architecture rule:
+If implementation conflicts with a canonical contract:
 
-Do not silently "make it work".
+1. fix implementation to match the contract, or
+2. if the contract is genuinely wrong, use the ADR/design-decision path and update affected canonical docs together
 
-Choose one:
-1. fix implementation to match the contract
-2. if the contract is genuinely wrong, create an ADR/design decision change and update affected canonical docs together
+Do not silently diverge.
 
-## Concurrent agents
+## Concurrent work
 
-If multiple agents may work concurrently:
+If multiple main agents work concurrently:
 - use separate branches/worktrees
-- each agent owns a non-overlapping Task Packet
-- avoid simultaneous edits to canonical coordination files when possible
-- merge foundational/canonical document changes before dependent implementation branches
-- rebase/re-read PROJECT-STATE after another agent merges
+- assign non-overlapping Task Packets
+- avoid concurrent edits to PROJECT-STATE/work queue
+- merge canonical changes before dependent implementation
+- re-read PROJECT-STATE after upstream merges
 
-Do not use a shared browser profile, database, or real production account across concurrent automated tests.
+## Handoff
 
-## Handoff requirement
+After a bounded slice, use `docs/HANDOFF-TEMPLATE.md`.
 
-Every completed agent run must provide a handoff using HANDOFF-TEMPLATE.md.
-
-A handoff must state:
+The handoff must identify:
 - what changed
-- what was validated
-- which acceptance criteria now pass
-- what remains
-- known risks/limitations
+- validation actually performed
+- acceptance mapping
+- known limitations
+- remaining work
 - recommended next slice
 
-Do not claim completion without evidence.
+## Escalate to maintainer only when needed
 
-## Human maintainer interaction
-
-Escalate to the maintainer only when:
-- product intent is genuinely ambiguous and materially affects behavior
+Ask the maintainer when:
+- product intent is materially ambiguous
 - a locked architecture choice should change
-- a security/privacy tradeoff requires human approval
-- two valid UX directions cannot be resolved from canonical docs
-- an irreversible external action requires explicit approval
+- a security/privacy tradeoff needs human approval
+- canonical docs conflict in a way that changes behavior
+- an irreversible external action requires approval
 
-Do not ask the maintainer questions that the repository already answers.
+Do not ask questions the repository already answers.
 
 ## Definition of autonomy
 
-An agent is considered properly autonomous when the maintainer can say only:
+The process works when the maintainer can say:
 
 > Continue FlowPilot according to the repository plan.
 
-and the agent can safely identify and complete the next appropriate bounded slice.
+and the Main Agent can run Plan Guard → Builder → Gatekeeper → State Keeper without needing the project history retold.
