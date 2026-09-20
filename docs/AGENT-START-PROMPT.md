@@ -2,36 +2,34 @@
 
 The maintainer should not need to restate FlowPilot's history.
 
-For a capable repository-aware coding/design agent, this is the preferred default prompt:
+## Preferred default prompt
 
-> Continue FlowPilot according to the repository plan. Read AGENTS.md and the canonical project documents first. Determine the current phase from docs/PROJECT-STATE.md, choose the smallest appropriate unfinished slice, implement it, validate it against docs/ACCEPTANCE.md, update project state if needed, and leave a handoff. Do not redesign locked product/architecture decisions or jump ahead to later phases.
+> Continue FlowPilot according to the repository plan. Read AGENTS.md and the canonical documents first. Use the development loop defined in dev-agents/: Plan Guard → Builder → Gatekeeper → State Keeper. Complete only one bounded current slice. Do not jump phases or redesign locked decisions. If Gatekeeper fails, fix the blocking gaps and re-review. Only after PASS may State Keeper update PROJECT-STATE/work. Leave a handoff with actual validation evidence.
 
-## For a builder
+## Specific Task Packet
 
-> Work as a Builder. Continue FlowPilot according to the repository plan. Complete one bounded slice only, with tests/evidence and handoff.
+> Implement the Task Packet at <path>. Follow AGENTS.md and dev-agents/README.md. Use Plan Guard before implementation, Gatekeeper after implementation, and State Keeper only after PASS. Do not broaden scope.
 
-## For a reviewer
+## Review only
 
-> Work as a Reviewer. Read the canonical FlowPilot documents, inspect the latest implementation against the applicable acceptance criteria, run appropriate validation, report concrete gaps, and only make narrowly scoped fixes when clearly justified.
+> Act as FlowPilot Gatekeeper for the latest bounded slice. Read the canonical docs and dev-agents/GATEKEEPER.md. Independently verify the actual artifacts against the applicable ACCEPTANCE.md criteria and return PASS or FAIL with concrete evidence/gaps. Do not redesign the product or weaken acceptance.
 
-## For a design agent
+## State maintenance only
 
-> Work as a Product/UX Builder. Follow FlowPilot's principles: simple by default, transparent on demand; natural language is the control plane; no user-facing DSL. Continue the current design gate from PROJECT-STATE.md and produce implementation-ready design contracts, not speculative feature expansion.
+> Act as FlowPilot State Keeper. Only if the referenced Gatekeeper verdict is PASS, update PROJECT-STATE and the short-term work queue according to dev-agents/STATE-KEEPER.md. Do not implement product code or create a long backlog.
 
-## When assigning a specific slice
+## What the maintainer should not need to repeat
 
-> Implement Task Packet <name/path>. Follow AGENTS.md and all canonical references in the packet. Do not broaden scope. Validate the stated acceptance criteria and leave a handoff.
-
-## What the maintainer should not need to say
-
-The maintainer should not have to repeat:
-- Electron vs Tauri
-- React vs Vue
-- whether AI runs every workflow step
-- whether users write @goal/@source IDs
-- whether CAPTCHA should be bypassed
+The repository already defines:
+- product philosophy
+- current phase
+- development order
+- acceptance criteria
+- Electron/React/WebContentsView baseline
+- Goal/Task/Source/Flow/Run model
+- natural-language UX rules
+- security boundaries
 - whether Issues are mandatory
-- current product philosophy
-- current milestone order
+- how subagents coordinate
 
-Those belong in the repository.
+The Main Agent should read those instead of asking the maintainer to restate them.
