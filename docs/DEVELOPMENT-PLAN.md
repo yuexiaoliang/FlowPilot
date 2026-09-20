@@ -1,59 +1,177 @@
 # FlowPilot Development Plan
 
-This document is the **source of truth for implementation order**.
+This document is the canonical implementation sequence.
 
-GitHub Issues may mirror items in this plan for tracking, but development is not required to start from or be organized around Issues. If an Issue conflicts with this document, this document wins unless an accepted ADR or a direct maintainer decision updates it.
+FlowPilot is developed through **gates**, not feature accumulation. A later phase starts only when the current phase has acceptance evidence in `ACCEPTANCE.md`.
 
-## Working model
-
-Development is organized into milestones and vertical slices.
-
-FlowPilot is intent-first. Human-facing Goal/Task sources use natural language/Markdown; structured IDs, schedules, bindings, and execution plans are compiled artifacts. See PRODUCT-MODEL.md, NATURAL-LANGUAGE-UX.md, and TASK-SOURCE-RUNTIME.md.
-
-Development must preserve this separation:
-
-```
-Human language
-→ GoalPlan / TaskPlan
-→ Source resolution / immutable InputBundle
-→ Flow
-→ Run
-```
-
-Development is organized into milestones and vertical slices.
-
-Each slice must:
-1. have a clearly defined input/output boundary
-2. be independently testable
-3. preserve repository architecture rules
-4. include tests before being considered complete
-5. satisfy the matching acceptance criteria in [ACCEPTANCE.md](./ACCEPTANCE.md)
-
-Agents should work on the smallest coherent slice that moves the current milestone toward its exit criteria.
+GitHub Issues are optional. The repository documents are the source of truth.
 
 ---
 
-# Milestone 0 — Repository foundation
+# Delivery model
+
+```
+D0 Design Contract
+        ↓
+P0 Interactive Mock Prototype
+        ↓
+E0 Engineering Foundation
+        ↓
+E1 Intent Compiler (Goal / Task)
+        ↓
+E2 Source / InputBundle / Scheduling Semantics
+        ↓
+E3 Deterministic Workflow Runtime
+        ↓
+E4 AI Discovery / Repair
+        ↓
+E5 Human Takeover / Risk
+        ↓
+E6 WeChat Official Accounts MVP
+        ↓
+H0 Hardening / Runner / Expansion
+```
+
+The reason for this order is deliberate:
+
+1. validate the product interaction before building infrastructure
+2. keep human-facing semantics separate from machine execution
+3. prove deterministic execution before adding self-healing AI
+4. validate safety/intervention before real-platform expansion
+
+---
+
+# D0 — Design Contract
 
 ## Objective
 
-Create a deterministic desktop development environment that any developer or coding agent can clone, install, test, build, and launch.
+Turn approved product principles and visual direction into an implementation-ready contract so future agents do not redesign FlowPilot while coding it.
+
+## Required artifacts
+
+Create under `design/`:
+
+- `README.md`
+- `DESIGN-PRINCIPLES.md`
+- `DESIGN-SYSTEM.md`
+- `INTERACTION-MODEL.md`
+- `COMPONENTS.md`
+- `SCREEN-SPECS.md`
+- `FLOWS.md`
+
+## Must encode
+
+- Simple by default, transparent on demand
+- intent-first, not dashboard-first
+- natural language/Markdown is the primary authoring surface
+- no required user-facing DSL or IDs
+- progressive disclosure
+- contextual/ephemeral UI
+- professional Inspector available on demand
+- minimal navigation
+- clear separation of Simple / Execution / Inspection surfaces
+
+## Golden screens
+
+At minimum specify:
+
+1. Intent Home
+2. AI Understanding Review
+3. contextual Source Connection
+4. Input Preview
+5. Execution
+6. Confirmation / Human Takeover
+7. Result
+8. Inspector / professional detail
+9. Repair Diff
+10. existing Task/Goal view
+
+## Exit
+
+Acceptance D0.
+
+---
+
+# P0 — Interactive Mock Prototype
+
+## Objective
+
+Validate the product experience before connecting production infrastructure.
+
+Build a real Electron + React desktop prototype with **mock services only**.
+
+## Golden path
+
+```
+Intent
+→ AI Understanding
+→ Source resolution
+→ Input preview
+→ Run
+→ Human confirmation
+→ Success
+→ Inspect details
+```
+
+## Mock only
+
+Do not require:
+- real LLM calls
+- real WeChat
+- production BrowserDriver
+- real scheduler
+- complex SQLite
+- real Git parsing
+
+Use deterministic mock fixtures.
+
+## Prototype behavior
+
+The user should be able to type naturally:
+
+```md
+每天早上 8 点检查我的行业学习仓库。
+
+如果今天有新的文章，就发布到微信公众号。
+
+正式发布之前让我确认。
+```
+
+The prototype should:
+- present FlowPilot's structured understanding
+- request Source connection only when missing
+- show an input preview
+- simulate execution
+- pause for confirmation
+- complete successfully
+- reveal professional details only when requested
+
+## Exit
+
+Acceptance P0.
+
+---
+
+# E0 — Engineering Foundation
+
+## Objective
+
+Create a deterministic repository/runtime foundation suitable for multi-agent development.
 
 ## Deliverables
 
-### 0.1 Workspace bootstrap
-
-Create:
 - pnpm workspace
-- root package.json
-- pinned Node version policy
-- pinned pnpm version
-- TypeScript strict config
-- shared tsconfig
-- ESLint
-- Prettier
+- pinned Node/pnpm policy
+- strict TypeScript
+- Electron main/preload/renderer
+- React + Vite
+- ESLint + Prettier
 - Vitest
-- basic root scripts
+- Playwright Test
+- typed IPC skeleton
+- secure Electron defaults
+- GitHub Actions
+- local deterministic fixture web application
 
 Required root commands:
 
@@ -67,81 +185,165 @@ pnpm test:e2e
 pnpm package
 ```
 
-### 0.2 Desktop shell
-
-Create:
-- Electron main process
-- preload
-- React renderer
-- Vite build
-- BrowserWindow
-- safe default Electron security configuration
-
-Renderer must not have Node integration.
-
-### 0.3 Typed IPC boundary
-
-Create initial typed request/event contracts.
-
-Do not expose a generic IPC invocation function to Renderer.
-
-### 0.4 CI
-
-GitHub Actions must run:
-- install
-- typecheck
-- lint
-- unit tests
-- build
-
-Packaging smoke testing may initially be platform-limited but must be automated before release work.
-
-### 0.5 Local fixture application
-
-Build a small deterministic fake publishing platform.
-
-It must support selectable states/versions:
-- v1 normal flow
-- v2 DOM/layout change
-- v3 extra interstitial/ambiguity
-- logged-out/auth-expired
+Fixture variants:
+- normal flow
+- changed DOM/layout
+- ambiguous/interstitial
+- auth expired
 - security challenge
 - upload
-- publish success
-- publish failure
+- publish success/failure
 
-## Milestone exit
+## Exit
 
-See Acceptance A0.
+Acceptance E0.
 
 ---
 
-# Milestone 1 — Workflow runtime without AI
+# E1 — Intent Compiler: Goal and Task
 
 ## Objective
 
-Prove that FlowPilot can deterministically execute a known persisted workflow.
+Compile ordinary natural-language/Markdown intent into versioned structured plans without exposing machine syntax to users.
 
-## Deliverables
+## Goal
 
-### 1.1 Workflow IR v1
+Implement:
+- Goal source/revisions
+- GoalPlan schema
+- intent
+- required/optional inputs
+- success/non-success criteria
+- human confirmation/intervention policy
+
+## Task
+
+Implement:
+- Task source/revisions
+- TaskPlan schema
+- semantic Goal reference
+- schedule interpretation
+- Source references
+- selection rules
+- policies
+- source-hash → compiled-plan linkage
+
+## Semantic resolution
+
+Natural-language phrases resolve to stable internal entities.
+
+Unambiguous:
+- bind silently
+
+Materially ambiguous:
+- produce contextual clarification UI
+
+Never require ordinary users to write:
+- `@goal/...`
+- `@source/...`
+- UUIDs
+- cron
+- selectors
+- retry DSL
+
+## Provider boundary
+
+Use provider-neutral structured-model interfaces.
+
+Initially support deterministic fake providers/fixtures for tests before real providers.
+
+## Exit
+
+Acceptance E1.
+
+---
+
+# E2 — Source, InputBundle, and Scheduling Semantics
+
+## Objective
+
+Connect authorized external data to Tasks reproducibly and safely.
+
+## Initial Sources
+
+- Local Folder
+- Local Git Repository
+
+## Source rules
+
+- explicit user authorization
+- scoped root
+- read-only by default
+- no arbitrary filesystem expansion from prose
+- provider interface isolated from domain model
+
+## InputBundle
+
+Before execution:
+
+```
+Task trigger
+→ resolve Source
+→ select content
+→ bind Goal inputs
+→ capture immutable provenance
+→ validate
+→ create InputBundle
+```
+
+A running Flow must not silently reread changing Source files.
+
+Git provenance:
+- source ID
+- branch/ref
+- exact commit SHA
+- selected paths
+- content hashes
+
+## Idempotency
+
+Recurring irreversible actions require deterministic duplicate prevention and consumption records.
+
+A failed run must not falsely mark source input consumed.
+
+## Schedule semantics
+
+Compile natural language to normalized schedules with explicit timezone.
+
+Support at least:
+- SKIP missed schedule
+- RUN_ON_NEXT_START
+
+Runtime-active local scheduling is sufficient at this phase. Background daemon/cloud runner is deferred.
+
+## Exit
+
+Acceptance E2.
+
+---
+
+# E3 — Deterministic Workflow Runtime
+
+## Objective
+
+Execute a known Flow repeatedly without AI.
+
+## Workflow IR
 
 Implement:
 - Flow
-- FlowRevision
+- immutable FlowRevision
 - Step
 - TargetDescriptor
 - Condition
 - Action
 - RetryPolicy
 - RepairPolicy
-- typed errors
+- typed error taxonomy
 
-Use Zod as the persisted/external schema boundary.
+## BrowserDriver
 
-### 1.2 BrowserDriver v1
-
-Minimum capabilities:
+Minimum surface:
 - navigate
 - snapshot
 - find
@@ -151,232 +353,109 @@ Minimum capabilities:
 - waitFor
 - screenshot
 
-Runtime/domain code must not import Electron, CDP, or Playwright.
+Runtime/domain code must not import Electron, Playwright, or CDP directly.
 
-### 1.3 ElectronDriver
+## ElectronDriver
 
-Implement BrowserDriver using WebContentsView/webContents/CDP as needed.
+Back BrowserDriver with WebContentsView/webContents/CDP as needed.
 
-### 1.4 Executor
+## Execution
 
-Every meaningful step follows:
+Each meaningful Step:
 
 ```
 precondition
 → target resolution
 → action
-→ wait/transition
+→ transition/wait
 → postcondition
 → evidence
 ```
 
-No thrown error does not equal success.
+Absence of an exception is not success.
 
-### 1.5 Run state machine
+## State machine
 
-Implement at least:
+At least:
+- PENDING
+- PREPARING
+- RUNNING
+- VERIFYING
+- SUCCEEDED
+- FAILED
+- CANCELLED
 
-```
-PENDING
-PREPARING
-RUNNING
-VERIFYING
-SUCCEEDED
-FAILED
-CANCELLED
-```
+## Exit
 
-Later milestones add PAUSED_HUMAN, REPAIRING, RETRY_WAIT.
-
-## Milestone exit
-
-See Acceptance A1.
+Acceptance E3.
 
 ---
 
-# Milestone 2 — Persistence and account sessions
+# E4 — AI Discovery and Repair
 
 ## Objective
 
-Persist application state and isolated platform identities across app restarts.
+Learn a Flow from a Goal and repair only failing regions when the environment changes.
 
-## Deliverables
-
-### 2.1 SQLite persistence
-
-Create migrations and repositories for:
-- platforms
-- accounts
-- flows
-- flow_versions
-- runs
-- run_steps
-- repair_attempts
-- publish_jobs
-
-### 2.2 Account isolation
-
-Each account gets an isolated persistent Electron session/partition.
-
-### 2.3 Session lifecycle
-
-Support:
-- create account session
-- load account session
-- detect likely logged-in/logged-out state
-- clear account session
-- remove account locally
-
-### 2.4 Secret abstraction
-
-Secrets must not be stored as ordinary plaintext domain fields.
-
-Use OS-backed secure storage where appropriate.
-
-## Milestone exit
-
-See Acceptance A2.
-
----
-
-# Milestone 3 — Goal compilation and AI Discovery
-
-## Objective
-
-Allow the user to describe an outcome in natural language/Markdown, compile it into a structured GoalPlan, learn a workflow for that Goal, and then execute the workflow without AI on the happy path.
-
-## Deliverables
-
-### 3.1 Provider-neutral model interface
-
-Domain/runtime code must not depend on an OpenAI/Anthropic/etc SDK.
-
-### 3.2 Goal source and GoalPlan
-
-Implement:
-- human-readable Goal Markdown/source
-- versioned Goal source revisions
-- structured GoalPlan schema
-- semantic success/failure criteria
-- required/optional input model
-- confirmation/human-intervention policy
-- source-hash → compiled-plan revision linkage
-
-Ordinary users must not need internal Goal IDs or FlowPilot DSL syntax.
-
-### 3.3 Semantic resolution
-
-Resolve natural-language platform/account/Goal references to internal entities.
-
-If materially ambiguous, return a structured clarification requirement rather than guessing.
-
-### 3.4 Sanitized page snapshot pipeline
-
-Before model calls:
-- remove auth/session material
-- redact secret-like values
-- bound page text
-- identify sensitive form fields
-- expose semantic page structure where possible
-
-### 3.5 Structured discovery
-
-Input:
-- user goal
-- sanitized page state
-- current platform state
-- allowed actions
-
-Output:
-- schema-validated workflow proposal
-
-### 3.6 Compilation and validation
-
-AI output must never directly become a trusted stored Flow.
+## Discovery
 
 Pipeline:
 
 ```
-AI proposal
+GoalPlan
++ sanitized page state
++ allowed actions
+→ structured proposal
 → schema validation
 → policy validation
-→ workflow compilation
-→ trial/verification
-→ persisted revision
+→ trial
+→ persisted Flow revision
 ```
 
-## Milestone exit
+## Repair
 
-See Acceptance A3.
-
----
-
-# Milestone 4 — Repair loop
-
-## Objective
-
-Prove FlowPilot's central loop:
-
-```
-Learn → Run → Fail → Repair → Validate → Version → Run
-```
-
-## Deliverables
-
-### 4.1 Failure classifier
-
-Classify typed failures:
-- target not found
-- target ambiguous
-- precondition failed
-- postcondition failed
-- unexpected navigation
-- auth required
-- security challenge
-- rate limited
-- permission denied
-- unknown
-
-### 4.2 Bounded RepairContext
-
-Repair receives:
-- failed step
-- last successful checkpoint
-- bounded neighboring steps
-- expected target state
-- sanitized current snapshot
+RepairContext contains:
 - typed failure
+- failed Step
+- last successful checkpoint
+- bounded neighboring context
+- expected target state
+- sanitized page snapshot
 - platform hints
 
-### 4.3 Patch proposal
+Preferred output:
+- smallest viable patch
 
-Repair should produce the smallest viable patch.
+A successful repair creates a new immutable Flow revision.
 
-Do not regenerate the whole workflow unless explicitly escalated.
+## Required proof
 
-### 4.4 Trial and revision
+```
+learn fixture v1
+→ run with no AI
+→ switch fixture to v2
+→ typed failure
+→ local repair
+→ validate
+→ revision N+1
+→ next run succeeds with no AI
+```
 
-A repair becomes durable only after validation.
+## Exit
 
-Successful repair creates a new immutable Flow revision.
-
-## Milestone exit
-
-See Acceptance A4.
+Acceptance E4.
 
 ---
 
-# Milestone 5 — Human takeover and risk engine
+# E5 — Human Takeover and Risk
 
 ## Objective
 
-Make security/user-intervention states safe and resumable.
+Handle user/security intervention explicitly and safely.
 
-## Deliverables
+## Risk taxonomy
 
-### 5.1 Risk taxonomy
-
-Support:
+At least:
 - LOGIN_REQUIRED
 - QR_REQUIRED
 - CAPTCHA
@@ -388,202 +467,96 @@ Support:
 - DESTRUCTIVE_ACTION_CONFIRMATION
 - UNKNOWN_INTERSTITIAL
 
-### 5.2 Pause/resume
+## Runtime states
 
-Runtime states now include:
+Add:
 - PAUSED_HUMAN
 - RETRY_WAIT
 - REPAIRING
 
-### 5.3 User takeover UI
+## Takeover
 
 User can:
 - take control
-- complete login/verification/manual action
+- complete login/verification/manual decision
 - return control
 
-Runtime must re-snapshot and verify a known state before resuming.
+Resume only after fresh snapshot + recognized safe state.
 
-## Milestone exit
+No CAPTCHA/MFA/security bypass.
 
-See Acceptance A5.
+## Exit
+
+Acceptance E5.
 
 ---
 
-# Milestone 6 — WeChat Official Accounts MVP
+# E6 — WeChat Official Accounts MVP
 
 ## Objective
 
-Apply the proven architecture to the first real platform.
+Apply the proven model/runtime to the first real platform.
 
-## Initial scope
+## Scope
 
-- add WeChat Official Accounts platform
-- manual first-time QR login
-- persistent session
-- article creation flow
+- add account/platform
+- manual QR login
+- persistent account session
+- learn article publishing
 - title
 - body
 - cover
-- summary where applicable
+- summary when applicable
 - publish confirmation
-- publish success verification
-- repair evidence collection
+- success verification
+- repair evidence
 
-## Out of scope
+No production account in CI.
 
-- CAPTCHA bypass
-- MFA bypass
-- stealth/fingerprint spoofing
-- cloud execution
-- multi-user collaboration
-- dozens of platforms
-- automatic irreversible publishing without configured confirmation policy
+No stealth/fingerprint/CAPTCHA/MFA bypass.
 
-## Milestone exit
+## Exit
 
-See Acceptance A6.
+Acceptance E6.
 
 ---
 
-# Milestone 7 — Task, Source, and scheduled automation
+# H0 — Hardening and Expansion
 
-## Objective
-
-Connect external user data to Goals without exposing machine-level syntax, and execute recurring Tasks reproducibly and without duplicate publishing.
-
-## Deliverables
-
-### 7.1 Task source and TaskPlan
-
-Implement:
-- human-readable Task Markdown/source
-- structured versioned TaskPlan
-- semantic Goal resolution
-- normalized schedule with explicit timezone
-- missed schedule policy
-- confirmation/retry policy
-
-### 7.2 Source Manager
-
-Initial Source types:
-- Local Folder
-- Local Git Repository
-
-Requirements:
-- explicit scoped authorization
-- read-only by default
-- Source metadata/inspection
-- deterministic selection
-- no arbitrary filesystem expansion from natural-language text
-
-### 7.3 Immutable InputBundle
-
-Before Flow execution:
-- resolve Source selection
-- capture exact Source version/provenance
-- bind Goal inputs
-- validate required inputs
-- freeze the Run InputBundle
-
-Git Sources record exact commit SHA and selected paths/hashes.
-
-### 7.4 Idempotency and consumption
-
-Prevent duplicate scheduled publishing using deterministic idempotency/consumption keys.
-
-Cursor/watermark updates occur only at the correct success boundary.
-
-### 7.5 Scheduler
-
-Support normalized recurring Tasks while the FlowPilot runtime is active.
-
-Support at least:
-- SKIP
-- RUN_ON_NEXT_START
-
-for missed schedule policy.
-
-Background daemon/cloud execution remains deferred.
-
-## Milestone exit
-
-See Acceptance A7.
-
----
-
-# Milestone 8 — Hardening
-
-Only after the MVP loop and Task/Source semantics are proven:
+Only after E6:
 
 - crash recovery
 - resumable runs
-- app update mechanism
-- workflow inspector
-- diagnostic export with redaction
+- local background runner/daemon
+- scheduler robustness
+- application updates
+- workflow/run Inspector polish
+- diagnostics export with redaction
 - compatibility matrix
-- memory/performance profiling
+- performance/memory profiling
 - signed installers
-- telemetry/diagnostics policy
-
----
-
-# Milestone 9 — Expansion
-
-Potential later work:
 - additional platforms
 - official API-backed actions
-- scheduled jobs while app is open
-- optional remote/browser execution
-- workflow templates
+- optional cloud runner
 - team features
 
-Every major expansion requires its own scoped plan or ADR.
+Any major expansion gets its own plan/ADR.
 
 ---
 
-# Dependency order
+# How an agent chooses work
 
-The intended dependency chain is:
+Unless explicitly assigned:
 
-```
-Foundation
-   ↓
-Deterministic Runtime
-   ↓
-Persistence / Sessions
-   ↓
-Discovery
-   ↓
-Repair
-   ↓
-Human Takeover / Risk
-   ↓
-Real Platform MVP
-   ↓
-Task / Source / Scheduling
-   ↓
-Hardening
-   ↓
-Expansion
-```
+1. read `AGENTS.md`
+2. read `PROJECT-STATE.md`
+3. read this plan
+4. read `ACCEPTANCE.md`
+5. choose the smallest unfinished slice in the current phase
+6. use `TASK-PACKET-TEMPLATE.md`
+7. implement
+8. validate
+9. update PROJECT-STATE if current truth changed
+10. leave a handoff
 
-Do not invert this order without a documented reason.
-
----
-
-# How agents should choose work
-
-An agent should:
-
-1. read AGENTS.md
-2. read this plan
-3. read ACCEPTANCE.md
-4. inspect current repository state
-5. identify the earliest incomplete milestone
-6. select the smallest coherent unfinished slice
-7. implement and validate it
-8. update documentation when behavior changes
-9. report what remains
-
-GitHub Issues are optional coordination objects. They are not required to determine the next task.
+Do not jump to a later phase without gate evidence.
