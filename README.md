@@ -1,5 +1,7 @@
 # FlowPilot
 
+**English (canonical)** | [简体中文](./README.zh-CN.md)
+
 FlowPilot is an intent-first desktop AI automation runtime.
 
 The user describes outcomes and rules in natural language. FlowPilot compiles that intent into structured plans, connects authorized data Sources, executes deterministic workflows, and repairs them when environments change.
@@ -52,6 +54,8 @@ The repository is the shared memory for all human and AI contributors.
 
 Start here:
 
+- [docs/README.md](./docs/README.md) — documentation index and language navigation
+- [docs/DOCUMENTATION-POLICY.md](./docs/DOCUMENTATION-POLICY.md) — English canonical / Chinese mirror policy
 - [AGENTS.md](./AGENTS.md) — non-negotiable rules
 - [docs/PROJECT-STATE.md](./docs/PROJECT-STATE.md) — current phase and next recommended slice
 - [docs/DEVELOPMENT-PLAN.md](./docs/DEVELOPMENT-PLAN.md) — canonical delivery order
