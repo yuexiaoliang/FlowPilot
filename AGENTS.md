@@ -144,11 +144,24 @@ Do not create parallel custom agent frameworks when Codex already provides the r
 
 Follow `docs/AGENT-OPERATING-PROTOCOL.md`.
 
-Default bounded development loop using the project Codex subagents:
+For every non-trivial development request such as "继续开发", "继续", "按计划开发", or an assigned Task Packet, the main Codex thread MUST execute this loop:
 
 ```
-Plan Guard → Builder → Gatekeeper → State Keeper
+plan_guard
+→ builder (or main thread performs the Builder role)
+→ gatekeeper
+→ state_keeper (only after GATEKEEPER: PASS)
 ```
+
+This is not optional guidance for normal development slices:
+
+1. **MUST invoke `plan_guard` before implementation** to select/validate the current slice from repository state.
+2. **MUST complete only that bounded slice.**
+3. **MUST invoke `gatekeeper` after implementation.**
+4. If Gatekeeper returns FAIL, **MUST fix only the blocking gaps and re-run Gatekeeper**.
+5. **MUST NOT invoke `state_keeper` on FAIL.**
+6. After PASS, **MUST invoke `state_keeper`** so a future Codex session can resume from repository state.
+7. **MUST stop after one accepted slice** unless the maintainer explicitly asks for multiple slices.
 
 The Builder is normally a strong general-purpose agent (often the Main Agent itself). Do not create permanent technology-specific specialist agents without demonstrated need.
 
