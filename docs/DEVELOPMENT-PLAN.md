@@ -8,6 +8,20 @@ GitHub Issues may mirror items in this plan for tracking, but development is not
 
 Development is organized into milestones and vertical slices.
 
+FlowPilot is intent-first. Human-facing Goal/Task sources use natural language/Markdown; structured IDs, schedules, bindings, and execution plans are compiled artifacts. See PRODUCT-MODEL.md, NATURAL-LANGUAGE-UX.md, and TASK-SOURCE-RUNTIME.md.
+
+Development must preserve this separation:
+
+```
+Human language
+→ GoalPlan / TaskPlan
+→ Source resolution / immutable InputBundle
+→ Flow
+→ Run
+```
+
+Development is organized into milestones and vertical slices.
+
 Each slice must:
 1. have a clearly defined input/output boundary
 2. be independently testable
@@ -225,11 +239,11 @@ See Acceptance A2.
 
 ---
 
-# Milestone 3 — AI Discovery
+# Milestone 3 — Goal compilation and AI Discovery
 
 ## Objective
 
-Allow AI to learn a new workflow, compile it into Workflow IR, and then execute that workflow without AI.
+Allow the user to describe an outcome in natural language/Markdown, compile it into a structured GoalPlan, learn a workflow for that Goal, and then execute the workflow without AI on the happy path.
 
 ## Deliverables
 
@@ -237,7 +251,26 @@ Allow AI to learn a new workflow, compile it into Workflow IR, and then execute 
 
 Domain/runtime code must not depend on an OpenAI/Anthropic/etc SDK.
 
-### 3.2 Sanitized page snapshot pipeline
+### 3.2 Goal source and GoalPlan
+
+Implement:
+- human-readable Goal Markdown/source
+- versioned Goal source revisions
+- structured GoalPlan schema
+- semantic success/failure criteria
+- required/optional input model
+- confirmation/human-intervention policy
+- source-hash → compiled-plan revision linkage
+
+Ordinary users must not need internal Goal IDs or FlowPilot DSL syntax.
+
+### 3.3 Semantic resolution
+
+Resolve natural-language platform/account/Goal references to internal entities.
+
+If materially ambiguous, return a structured clarification requirement rather than guessing.
+
+### 3.4 Sanitized page snapshot pipeline
 
 Before model calls:
 - remove auth/session material
@@ -246,7 +279,7 @@ Before model calls:
 - identify sensitive form fields
 - expose semantic page structure where possible
 
-### 3.3 Structured discovery
+### 3.5 Structured discovery
 
 Input:
 - user goal
@@ -257,7 +290,7 @@ Input:
 Output:
 - schema-validated workflow proposal
 
-### 3.4 Compilation and validation
+### 3.6 Compilation and validation
 
 AI output must never directly become a trusted stored Flow.
 
@@ -413,9 +446,75 @@ See Acceptance A6.
 
 ---
 
-# Milestone 7 — Hardening
+# Milestone 7 — Task, Source, and scheduled automation
 
-Only after the MVP loop is proven:
+## Objective
+
+Connect external user data to Goals without exposing machine-level syntax, and execute recurring Tasks reproducibly and without duplicate publishing.
+
+## Deliverables
+
+### 7.1 Task source and TaskPlan
+
+Implement:
+- human-readable Task Markdown/source
+- structured versioned TaskPlan
+- semantic Goal resolution
+- normalized schedule with explicit timezone
+- missed schedule policy
+- confirmation/retry policy
+
+### 7.2 Source Manager
+
+Initial Source types:
+- Local Folder
+- Local Git Repository
+
+Requirements:
+- explicit scoped authorization
+- read-only by default
+- Source metadata/inspection
+- deterministic selection
+- no arbitrary filesystem expansion from natural-language text
+
+### 7.3 Immutable InputBundle
+
+Before Flow execution:
+- resolve Source selection
+- capture exact Source version/provenance
+- bind Goal inputs
+- validate required inputs
+- freeze the Run InputBundle
+
+Git Sources record exact commit SHA and selected paths/hashes.
+
+### 7.4 Idempotency and consumption
+
+Prevent duplicate scheduled publishing using deterministic idempotency/consumption keys.
+
+Cursor/watermark updates occur only at the correct success boundary.
+
+### 7.5 Scheduler
+
+Support normalized recurring Tasks while the FlowPilot runtime is active.
+
+Support at least:
+- SKIP
+- RUN_ON_NEXT_START
+
+for missed schedule policy.
+
+Background daemon/cloud execution remains deferred.
+
+## Milestone exit
+
+See Acceptance A7.
+
+---
+
+# Milestone 8 — Hardening
+
+Only after the MVP loop and Task/Source semantics are proven:
 
 - crash recovery
 - resumable runs
@@ -429,7 +528,7 @@ Only after the MVP loop is proven:
 
 ---
 
-# Milestone 8 — Expansion
+# Milestone 9 — Expansion
 
 Potential later work:
 - additional platforms
@@ -461,6 +560,8 @@ Repair
 Human Takeover / Risk
    ↓
 Real Platform MVP
+   ↓
+Task / Source / Scheduling
    ↓
 Hardening
    ↓
