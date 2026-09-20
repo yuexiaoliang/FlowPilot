@@ -1,67 +1,110 @@
 # FlowPilot Acceptance Specification
 
-This document defines **what counts as complete**.
+This document defines what counts as complete.
 
-A feature or milestone is not complete merely because code exists. It must satisfy the relevant acceptance criteria below.
+A phase is complete only when its criteria have evidence. Code, screenshots, or prose alone do not imply acceptance.
 
 ---
 
 # Global Definition of Done
 
-Every implementation change must satisfy, where applicable:
+Applicable changes require:
+
+## Product alignment
+- follows PRODUCT-MODEL.md
+- follows NATURAL-LANGUAGE-UX.md
+- ordinary users are not required to learn internal IDs/DSL
+- default surfaces remain simple
+- professional detail is available on demand where relevant
 
 ## Code quality
+- TypeScript strict mode passes when code exists
+- no unexplained `any`
+- boundaries are preserved
+- external/persisted/model inputs are runtime validated
+- failures are typed/actionable
 
-- TypeScript strict mode passes.
-- No unexplained `any`.
-- No architecture boundary violations.
-- Public/external/persisted inputs are runtime validated.
-- Errors are typed and actionable.
-
-## Tests
-
-- relevant unit tests exist
-- integration tests exist for cross-boundary behavior
-- regression tests exist for fixed defects
+## Tests/evidence
+- relevant tests exist
+- regressions get regression tests
 - no production account is required for CI
+- acceptance evidence is named in the handoff
 
 ## Security
-
-- no secrets committed
-- no session/auth data logged
-- no credentials passed to AI unless explicitly reviewed
-- third-party content has no Node/filesystem/shell access
-- security challenges do not get silently bypassed
+- no secrets committed/logged
+- no session/auth data sent to AI by default
+- remote content gets no Node/filesystem/shell privileges
+- no security challenge bypass
 
 ## Documentation
+Update canonical documents when behavior, architecture, product semantics, or acceptance changes.
 
-Update documentation when:
-- commands change
-- architecture changes
-- Workflow IR changes
-- data model changes
-- security behavior changes
-- user-visible behavior changes materially
-
-## Operational behavior
-
-- timeouts/cancellation exist for external operations
-- failure does not silently become success
-- logs contain correlation/run context
+## Operational truth
+- external operations have timeout/cancellation where applicable
+- failure never silently becomes success
+- evidence/provenance can be inspected
 - sensitive fields are redacted
 
 ---
 
-# A0 — Repository foundation acceptance
+# D0 — Design Contract acceptance
 
-Milestone 0 is complete when:
+D0 is complete when:
 
-### Fresh clone
+1. all required `design/` contract documents exist
+2. "Simple by default, transparent on demand" is explicit and operationalized
+3. Intent Home is the primary entry pattern, not a dense dashboard
+4. natural language/Markdown is the primary authoring mechanism
+5. ordinary flows do not require IDs, DSL, cron, selectors, workflow nodes, or machine configuration
+6. Simple / Execution / Inspection layers are defined
+7. progressive-disclosure rules specify what is hidden by default vs inspectable
+8. contextual UI rules cover Source connection, ambiguity, confirmation, takeover, repair, and professional detail
+9. component specs include all meaningful states (idle/loading/success/failure/paused/disabled where applicable)
+10. screen specs cover the golden screens listed in DEVELOPMENT-PLAN
+11. the golden user flow is documented end-to-end
+12. image-generation mockups are treated as visual references, while written specs are implementation authority
+13. dense prior SaaS/dashboard explorations are explicitly non-canonical
+14. a Reviewer can determine whether a future UI implementation matches the design without inventing missing behavior
 
-A developer/agent can run:
+Required evidence:
+- committed design contract
+- reviewer checklist/mapping against D0 criteria
+
+---
+
+# P0 — Interactive Mock Prototype acceptance
+
+P0 is complete when:
+
+1. Electron + React prototype launches
+2. prototype uses deterministic mocks and does not require real AI/WeChat/Git/backend automation
+3. user can author the example task in ordinary natural language
+4. FlowPilot shows a concise AI Understanding Review
+5. Source connection appears only because the referenced Source is missing/unconnected
+6. Source selection/authorization does not expose internal IDs
+7. Input Preview shows the concrete article/cover selected for this run
+8. simulated execution shows only useful default progress
+9. irreversible publish pauses for explicit confirmation
+10. success state is intentionally minimal
+11. user can expand professional details after success
+12. professional details expose mock provenance (TaskPlan/GoalPlan/Flow revision, Source version, InputBundle/run timeline)
+13. technical detail is not permanently visible on the default path
+14. navigation and page density conform to the D0 contract
+15. the complete golden path can be demonstrated without explaining hidden UI conventions
+
+Required evidence:
+- automated build/typecheck where applicable
+- screenshots/video or deterministic E2E walkthrough
+- design-contract review
+- handoff identifying usability gaps found
+
+---
+
+# E0 — Engineering Foundation acceptance
+
+E0 is complete when a clean clone can run documented setup and:
 
 ```
-corepack enable
 pnpm install
 pnpm typecheck
 pnpm lint
@@ -70,207 +113,152 @@ pnpm build
 pnpm dev
 ```
 
-without undocumented manual setup beyond platform prerequisites.
-
-### Desktop security
-
-Verify:
-- Renderer does not have Node integration.
-- Context isolation is enabled.
-- preload exposes narrow typed APIs.
-- third-party WebContentsView receives no privileged preload API.
-
-### CI
-
-A pull request runs automated:
-- typecheck
-- lint
-- unit tests
-- build
-
-### Fixture platform
-
-Tests can deterministically choose fixture variants:
-- v1
-- v2
-- v3
-- auth expired
-- security challenge
-- publish success/failure
-
-No real remote platform is required.
+Additional:
+1. Renderer has no Node integration
+2. context isolation is enabled
+3. preload is narrow and typed
+4. third-party WebContentsView has no privileged preload surface
+5. CI runs typecheck/lint/test/build
+6. deterministic fixture site supports required variants
+7. root commands are documented
+8. no undocumented production credential is required
 
 ---
 
-# A1 — Deterministic runtime acceptance
+# E1 — Intent Compiler acceptance
 
-Milestone 1 is complete when:
+E1 is complete when:
 
-1. A valid Flow IR document can be loaded and validated.
-2. The runtime executes a complete fixture publishing flow using BrowserDriver.
-3. No LLM/API model call occurs during the run.
-4. Each meaningful step verifies its postcondition.
-5. Missing targets produce TARGET_NOT_FOUND.
-6. Ambiguous targets produce TARGET_AMBIGUOUS.
-7. Wrong resulting page/state produces POSTCONDITION_FAILED or NAVIGATION_UNEXPECTED.
-8. A successful run records step evidence and ends SUCCEEDED.
-9. A failed run ends FAILED with typed failure context.
-10. Browser-specific objects do not appear in persisted Workflow IR.
+1. Goal can be authored as ordinary Markdown
+2. Task can be authored as ordinary Markdown
+3. no internal ID/DSL/cron is required
+4. Goal source compiles to schema-validated versioned GoalPlan
+5. Task source compiles to schema-validated versioned TaskPlan
+6. unambiguous semantic references resolve to stable internal entities
+7. material ambiguity returns a structured clarification requirement
+8. user-facing text remains human-readable outside FlowPilot
+9. changing Markdown creates a new compiled-plan revision
+10. prior plan revisions remain auditable
+11. provider access is behind a provider-neutral interface
+12. fake/deterministic compiler providers support CI tests
+13. unsafe/invalid structured model output is rejected
 
 Required proof:
-- automated tests
-- one E2E fixture run
+- natural-language fixture → structured plans
+- ambiguity fixture → clarification
+- modified source → revision N+1
 
 ---
 
-# A2 — Persistence/session acceptance
+# E2 — Source / InputBundle / Scheduling acceptance
 
-Milestone 2 is complete when:
+E2 is complete when:
 
-1. A Flow persists across application restart.
-2. Flow revisions remain immutable.
-3. A Run references the exact revision executed.
-4. Two accounts on the same platform use isolated browser sessions.
-5. Session A cannot see Session B's cookies/auth state in the fixture environment.
-6. Removing an account clears its local browser/session material.
-7. database migrations run atomically.
-8. an interrupted/failed migration does not silently corrupt the existing DB.
-9. secrets are stored through the secret abstraction, not ordinary plaintext columns/logs.
-
----
-
-# A3 — Goal compilation and Discovery acceptance
-
-Milestone 3 is complete when:
-
-1. The model provider is accessed through a provider-neutral interface.
-2. A user can author a Goal as ordinary Markdown without internal IDs, @goal/@source syntax, cron, selectors, or FlowPilot DSL.
-3. Goal Markdown compiles into a schema-validated versioned GoalPlan.
-4. A material ambiguity in Goal/platform/account resolution produces a structured clarification request instead of a silent guess.
-5. A sanitized snapshot is produced before every discovery model call.
-6. Fixture-injected fake secrets do not appear in captured model request fixtures.
-7. Discovery returns structured data validated by schema.
-8. Invalid model output is rejected safely.
-9. A discovered workflow must be compiled/validated before persistence.
-10. Fixture v1 can be learned from a GoalPlan.
-11. The persisted learned Flow can later execute with zero model calls.
-12. Changing Goal Markdown creates a new compiled plan revision rather than silently mutating the prior plan.
-
-Required proof:
-
-```
-goal
-→ AI discovery
-→ Flow revision 1
-→ close/reload runtime
-→ execute revision 1 without AI
-→ success
-```
+1. Local Folder Source is explicitly authorized and scoped
+2. Local Git Repository Source is explicitly authorized and scoped
+3. natural language cannot expand filesystem access beyond authorized Sources
+4. Source data is resolved before Flow execution
+5. Run receives an immutable InputBundle
+6. changing a source file after InputBundle creation does not silently change the running Run
+7. Git provenance records exact commit SHA + selected paths/hashes
+8. required Goal inputs are validated before execution
+9. missing inputs follow explicit Task policy
+10. deterministic idempotency prevents duplicate irreversible publishing for the same logical input/destination
+11. failed Run does not incorrectly advance consumption state
+12. successful Run records exact TaskPlan, GoalPlan, Source snapshot, InputBundle and destination provenance
+13. no new content can end SKIPPED with typed reason
+14. natural-language schedule normalizes with explicit timezone
+15. SKIP and RUN_ON_NEXT_START missed-schedule policies are supported semantically
+16. tests use local fixtures only
 
 ---
 
-# A4 — Repair acceptance
+# E3 — Deterministic Workflow Runtime acceptance
 
-This is the most important technical milestone.
+E3 is complete when:
 
-Milestone 4 is complete only when this automated scenario passes:
-
-## Scenario
-
-1. Start fixture platform in v1.
-2. Discover or load a valid v1 Flow.
-3. Execute successfully.
-4. Switch fixture platform to v2.
-5. Execute old Flow.
-6. Runtime fails at the changed region with a typed failure.
-7. Repair receives bounded context.
-8. Repair proposes a local patch.
-9. Candidate patch is policy/schema validated.
-10. Candidate patch is trial-executed.
-11. Expected state is reached.
-12. Flow revision N+1 is persisted.
-13. Revision N remains available.
-14. Execute revision N+1 again.
-15. Run succeeds.
-16. Second successful run does not invoke AI.
-
-Additional criteria:
-- repair cannot modify secret/session state
-- repair cannot override hard-pause security policy
-- repair records provenance and diff
-- invalid repair proposal leaves prior Flow untouched
+1. Workflow IR validates
+2. complete fixture flow executes through BrowserDriver
+3. no LLM call occurs on happy-path execution
+4. every meaningful Step verifies postconditions
+5. missing target → TARGET_NOT_FOUND
+6. ambiguous target → TARGET_AMBIGUOUS
+7. unexpected state/navigation produces typed failure
+8. successful Run records step evidence
+9. failed Run records typed context
+10. browser-library objects do not leak into persisted Workflow IR
+11. BrowserDriver contract tests pass
+12. one end-to-end fixture run passes
 
 ---
 
-# A5 — Human takeover/risk acceptance
+# E4 — AI Discovery / Repair acceptance
 
-Milestone 5 is complete when:
+E4 is complete only when the automated scenario passes:
 
-1. Fixture CAPTCHA state pauses automation.
-2. Fixture MFA/security challenge pauses automation.
-3. QR login state can request user takeover.
-4. Runtime does not ask AI to solve/bypass those challenges.
-5. User can manually interact with the page.
-6. Returning control triggers a fresh snapshot.
-7. Resume occurs only if a recognized safe state is verified.
-8. Unknown/unsafe state does not auto-resume.
-9. destructive-action confirmation can pause before execution.
-10. rate-limit state uses backoff/pause rather than rapid retry.
+1. start fixture v1
+2. discover/compile a valid Flow
+3. execute successfully
+4. execute again with zero model calls
+5. switch fixture to v2
+6. old Flow fails with typed localized failure
+7. bounded RepairContext is created
+8. repair proposes a local patch
+9. patch passes schema/policy validation
+10. candidate is trial-executed
+11. expected state is reached
+12. revision N+1 is persisted
+13. revision N remains available
+14. revision N+1 executes successfully again
+15. second success uses zero model calls
 
----
-
-# A6 — WeChat Official Accounts MVP acceptance
-
-This milestone is real-platform validation and should not be required in automated CI.
-
-Use a controlled test account.
-
-Acceptance:
-
-1. User can add the platform/account.
-2. App opens the correct official platform page.
-3. User can complete QR login manually.
-4. Closing/restarting the app reuses the existing valid session when available.
-5. A previously learned article workflow can open the editor.
-6. Title can be inserted.
-7. Body can be inserted.
-8. supported cover/summary operations work.
-9. runtime can reach the publish confirmation stage.
-10. irreversible publish requires the configured confirmation policy.
-11. success is verified using page/platform state, not only a click result.
-12. login expiration becomes a typed auth/user-intervention state.
-13. a minor compatible UI change can trigger bounded repair rather than full relearning.
-14. no CAPTCHA/MFA/security bypass is attempted.
-
-Evidence should include:
-- run log
-- workflow revision
-- repair record if repair was exercised
-- manual validation notes
-
+Additional:
+- secrets/session state never enter model context
+- repair cannot override hard-stop safety policy
+- invalid repair leaves prior Flow untouched
+- repair provenance/diff is inspectable
 
 ---
 
-# A7 — Task, Source, and scheduled automation acceptance
+# E5 — Human Takeover / Risk acceptance
 
-Milestone 7 is complete when:
+E5 is complete when:
 
-1. A user can author a Task in ordinary Markdown such as “每天早上 8 点从我的行业学习仓库找到今天最新的文章并发布到微信公众号”.
-2. The Markdown does not require internal Goal IDs, Source IDs, cron expressions, or binding syntax.
-3. FlowPilot can semantically resolve an unambiguous existing Goal and authorized Source.
-4. Material ambiguity produces contextual clarification rather than guessing.
-5. Local Folder access is scoped to a user-authorized root.
-6. Local Git Repository runs record the exact commit SHA and selected file paths/content hashes.
-7. Source data is fully resolved before the Flow begins.
-8. A Run receives an immutable InputBundle and does not silently reread changed Source files mid-run.
-9. Missing required Goal inputs follow an explicit Task policy and cannot silently become empty values.
-10. Two runs with the same irreversible destination and same deterministic idempotency key cannot both successfully publish the same source version.
-11. A failed Run does not incorrectly advance the Source consumption cursor.
-12. A successful Run records sufficient provenance to identify the exact GoalPlan, TaskPlan, Flow revision, Source snapshot, and InputBundle used.
-13. “No content today” can end as SKIPPED with a typed reason rather than FAILED.
-14. Natural-language schedules are normalized with an explicit timezone.
-15. Missed schedule policy supports at least SKIP and RUN_ON_NEXT_START.
-16. Scheduler tests use fixture/local sources and never publish to production accounts in CI.
+1. CAPTCHA fixture pauses
+2. MFA/security fixture pauses
+3. QR login can request takeover
+4. runtime never asks AI to bypass those controls
+5. user can manually interact
+6. returning control triggers fresh snapshot
+7. resume occurs only from recognized safe state
+8. unsafe/unknown state does not auto-resume
+9. destructive confirmation can pause before execution
+10. rate limit uses backoff/pause, not rapid retries
+11. default UI remains simple while professional detail can explain the pause
+
+---
+
+# E6 — WeChat Official Accounts MVP acceptance
+
+Real-platform validation uses a controlled test account and is not CI-required.
+
+E6 is complete when:
+
+1. account/platform can be added
+2. official page opens in isolated persistent session
+3. user completes QR login manually
+4. valid session can survive app restart
+5. persisted learned article Flow opens editor
+6. title is inserted
+7. body is inserted
+8. supported cover/summary input works
+9. run reaches publish confirmation
+10. irreversible publish follows confirmation policy
+11. success is verified from platform/page state, not click success alone
+12. login expiration becomes typed intervention state
+13. a minor compatible UI change can use bounded repair
+14. no CAPTCHA/MFA/security/stealth bypass is attempted
+15. Run evidence identifies exact input/source/Flow used
 
 ---
 
@@ -278,14 +266,13 @@ Milestone 7 is complete when:
 
 A distributable release additionally requires:
 
-- packaging test on supported OS targets
+- packaging smoke tests for supported targets
 - no development secrets bundled
-- migrations tested from previous release
-- crash on startup not observed in smoke test
-- application data location documented
-- uninstall/account removal behavior reviewed
-- release notes
-- version number
+- migration path tested from previous release
+- startup smoke test
+- application-data location documented
+- account/source removal behavior reviewed
+- release notes/version
 - code signing when public distribution begins
 
 ---
@@ -296,8 +283,9 @@ Order of authority:
 
 1. direct maintainer decision
 2. accepted ADR
-3. this acceptance specification
+3. this specification
 4. DEVELOPMENT-PLAN.md
-5. GitHub Issues / task notes
+5. product/design/architecture/security docs
+6. Task Packets / Issues
 
-An Issue may add stricter acceptance criteria, but must not silently weaken these requirements.
+A Task Packet or Issue may be stricter, but cannot silently weaken these gates.
