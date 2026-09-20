@@ -2,7 +2,7 @@
 
 ## Architectural objective
 
-FlowPilot is a local-first desktop application whose durable asset is a set of versioned workflows. AI helps discover and repair those workflows; it is not the workflow runtime.
+FlowPilot is a local-first, intent-first desktop automation runtime. Human intent is authored primarily in natural language/Markdown and compiled into structured plans. Its durable assets include versioned GoalPlans, TaskPlans, Sources, Workflows, and Run provenance. AI helps interpret intent, discover workflows, and repair them; it is not the deterministic workflow runtime.
 
 ## Runtime topology
 
@@ -30,6 +30,10 @@ Renderer has no direct filesystem/database/Node access beyond narrow preload API
 
 ### Automation Worker / Application Services
 Owns:
+- natural-language Goal/Task compilation orchestration
+- semantic entity resolution
+- Source Manager and InputBundle construction
+- scheduler/task orchestration when enabled
 - Flow loading
 - planning of deterministic execution
 - executor
@@ -56,6 +60,9 @@ apps/
 
 packages/
   domain/             # entities, IDs, error taxonomy
+  goal-ir/            # GoalPlan schema/compiler boundary
+  task-ir/            # TaskPlan schema/compiler boundary
+  source-core/        # Source providers, permissions, snapshots
   workflow-ir/        # Flow schema and compiler primitives
   workflow-runtime/   # executor, validator, retry, resume
   browser-driver/     # interface + contract tests
@@ -71,6 +78,46 @@ packages/
 ```
 
 Not all packages need to exist on day one. Extract only when a boundary becomes real, but preserve dependency direction.
+
+## Product compilation model
+
+FlowPilot separates the human source from machine execution:
+
+```
+Goal.md / Task.md
+      ↓
+semantic compilation
+      ↓
+GoalPlan / TaskPlan
+      ↓
+Source resolution
+      ↓
+immutable InputBundle
+      ↓
+Flow discovery/selection
+      ↓
+versioned Flow
+      ↓
+Run
+```
+
+Rules:
+- human-facing Markdown remains normal prose and must not require internal IDs or DSL syntax
+- semantic phrases are resolved to stable internal entity references
+- materially ambiguous resolution pauses for a user choice rather than guessing
+- compiled plans are versioned artifacts
+- a Run binds exact plan/Flow revisions and immutable input provenance
+- repair updates Flow revisions; it does not silently rewrite the user's Goal
+
+See `PRODUCT-MODEL.md` and `TASK-SOURCE-RUNTIME.md`.
+
+## Source and input model
+
+A Source is an explicit permission boundary. Natural-language references never grant arbitrary filesystem or repository access.
+
+Before execution, Source data is resolved into an immutable InputBundle. The workflow must not reread mutable Source data mid-run.
+
+Scheduled/recurring tasks require deterministic idempotency and consumption semantics so the same source version is not accidentally published twice.
 
 ## Browser model
 
@@ -202,6 +249,10 @@ Generic runtime behavior stays generic.
 SQLite stores structured application state:
 - platforms
 - accounts (non-secret metadata)
+- goals / goal revisions / compiled GoalPlans
+- tasks / task revisions / compiled TaskPlans
+- sources / scoped permissions / source cursors
+- input bundles / source provenance / consumption records
 - flows
 - flow_versions
 - runs
