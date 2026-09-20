@@ -1,56 +1,71 @@
-# Documentation Language Policy
+# 文档语言规范
 
-FlowPilot maintains two human-readable documentation languages:
+FlowPilot 的长期项目文档默认且仅使用**简体中文**。简体中文文档是规划、实现、验收和 Codex 行为的规范源。
 
-- **English** — canonical/default
-- **简体中文** — synchronized reading mirror
+## 规范源规则
 
-## Canonical rule
+长期文档直接保存在稳定主路径中：
 
-The English document is the source of truth. If English and Chinese disagree, implementation, architecture, acceptance, and Codex behavior follow the English version, and the Chinese mirror should be corrected.
+- `README.md`
+- `AGENTS.md`
+- `docs/<FILE>.md`
+- `docs/adr/<FILE>.md`
+- `design/<FILE>.md`
 
-The Chinese version must never introduce requirements that do not exist in the English canonical document.
+不维护 `*.zh-CN.md`、`docs/zh-CN/`、`design/zh-CN/` 或对应英文副本。Git 历史保留迁移前版本，需要追溯时应查看历史，而不是在当前树中复制一套镜像。
 
-## File layout
+## 适用范围
 
-- `README.md` / `README.zh-CN.md`
-- `AGENTS.md` / `AGENTS.zh-CN.md`
-- `docs/<FILE>.md` / `docs/zh-CN/<FILE>.md`
-- `docs/adr/<FILE>.md` / `docs/zh-CN/adr/<FILE>.md`
-- future stable design docs: `design/<FILE>.md` / `design/zh-CN/<FILE>.md`
+以下长期、面向人的项目文档必须使用简体中文：
 
-## What must be bilingual
+- 项目说明和导航
+- Agent 规范、流程、Task Packet 与 handoff 模板
+- 项目状态、开发计划和验收规范
+- 产品模型、UX、架构、技术、安全和运行时语义
+- 稳定设计契约和 ADR
+- `.codex/agents/*.toml` 中面向 Agent 的 description 与 instructions
+- `work/` 中当前有效的任务说明
 
-Maintain Chinese mirrors for durable human-facing project documents: product model, project state, development plan, acceptance, architecture, technology decisions, security, workflow semantics, development process, stable design contracts, and ADRs.
+源代码、测试、迁移、package/config 键、依赖锁文件、生成产物、Git commit message 和外部协议字段不因本规范而强制翻译。
 
-## What stays English-only by default
+## 保留英文的情况
 
-Do not duplicate source code, tests, migrations, package/config files, `.codex/config.toml`, `.codex/agents/*.toml`, generated artifacts, transient `work/` Task Packets, temporary handoff notes, or commit messages unless there is a specific need.
+在下列情况中，保留英文通常更准确：
 
-## Update rule
+- Goal、Task、Source、InputBundle、Flow、Run、Workflow IR、BrowserDriver 等稳定领域术语
+- 类型名、函数名、变量名、Schema 名、API 名、事件名和错误码
+- 路径、命令、配置键、package 名和第三方产品名
+- 必须与外部系统逐字匹配的文本
+- 代码片段和序列化示例
 
-When a canonical English document changes materially:
+保留必要英文术语不等于保留英文版本。解释、规则、标题和上下文应使用清晰的简体中文。
 
-1. update English first;
-2. update the corresponding Chinese mirror in the same change when practical;
-3. keep headings/structure comparable;
-4. keep code identifiers, schema names, paths, commands, and API names unchanged;
-5. translate meaning, not implementation identifiers.
+## 更新规则
 
-Trivial typo fixes that do not change meaning may defer mirror synchronization.
+长期文档发生实质变化时：
 
-## Codex rule
+1. 直接更新主路径上的中文规范文档；
+2. 同步更新所有受影响的索引、链接、Agent 说明和当前 Task Packet；
+3. 保留代码标识符、Schema、路径、命令和 API 的精确拼写；
+4. 不得在翻译或改写时弱化、合并或遗漏产品、架构、安全、验收和运行时要求；
+5. 当前事实变化时，仅在 Gatekeeper PASS 后由 State Keeper 更新 `PROJECT-STATE.md` 和短期工作队列。
 
-Codex MUST use English canonical documents for planning, implementation, and acceptance. Chinese mirrors are for human readability and must not override English canonical content.
+## Codex 规则
 
-When a Codex task materially changes a durable bilingual document, Builder should update both language versions before Gatekeeper review.
+Codex 在规划、实现和验收时必须读取主路径上的中文规范文档。
 
-Gatekeeper should treat a missing/outdated Chinese mirror as blocking for a deliberate durable documentation change, but non-blocking for code-only changes that do not alter documented semantics.
+当任务实质修改长期文档时，Builder 应在 Gatekeeper 评审前完成受影响中文文档的更新。Gatekeeper 必须把遗留的双语镜像引用、失效链接或规范性内容丢失视为阻塞问题。
 
-## Translation style
+纯代码修改没有改变已记录语义时，不要求无关文档改动。
 
-Use clear Simplified Chinese. Keep precise domain terms such as Goal, Task, Source, InputBundle, Flow, Run, Workflow IR, and BrowserDriver when the English term improves precision. Preserve code and technical identifiers.
+## 写作风格
 
-## Navigation
+- 使用准确、直接的简体中文；
+- 面向普通用户时优先使用自然语言，避免无必要的内部术语；
+- 面向实现者时保留必要的英文领域名和代码标识符；
+- 规范性语句明确使用“必须”“不得”“可以”等词；
+- 示例不能替代规则，也不能悄悄引入新要求。
 
-Top-level documentation indexes should provide obvious links between English and Chinese versions.
+## 导航
+
+顶层 README 和文档索引直接链接稳定主路径，不提供语言切换入口。新增长期文档时，应从适当索引加入链接，并保持相对链接有效。

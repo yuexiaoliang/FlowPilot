@@ -1,58 +1,68 @@
-# Minimal Codex Start Prompt
+# 最小 Codex 启动说明
 
-FlowPilot's development agent framework is Codex-native.
+FlowPilot 的开发 Agent 机制使用 Codex 原生能力。
 
-Project subagents live in:
+项目 subagents：
 
-```
-.codex/agents/
-├── plan_guard.toml
-├── builder.toml
-├── gatekeeper.toml
-└── state_keeper.toml
-```
+    .codex/agents/
+    ├── plan_guard.toml
+    ├── builder.toml
+    ├── gatekeeper.toml
+    └── state_keeper.toml
 
-Codex project multi-agent support is enabled by `.codex/config.toml`.
+`.codex/config.toml` 开启项目多 Agent 支持。
 
-## Preferred default prompt
+## 日常推荐用法
 
-> Continue FlowPilot according to the repository plan. Read AGENTS.md and the canonical documents first. Use the project Codex subagents with the Plan Guard → Builder → Gatekeeper → State Keeper loop. Complete only one bounded current slice. Do not jump phases or redesign locked decisions. If Gatekeeper fails, fix only the blocking gaps and re-review. Only after PASS may State Keeper update PROJECT-STATE/work. Leave a handoff with actual validation evidence.
+正常开发时，你通常只需要在 FlowPilot 仓库里说：
 
-## Specific Task Packet
+> 继续开发。
 
-> Implement the Task Packet at <path>. Follow AGENTS.md. Use the project Codex plan_guard before implementation, builder for the bounded slice if delegation is useful, gatekeeper after implementation, and state_keeper only after PASS. Do not broaden scope.
+`AGENTS.md` 会要求主 Codex 自动执行 Plan Guard → Builder → Gatekeeper → State Keeper。
 
-## Review only
+## 完整兜底 Prompt
 
-> Use the FlowPilot gatekeeper subagent to independently validate the latest bounded slice against the applicable ACCEPTANCE.md criteria. Return PASS or FAIL with concrete evidence/gaps. Do not redesign the product or weaken acceptance.
+只有当某次 Codex 明显没有按仓库流程执行时，才需要使用较长的兜底说明：
 
-## State maintenance only
+> 按仓库计划继续开发 FlowPilot。先阅读 AGENTS.md 和规范文档。使用项目 Codex subagent 执行 Plan Guard → Builder → Gatekeeper → State Keeper 闭环。只完成一个有界的当前切片；不得跳阶段或重新设计已锁定决策。Gatekeeper 失败时，只修复阻塞缺口并重新评审。只有 PASS 后 State Keeper 才能更新 PROJECT-STATE / work。最后留下包含真实验证证据的 handoff。
 
-> Use the FlowPilot state_keeper subagent. Proceed only if the referenced Gatekeeper verdict is PASS. Update PROJECT-STATE and the short-term work queue; do not implement product code or create a long backlog.
+## 指定 Task Packet
 
-## Codex-first convention
+> 实现 `<path>` 中的 Task Packet。遵守 AGENTS.md；实现前使用 plan_guard，实现后使用 gatekeeper，并且只在 PASS 后使用 state_keeper。不得扩大范围。
 
-For future agent automation in this repository, prefer Codex-native facilities first:
-- `AGENTS.md` for persistent project instructions
-- `.codex/agents/*.toml` for reusable custom subagents
-- `.codex/config.toml` for project-level Codex configuration
-- Codex skills for repeatable workflows when a role alone is insufficient
-- MCP for external systems when needed
-- hooks only for concrete enforceable lifecycle policies
+## 只做验收
 
-Do not invent a parallel generic agent specification unless Codex cannot express the required behavior.
+> 使用 FlowPilot gatekeeper subagent，依据 ACCEPTANCE.md 独立验证最新有界切片，并返回 PASS 或 FAIL。
 
-## What the maintainer should not need to repeat
+## 只维护项目状态
 
-The repository already defines:
-- product philosophy
-- current phase
-- development order
-- acceptance criteria
-- technology baseline
-- Goal/Task/Source/Flow/Run model
-- natural-language UX rules
-- security boundaries
-- how Codex subagents coordinate
+> 使用 FlowPilot state_keeper subagent。只有已有 Gatekeeper PASS 时才能继续。更新 PROJECT-STATE 和短期工作队列；不要实现产品代码。
 
-A new Codex session should read those rather than asking the maintainer to retell project history.
+## Codex-first 约定
+
+未来新增 Agent 自动化时，优先使用：
+
+- `AGENTS.md`
+- `.codex/config.toml`
+- `.codex/agents/*.toml`
+- Codex skills
+- MCP
+- hooks
+
+只有 Codex 无法表达需求时，才考虑额外 Agent 规范格式。
+
+## Maintainer 不需要重复的内容
+
+仓库已经记录：
+
+- 产品哲学
+- 当前阶段
+- 开发顺序
+- 验收标准
+- 技术基线
+- Goal / Task / Source / Flow / Run 模型
+- 自然语言 UX 规则
+- 安全边界
+- Codex subagent 调度方式
+
+新 Codex 会话应读取仓库，而不是让 Maintainer 重新讲项目历史。

@@ -1,6 +1,6 @@
-# FlowPilot project-level Codex configuration.
-# Keep this intentionally minimal. Model/reasoning choices inherit from the
-# invoking Codex session so the repository does not pin itself to a stale model.
+# FlowPilot 项目级 Codex 配置。
+# 此处有意保持精简。模型和推理强度继承启动本任务的 Codex 会话，
+# 避免仓库固定到已经过时的模型。
 
 [agents]
 enabled = true

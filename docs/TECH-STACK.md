@@ -1,78 +1,87 @@
-# Technology Stack
+# 技术栈
 
-This document records the default implementation choices for FlowPilot. Replacing a **Locked** choice requires an ADR.
+本文件记录 FlowPilot 的默认实现选择。替换标记为 **Locked** 的选择必须通过 ADR。
 
-| Area | Choice | Status | Rationale |
+| 领域 | 选择 | 状态 | 原因 |
 |---|---|---|---|
-| Desktop runtime | Electron | **Locked** | We need a bundled, controllable Chromium and deep session/WebContents integration across desktop platforms. |
-| Language | TypeScript, strict | **Locked** | Shared types across UI, IPC, runtime, workflow schemas, and browser adapters. |
-| UI | React | Default | Large ecosystem, predictable agent support, no requirement for SSR. |
-| UI build | Vite | Default | Fast desktop renderer development; aligns with Electron tooling. |
-| Embedded remote browser | WebContentsView | **Locked** | First-class Electron controlled web content; avoids the discouraged `<webview>` path. |
-| Production browser control | Electron webContents/CDP behind ElectronDriver | **Locked boundary** | Keeps the viewed page and automated page identical. |
-| Automation/testing | Playwright | Default | Excellent locators, browser integration, test fixtures, and dev/debug tooling. It is an adapter/helper, not the domain runtime. |
-| Workflow runtime | FlowPilot custom | **Locked** | This is the core product asset; must be versioned, provider-independent, and self-healing. |
-| Validation | Zod | Default | Runtime schemas at persistence/AI/IPC boundaries. |
-| Local DB | SQLite | **Locked for MVP** | Local-first desktop state, transactions, migrations, no server requirement. |
-| SQLite access | Drizzle ORM + better-sqlite3 initially | Default | Typed schema/migrations with a mature SQLite driver. Isolate behind repositories so driver can change later. |
-| UI state | Zustand | Default | Small state layer; keep durable/business state outside renderer stores. |
-| Package manager | pnpm workspaces | **Locked** | Efficient monorepo and deterministic lockfile. |
-| Unit/integration tests | Vitest | Default | TypeScript/Vite-friendly. |
-| E2E | Playwright Test | Default | Cross-process/renderer/browser testing and deterministic fixture-site testing. |
-| Packaging | Electron Forge | Default | Electron-focused packaging/rebuild/publishing integration. |
-| CI | GitHub Actions | Default | Repository-native checks. |
-| Secrets | Electron safeStorage + OS facilities | **Locked policy** | No plaintext credential persistence. |
-| AI SDK | provider adapters, no domain dependency on vendor SDK | **Locked boundary** | Avoid model/vendor lock-in. |
+| Desktop runtime | Electron | **Locked** | 需要统一、可控的 Chromium，以及深度 Session / WebContents 集成。 |
+| Language | TypeScript strict | **Locked** | UI、IPC、runtime、schema、adapter 共用类型。 |
+| UI | React | Default | 生态成熟、Agent 支持稳定，不需要 SSR。 |
+| UI build | Vite | Default | 桌面 renderer 开发快，适合 Electron。 |
+| Embedded browser | WebContentsView | **Locked** | Electron 原生受控 web content，避免 `<webview>` 路线。 |
+| Production browser control | Electron webContents/CDP behind ElectronDriver | **Locked boundary** | 保证用户看到和自动化控制的是同一页面。 |
+| Automation/testing | Playwright | Default | locator、测试、调试优秀，但它是 adapter/helper，不是 domain runtime。 |
+| Workflow runtime | FlowPilot custom | **Locked** | 这是核心产品资产，必须版本化、provider-independent、可自愈。 |
+| Validation | Zod | Default | 用于 persistence / AI / IPC 边界。 |
+| Local DB | SQLite | **Locked for MVP** | Local-first、事务、迁移、不依赖 server。 |
+| SQLite access | Drizzle ORM + better-sqlite3 initially | Default | typed schema / migration，且隔离在 repository 层。 |
+| UI state | Zustand | Default | 轻量；durable / business state 不放 renderer store。 |
+| Package manager | pnpm workspaces | **Locked** | 适合 monorepo，lockfile 稳定。 |
+| Unit/integration tests | Vitest | Default | TypeScript / Vite 友好。 |
+| E2E | Playwright Test | Default | 适合桌面 / browser / fixture 测试。 |
+| Packaging | Electron Forge | Default | Electron 打包、rebuild、发布能力完整。 |
+| CI | GitHub Actions | Default | 与仓库原生集成。 |
+| Secrets | Electron safeStorage + OS facilities | **Locked policy** | 不允许明文持久 credential。 |
+| AI SDK | provider adapters | **Locked boundary** | domain 不依赖厂商 SDK，避免模型 / 厂商锁定。 |
 
-## Node and dependency versions
+## Node 与依赖版本
 
-Do not hard-code version numbers into architecture documentation. The repository is authoritative through:
+架构文档不写死版本号。实际版本以仓库中的以下文件为准：
+
 - `package.json#engines`
 - `package.json#packageManager`
 - `pnpm-lock.yaml`
 
-Bootstrap should choose a supported Node active-LTS line compatible with the chosen Electron release and pin the package manager.
+Bootstrap 选择与 Electron 兼容的受支持 Node active-LTS，并固定 package manager。
 
-Dependencies use exact or controlled ranges according to the repository update policy. Major upgrades are separate PRs.
+依赖应根据仓库更新策略使用精确版本或受控范围。大版本升级应独立 PR，不与普通 feature 混合。
 
-## Why Electron rather than Tauri
+## 为什么选 Electron 而不是 Tauri
 
-FlowPilot is browser-centric. Electron gives the desktop product one bundled Chromium behavior model and exposes sessions, WebContentsView, navigation, permissions, and CDP through one runtime. Tauri's system WebView strategy is attractive for small desktop apps but introduces engine differences that are undesirable for persisted web workflows.
+FlowPilot 的核心是浏览器。Electron 提供统一 Chromium 运行时，并直接暴露 session、WebContentsView、navigation、permission 和 CDP。
 
-This is an architecture choice, not a general claim that Electron is better than Tauri.
+Tauri 对普通小型桌面 App 很有吸引力，但依赖系统 WebView，会带来不同 OS 的浏览器引擎差异，不利于持久化网页 Workflow。
 
-## Why WebContentsView
+这是 FlowPilot 的具体架构选择，不代表 Electron 普遍优于 Tauri。
 
-Remote platform UI must be visible to the user and controllable by the runtime. WebContentsView lets Main own the untrusted page separately from the trusted React renderer. Do not use `<webview>` as an implementation shortcut.
+## 为什么是 WebContentsView
 
-## Why BrowserDriver exists
+第三方平台 UI 需要同时可见、可由 runtime 控制。WebContentsView 可以由 Main 独立拥有不可信页面。
 
-Without BrowserDriver, platform features gradually become coupled to Playwright selectors, Electron APIs, or CDP commands. That would make Workflow IR impossible to keep implementation-neutral.
+不要为了省事使用 `<webview>`。
 
-Only driver packages may depend on browser-specific control APIs.
+## 为什么需要 BrowserDriver
 
-## Playwright's role
+如果没有 BrowserDriver，平台功能会逐渐直接耦合 Playwright selector、Electron API、CDP。
 
-Use Playwright for:
+那会让 Workflow IR 无法保持实现中立。
+
+只有 driver package 可以依赖 browser-specific control API。
+
+## Playwright 的角色
+
+使用 Playwright：
+
 - automated tests
 - local fixture workflows
 - driver contract verification
-- development/debug experiments
-- optional fallback/dev driver
+- development / debug experiments
+- optional fallback / dev driver
 
-Do not serialize Playwright Locator objects or Playwright-specific selectors into Workflow IR.
+不要把 Playwright Locator 或 Playwright-specific selector 序列化进 Workflow IR。
 
-## SQLite guidance
+## SQLite 说明
 
-Persistence is accessed through repositories. Renderer never touches SQLite.
+持久化只能经过 repository 层；Renderer 不直接访问 SQLite。
 
-The initial `better-sqlite3` choice is intentionally isolated because it is a native module and must be rebuilt for Electron during packaging. Electron Forge/rebuild configuration must be covered by a packaging smoke test.
+初始 `better-sqlite3` 是 native module，Electron 打包时需要 rebuild，因此必须有 packaging smoke test。
 
-If Node's built-in SQLite support becomes the clearly safer production choice for the pinned runtime, migrate behind the repository layer via ADR rather than leaking either API into domain code.
+如果未来 Node 内置 SQLite 明显更适合固定 runtime，应通过 ADR 在 repository 层替换，而不是让两套 API 泄漏到 domain。
 
-## AI providers
+## AI provider
 
-Define a provider-neutral interface such as:
+定义 provider-neutral structured model interface，例如：
+
 ```ts
 interface StructuredModel {
   generate<TInput, TOutput>(
@@ -82,22 +91,23 @@ interface StructuredModel {
 }
 ```
 
-Provider-specific SDKs belong in adapters. Model names, prompts, and provider settings are configuration, not Workflow IR.
+厂商 SDK 只存在于 adapter；模型名、prompt、provider 设置属于配置，不属于 Workflow IR。
 
-## What not to add initially
+## 初期不要加入
 
-Do not add without demonstrated need:
+没有明确需求时不要加：
+
 - Next.js
 - Redux
 - NestJS
-- Express/Fastify server
+- Express / Fastify server
 - PostgreSQL
 - Redis
-- Docker requirement for desktop development
-- Nx/Turborepo
+- Docker 作为桌面开发前置
+- Nx / Turborepo
 - Temporal
-- LangChain/LangGraph as the workflow runtime
-- cloud browser vendors
-- stealth browser plugins
+- LangChain / LangGraph 作为 Workflow Runtime
+- Cloud browser vendor
+- stealth browser plugin
 
-These may become valid later, but none is required to prove the core product loop.
+这些未来可能合理，但都不是证明核心闭环的前置条件。

@@ -1,90 +1,58 @@
-# FlowPilot Design Contract
+# FlowPilot 设计契约
 
-[简体中文](zh-CN/README.md)
+本目录中的文档是 FlowPilot 产品体验的实现契约。它们将已批准的产品模型转化为具体规则，使 Builder 能够据此实现、Reviewer 能够据此验证，而不必在交付过程中重新发明产品行为。
 
-The documents in this directory are implementation contracts for FlowPilot's
-product experience. They translate the approved product model into rules that a
-Builder can implement and a Reviewer can verify without inventing product
-behavior during delivery.
+## 权威性
 
-## Authority
+书面契约是行为权威。视觉稿、生成图片、原型和截图可以说明视觉气质、构图或一种可能的布局，但它们不能创设行为，也不能覆盖这些文档。当视觉参考不完整或有歧义时，以书面的屏幕、组件、交互和流程规格为准。
 
-The written contract is the behavioral authority. Visual mockups, generated
-images, prototypes, and screenshots may illustrate tone, composition, or a
-possible layout, but they do not create behavior or override these documents.
-When a visual reference is incomplete or ambiguous, the written screen,
-component, interaction, and flow specifications win.
+`AGENTS.md` 规定的全仓库事实来源优先级仍然适用。特别是，本目录不能弱化 `docs/ACCEPTANCE.md`、改变已批准的产品模型，或更改锁定的架构决策。
 
-The repository-wide source-of-truth order in `AGENTS.md` still applies. In
-particular, this directory cannot weaken `docs/ACCEPTANCE.md`, change the
-approved product model, or alter a locked architecture decision.
+## 契约地图
 
-## Contract map
+设计契约按职责有意拆分：
 
-The Design Contract is intentionally split by responsibility:
-
-| Document | Contract responsibility |
+| 文档 | 契约职责 |
 | --- | --- |
-| `DESIGN-PRINCIPLES.md` | Product-wide rules and review tests for every surface. |
-| `INTERACTION-MODEL.md` | Simple, Execution, and Inspection surfaces and the rules for moving information between them. |
-| `DESIGN-SYSTEM.md` | Visual tokens, typography, spacing, motion, and accessibility rules. |
-| `COMPONENTS.md` | States and behavior of reusable contextual UI primitives. |
-| `SCREEN-SPECS.md` | Required content, hierarchy, and behavior of each golden screen. |
-| `FLOWS.md` | End-to-end transitions, branches, recovery, and the golden path. |
+| `DESIGN-PRINCIPLES.md` | 适用于所有界面的产品级规则与评审测试。 |
+| `INTERACTION-MODEL.md` | Simple、Execution、Inspection 三个界面层级，以及信息在层级间移动的规则。 |
+| `DESIGN-SYSTEM.md` | 视觉令牌、排版、间距、动效和无障碍规则。 |
+| `COMPONENTS.md` | 可复用上下文 UI 原语的状态和行为。 |
+| `SCREEN-SPECS.md` | 各个 golden screen 的必需内容、层级和行为。 |
+| `FLOWS.md` | 端到端转场、分支、恢复和黄金路径。 |
 
-The first three files in this list do not replace the others. A later document
-may add detail, but it must preserve the principles and interaction hierarchy.
+列表中的前三份文件不能替代其余文件。后续文档可以补充细节，但必须保留既有原则和交互层级。
 
-## How Builders use the contract
+## Builder 如何使用契约
 
-Before implementing a user-facing slice, a Builder must:
+实现面向用户的切片前，Builder 必须：
 
-1. identify the user's current outcome and the applicable screen or flow;
-2. place each piece of information on the Simple, Execution, or Inspection
-   surface using `INTERACTION-MODEL.md`;
-3. use a contextual primitive only when a current state requires observation,
-   choice, comparison, approval, or intervention;
-4. implement every applicable component state described in the component and
-   screen specifications;
-5. preserve semantic names in ordinary UI and keep internal references in the
-   Inspection surface;
-6. record acceptance evidence that demonstrates the default path and the
-   on-demand detail path separately.
+1. 识别用户当前的目标结果以及适用的屏幕或流程；
+2. 使用 `INTERACTION-MODEL.md` 将每项信息放入 Simple、Execution 或 Inspection 界面；
+3. 仅当当前状态需要观察、选择、比较、批准或介入时，才使用上下文原语；
+4. 实现组件与屏幕规格中所有适用的组件状态；
+5. 在普通 UI 中保留语义名称，将内部引用留在 Inspection 界面；
+6. 分别记录默认路径与按需详情路径的验收证据。
 
-A Builder must not fill a missing contract decision by adding a permanent form,
-dashboard region, navigation destination, exposed identifier, or new DSL. If a
-material behavior remains unspecified, stop at the design gate and resolve the
-contract first.
+Builder 不能通过增加永久表单、Dashboard 区域、导航目的地、暴露的标识符或新 DSL 来填补缺失的契约决策。如果一项实质行为尚未规定，应停留在设计门禁，先解决契约问题。
 
-## How Reviewers use the contract
+## Reviewer 如何使用契约
 
-A Reviewer should verify observable behavior, not resemblance to a single
-mockup. At minimum, review that:
+Reviewer 应验证可观察行为，而不是界面与某一张视觉稿是否相似。至少应检查：
 
-- the first view centers the user's intent or current outcome;
-- the default path contains only information needed for the next decision;
-- Source authorization, ambiguity, confirmation, and takeover appear only when
-  their triggering state exists;
-- meaningful progress and recovery remain visible during execution;
-- professional detail is reachable from the object or result it explains;
-- the Inspector exposes the underlying structured truth without making it
-  required reading;
-- internal IDs, cron syntax, selectors, workflow nodes, and raw logs are absent
-  from ordinary authoring and operation;
-- the implementation remains understandable with assistive technology, keyboard
-  navigation, zoom, and reduced motion.
+- 首屏是否围绕用户意图或当前目标结果展开；
+- 默认路径是否只包含下一项决策所需的信息；
+- Source 授权、歧义、确认和接管是否仅在对应触发状态存在时出现；
+- 执行期间是否始终能看到有意义的进度和恢复信息；
+- 专业详情是否能从其解释的对象或结果进入；
+- Inspector 是否暴露底层结构化事实，但不要求普通用户必须阅读；
+- 普通创作和操作过程中是否没有内部 ID、cron 语法、选择器、工作流节点和原始日志；
+- 在辅助技术、键盘导航、缩放和减少动态效果的条件下，实现是否仍然可理解。
 
-Passing visual review alone is not acceptance. Review evidence must map to the
-applicable criteria in `docs/ACCEPTANCE.md`.
+仅通过视觉评审并不代表验收通过。评审证据必须映射到 `docs/ACCEPTANCE.md` 中适用的标准。
 
-## Contract change rule
+## 契约变更规则
 
-Changes to this directory are product decisions. Update the English canonical
-document first and its `zh-CN/` mirror in the same change. If a proposed UI
-requires changing Goal, Task, Source, InputBundle, Flow, or Run semantics, update
-the canonical product documentation through the repository decision process
-instead of silently encoding the change in a mockup.
+本目录的变更属于产品决策，必须直接更新主路径上的中文规范文档。如果提议的 UI 需要改变 Goal、Task、Source、InputBundle、Flow 或 Run 的语义，应通过仓库决策流程更新产品规范文档，而不是将变更悄悄编码进视觉稿。
 
-Dense dashboard explorations created before this contract are non-canonical
-reference material. They may contribute an isolated visual idea, but not the
-product hierarchy, navigation model, or information density.
+本契约之前产生的密集型 SaaS/Dashboard 探索均为非规范参考材料。它们可以贡献孤立的视觉想法，但不能决定产品层级、导航模型或信息密度。

@@ -1,76 +1,72 @@
-# Codex Development Workflow
+# Codex 开发流程
 
-FlowPilot development is Codex-native.
+FlowPilot 的开发流程采用 Codex 原生能力。
 
-Project subagents:
+项目 subagents：
 
-```
-.codex/agents/
-├── plan_guard.toml
-├── builder.toml
-├── gatekeeper.toml
-└── state_keeper.toml
-```
+    .codex/agents/
+    ├── plan_guard.toml
+    ├── builder.toml
+    ├── gatekeeper.toml
+    └── state_keeper.toml
 
-Canonical orchestration is defined in `AGENT-OPERATING-PROTOCOL.md`.
+规范调度见 `AGENT-OPERATING-PROTOCOL.md`。
 
-## Start
+## 开始
 
-1. Read `AGENTS.md`.
-2. Read `PROJECT-STATE.md`.
-3. Read `DEVELOPMENT-PLAN.md`.
-4. Read `ACCEPTANCE.md`.
-5. Read the relevant product/design/architecture docs.
-6. Inspect the repository.
+1. 读取 `AGENTS.md`。
+2. 读取 `PROJECT-STATE.md`。
+3. 读取 `DEVELOPMENT-PLAN.md`。
+4. 读取 `ACCEPTANCE.md`。
+5. 读取与当前任务相关的产品 / 设计 / 架构文档。
+6. 检查仓库当前实现。
 
-## Execute one bounded slice
+## 一次只执行一个 bounded slice
 
-Use:
+使用：
 
-```
-plan_guard
-→ builder (or main Codex thread)
-→ gatekeeper
-→ state_keeper
-```
+    plan_guard
+    → builder（或主 Codex 线程）
+    → gatekeeper
+    → state_keeper
 
-Rules:
-- work only in the current phase unless the maintainer explicitly changes direction
-- do not broaden scope because adjacent work is visible
-- Gatekeeper must PASS before State Keeper marks the slice complete
-- State Keeper, not Builder, advances PROJECT-STATE/work
-- use a Task Packet when scope could be misunderstood
+规则：
 
-## Validation
+- 除非 Maintainer 明确改变方向，否则只做当前阶段
+- 不因为看到相邻工作就扩大范围
+- Gatekeeper PASS 后 State Keeper 才能标记完成
+- Builder 不负责推进 PROJECT-STATE / work
+- 范围容易误解时使用 Task Packet
 
-Run only checks that actually apply, and never claim a check passed unless it was executed.
+## 验证
 
-Typical engineering checks:
+只执行真正适用的检查，并且绝不能声称未执行的检查已经通过。
 
-```
-pnpm typecheck
-pnpm lint
-pnpm test
-pnpm test:e2e
-pnpm build
-pnpm package
-```
+典型工程检查：
 
-Design work requires acceptance mapping and reviewer evidence rather than fake command output.
+    pnpm typecheck
+    pnpm lint
+    pnpm test
+    pnpm test:e2e
+    pnpm build
+    pnpm package
 
-## Finish
+设计工作使用 Acceptance 映射和 Reviewer 证据，不要伪造命令输出。
 
-1. Gatekeeper maps actual evidence to `ACCEPTANCE.md`.
-2. If FAIL, return only blocking gaps to Builder.
-3. If PASS, State Keeper updates `PROJECT-STATE.md` and the short-term `work/` queue.
-4. Leave a handoff using `HANDOFF-TEMPLATE.md`.
-5. Report the smallest recommended next slice.
+## 完成
 
-GitHub Issues are optional and never replace this process.
+1. Gatekeeper 将真实证据映射到 `ACCEPTANCE.md`。
+2. FAIL 时只把 blocking gaps 交回 Builder。
+3. PASS 时 State Keeper 更新 `PROJECT-STATE.md` 和短期 `work/` 队列。
+4. 使用 `HANDOFF-TEMPLATE.md` 留下 handoff。
+5. 报告最小推荐下一切片。
 
-## Codex-first convention
+GitHub Issues 是可选的，不替代这套流程。
 
-When adding future agent automation, prefer Codex-native mechanisms:
+## Codex-first
+
+未来增加 Agent 自动化时优先：
+
 - `AGENTS.md`
 - `.codex/config.toml`
 - `.codex/agents/*.toml`
@@ -78,4 +74,4 @@ When adding future agent automation, prefer Codex-native mechanisms:
 - MCP
 - hooks
 
-Only introduce another agent-spec format if Codex cannot express the required behavior.
+只有 Codex 原生机制无法表达需求时，才增加新的 Agent spec 格式。

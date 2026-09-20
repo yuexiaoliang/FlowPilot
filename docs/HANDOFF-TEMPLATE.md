@@ -1,61 +1,59 @@
-# Agent Handoff Template
+# Agent 交接模板
 
-Use this at the end of every bounded FlowPilot agent task.
+每个 bounded FlowPilot Agent 任务结束时使用。
 
-## Role
+## 角色
 
 Builder | Reviewer | Planner
 
-## Task
+## 任务
 
-What bounded task was performed?
+本轮完成的是哪个 bounded task？
 
-## Completed
-
-- ...
-- ...
-
-## Files changed
+## 已完成
 
 - ...
+- ...
 
-## Validation performed
+## 变更文件
 
-List exact checks and outcomes.
+- ...
 
-Example:
+## 已执行验证
 
-```
-pnpm typecheck — PASS
-pnpm test — PASS
-prototype golden path — PASS (manual)
-```
+列出真实执行的检查和结果。
 
-Do not list a check as passing if it was not actually executed.
+例如：
 
-## Acceptance mapping
+    pnpm typecheck — PASS
+    pnpm test — PASS
+    prototype golden path — PASS (manual)
 
-State the exact criteria satisfied.
+没有真正执行的检查不能写 PASS。
+
+## 验收映射
+
+写出实际满足的条目和证据。
 
 - D0.1 — PASS, evidence: ...
 - P0.4 — PARTIAL, remaining: ...
 
-## Product/architecture/security notes
+## 产品 / 架构 / 安全说明
 
-Any material implications or decisions.
+记录实质影响或决策。
 
-## Known limitations
+## 已知限制
 
-What is intentionally not solved?
+哪些问题有意留到后续？
 
-## Remaining work
+## 剩余工作
 
-What is still required in the current phase?
+当前阶段还缺什么？
 
-## Recommended next slice
+## 下一推荐切片
 
-Name the smallest coherent next task.
+推荐下一个最小 coherent task。
 
-## Blockers / maintainer decisions needed
+## 阻塞项 / 所需 Maintainer 决策
 
-Write `None` if none.
+没有就写 `None`。

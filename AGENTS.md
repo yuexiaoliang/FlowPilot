@@ -1,10 +1,10 @@
 # AGENTS.md
 
-This file is mandatory reading for every agent working on FlowPilot.
+每一位参与 FlowPilot 的 Agent 都必须阅读本文件。
 
-## Required reading order
+## 必读顺序
 
-Before doing any work, read:
+开始任何工作前，依次阅读：
 
 1. `docs/PROJECT-STATE.md`
 2. `docs/DEVELOPMENT-PLAN.md`
@@ -13,79 +13,78 @@ Before doing any work, read:
 5. `docs/PRODUCT-MODEL.md`
 6. `docs/NATURAL-LANGUAGE-UX.md`
 7. `docs/TASK-SOURCE-RUNTIME.md`
-8. relevant design/architecture/security/domain docs and ADRs
+8. 与当前任务相关的设计、架构、安全、领域文档和 ADR
 
-FlowPilot is **document-driven, not Issue-driven**. GitHub Issues are optional coordination artifacts.
+FlowPilot 是**文档驱动，而不是 Issue 驱动**。GitHub Issue 只是可选的协作工具。
 
-## Mission
+## 使命
 
-Build FlowPilot as an intent-first desktop automation runtime.
+将 FlowPilot 构建为一个意图优先的桌面自动化运行时。
 
-The user expresses desired outcomes and rules in natural language/Markdown. FlowPilot compiles that intent into structured plans, resolves authorized data Sources, executes deterministic versioned Flows, and uses AI for interpretation, discovery, and repair where appropriate.
+用户用自然语言 / Markdown 表达想要的结果和规则。FlowPilot 将意图编译成结构化计划，解析经过授权的数据 Source，执行确定性、可版本化的 Flow，并在合适的环节使用 AI 做理解、发现和修复。
 
-The architecture must remain usable without any particular LLM vendor, browser automation library, or target platform.
+架构必须避免绑定某个特定 LLM 厂商、浏览器自动化库或目标平台。
 
-## Non-negotiable product rules
+## 不可违反的产品规则
 
-1. **Simple by default, transparent on demand.**
-2. **Natural language is the control plane.** Ordinary users must not be required to author internal IDs, `@goal/...`, `@source/...`, cron syntax, selectors, workflow nodes, or another FlowPilot DSL.
-3. **Users write semantics; the system stores references.**
-4. **Keep Goal, Task, Source, InputBundle, Flow, and Run separate.**
-5. **UI is contextual, not configuration-first.** Prefer natural-language authoring plus concise understanding review and contextual UI primitives over permanent forms.
-6. **Professional detail must remain inspectable.** Simplicity must not become a black box.
-7. **Do not redesign approved product direction while implementing.** Follow the current design gate and written design contracts.
+1. **默认简单，按需透明。**
+2. **自然语言是控制面。** 普通用户不能被要求编写内部 ID、`@goal/...`、`@source/...`、cron 语法、选择器、工作流节点或另一套 FlowPilot DSL。
+3. **用户写语义，系统保存引用。**
+4. **Goal、Task、Source、InputBundle、Flow 和 Run 必须分离。**
+5. **UI 是上下文化的，而不是配置优先。** 与永久表单相比，优先采用自然语言创作、简洁的理解审阅以及上下文 UI 原语。
+6. **专业细节必须可检查。** 简单不能变成黑箱。
+7. **实现阶段不得重新设计已批准的产品方向。** 遵守当前设计门禁和书面设计契约。
 
-## Non-negotiable runtime rules
+## 不可违反的运行时规则
 
-8. **Deterministic runtime first.** Do not add an LLM call to a known happy-path step when deterministic execution can do it.
-9. **All browser operations go through BrowserDriver.**
-10. **Workflow data is versioned and schema-validated.**
-11. **Meaningful Steps require preconditions/postconditions.**
-12. **Repair is local by default.**
-13. **Human takeover is a first-class runtime state.**
-14. **No bot-evasion features.** No CAPTCHA bypass, fingerprint spoofing, webdriver concealment, or anti-bot circumvention.
-15. **Remote web content is untrusted.**
-16. **Secrets do not enter prompts by default.**
-17. **Source permissions are scoped and explicit.**
-18. **Resolve Source data before execution.** A Run uses an immutable InputBundle; do not silently reread changing files mid-run.
-19. **Scheduled irreversible actions require idempotency/deduplication.**
-20. **No hidden fallback.** Uncertainty becomes a typed failure/clarification/intervention, not pretend success.
+8. **确定性运行时优先。** 已知正常路径能确定性执行时，不得增加 LLM 调用。
+9. **所有浏览器操作必须经过 BrowserDriver。**
+10. **Workflow 数据必须版本化并经过 Schema 校验。**
+11. **有意义的 Step 必须包含前置条件和后置条件。**
+12. **Repair 默认只做局部修复。**
+13. **Human Takeover 是一等运行时状态。**
+14. **禁止反机器人规避功能。** 不得绕过 CAPTCHA、伪造指纹、隐藏 webdriver 或规避反机器人机制。
+15. **远程网页内容是不可信输入。**
+16. **Secret 默认不得进入 Prompt。**
+17. **Source 权限必须显式并限定范围。**
+18. **执行前先解析 Source 数据。** Run 使用不可变 InputBundle；执行中不得静默重新读取变化中的文件。
+19. **定时不可逆操作必须具备幂等和去重能力。**
+20. **禁止隐藏回退。** 不确定性必须转成类型化 failure、clarification 或 intervention，不能伪装成功。
 
-## Architecture change rule
+## 架构变更规则
 
-No architecture drift without an ADR.
+没有 ADR 就不得发生架构漂移。
 
-Changing any locked baseline such as:
+修改以下任何已锁定基线，都必须记录决策并协调更新文档：
+
 - Electron
 - React
 - WebContentsView
-- BrowserDriver boundary
-- persistence model
-- Workflow IR semantics
-- trust/security boundaries
+- BrowserDriver 边界
+- 持久化模型
+- Workflow IR 语义
+- 信任 / 安全边界
 
-requires a documented decision and coordinated doc updates.
+## 事实来源优先级
 
-## Source-of-truth order
+指令冲突时，按以下顺序处理：
 
-When instructions conflict:
-
-1. direct maintainer decision
-2. accepted ADR
+1. Maintainer 的直接决定
+2. 已接受的 ADR
 3. `docs/ACCEPTANCE.md`
 4. `docs/DEVELOPMENT-PLAN.md`
-5. `docs/PROJECT-STATE.md` for current phase/status
-6. product/design/architecture/security docs
-7. Task Packets
-8. GitHub Issues/task notes
+5. `docs/PROJECT-STATE.md` 中的当前阶段 / 状态
+6. 产品 / 设计 / 架构 / 安全文档
+7. Task Packet
+8. GitHub Issue / 临时任务说明
 
-A Task Packet or Issue may be stricter, but cannot silently weaken canonical rules.
+Task Packet 或 Issue 可以更严格，但不能静默弱化规范规则。
 
-## Layer boundaries
+## 分层边界
 
-Expected dependency direction:
+预期依赖方向：
 
-```
+```text
 renderer UI
    ↓ IPC/contracts
 desktop application services
@@ -94,107 +93,108 @@ workflow runtime ──→ BrowserDriver interface
    ↓                     ↑
 domain/storage       ElectronDriver / PlaywrightDriver
    ↓
-AI interfaces ← interpretation/discovery/repair only
+AI interfaces ← 仅用于 interpretation / discovery / repair
 ```
 
-Forbidden:
-- renderer importing Electron main implementation
-- workflow/domain importing React/Electron
-- platform adapters bypassing BrowserDriver
-- AI provider SDK types leaking into domain models
-- database row types becoming public domain types
+禁止：
 
-## Implementation style
+- renderer 导入 Electron main 实现
+- workflow / domain 导入 React 或 Electron
+- platform adapter 绕过 BrowserDriver
+- AI provider SDK 类型泄漏到 domain model
+- 数据库行类型成为公开 domain type
+
+## 实现风格
 
 - TypeScript strict mode
-- avoid unexplained `any`
-- validate untrusted/persisted/model inputs with runtime schemas
-- use typed errors/results at boundaries
-- prefer small pure functions for compilation/state evaluation
-- stable opaque IDs internally
-- UTC ISO-8601 timestamps internally; explicit user timezone for schedules
-- structured redacted logs
-- timeout/cancellation for network/AI/browser operations
+- 避免无法解释的 `any`
+- 使用运行时 Schema 校验不可信、持久化或模型输入
+- 在边界处使用类型化 error / result
+- 编译和状态判断优先使用小型纯函数
+- 内部使用稳定、不透明的 ID
+- 内部时间使用 UTC ISO-8601；日程显式记录用户时区
+- 使用结构化、已脱敏日志
+- 网络、AI 和浏览器操作必须支持超时 / 取消
 
-## Required validation
+## 必需验证
 
-At minimum where applicable:
-- domain/IR changes: unit + compatibility tests
-- executor: deterministic runtime tests
-- drivers: contract tests
-- DB: migration tests
-- IPC: contract tests
-- discovery/repair: fixture-based tests
-- critical UI flow: E2E/manual design-contract evidence
-- design work: map explicitly to D0 acceptance criteria
+适用时至少包括：
 
-Never use a live production account in CI.
+- domain / IR 变更：单元测试和兼容性测试
+- executor：确定性运行时测试
+- driver：契约测试
+- DB：迁移测试
+- IPC：契约测试
+- discovery / repair：基于 fixture 的测试
+- 关键 UI 流程：E2E 或手工设计契约证据
+- 设计工作：显式映射 D0 验收标准
 
-## Agent execution
+CI 永远不得使用真实生产账号。
 
-FlowPilot development automation targets **OpenAI Codex by default**.
+## Agent 执行规范
 
-Prefer Codex-native mechanisms for agent behavior:
-- repository instructions in `AGENTS.md`
-- project subagents in `.codex/agents/*.toml`
-- project configuration in `.codex/config.toml`
-- Codex skills/MCP/hooks only when they solve a concrete recurring need
+FlowPilot 的开发自动化默认使用 **OpenAI Codex**。
 
-Do not create parallel custom agent frameworks when Codex already provides the required mechanism.
+优先使用 Codex 原生机制：
 
-Follow `docs/AGENT-OPERATING-PROTOCOL.md`.
+- `AGENTS.md` 中的仓库指令
+- `.codex/agents/*.toml` 中的项目 subagent
+- `.codex/config.toml` 中的项目配置
+- 只有在能解决明确、重复需求时才使用 Codex skill / MCP / hook
 
-For every non-trivial development request such as "继续开发", "继续", "按计划开发", or an assigned Task Packet, the main Codex thread MUST execute this loop:
+Codex 已提供所需机制时，不得另建一套并行自定义 Agent 框架。
 
-```
+遵守 `docs/AGENT-OPERATING-PROTOCOL.md`。
+
+对于“继续开发”“继续”“按计划开发”或已分配 Task Packet 等任何非简单开发请求，主 Codex 线程必须执行：
+
+```text
 plan_guard
-→ builder (or main thread performs the Builder role)
+→ builder（或主线程承担 Builder）
 → gatekeeper
-→ state_keeper (only after GATEKEEPER: PASS)
+→ state_keeper（仅在 GATEKEEPER: PASS 后）
 ```
 
-This is not optional guidance for normal development slices:
+这不是可选建议：
 
-1. **MUST invoke `plan_guard` before implementation** to select/validate the current slice from repository state.
-2. **MUST complete only that bounded slice.**
-3. **MUST invoke `gatekeeper` after implementation.**
-4. If Gatekeeper returns FAIL, **MUST fix only the blocking gaps and re-run Gatekeeper**.
-5. **MUST NOT invoke `state_keeper` on FAIL.**
-6. After PASS, **MUST invoke `state_keeper`** so a future Codex session can resume from repository state.
-7. **MUST stop after one accepted slice** unless the maintainer explicitly asks for multiple slices.
+1. 实现前**必须调用 `plan_guard`**，根据仓库状态选择 / 验证当前切片。
+2. **只完成该有界切片。**
+3. 实现后**必须调用 `gatekeeper`**。
+4. Gatekeeper 返回 FAIL 时，**只能修复阻塞项并重新运行 Gatekeeper**。
+5. FAIL 时**不得调用 `state_keeper`**。
+6. PASS 后**必须调用 `state_keeper`**，使未来 Codex 会话可从仓库状态继续。
+7. 除非 Maintainer 明确要求多个切片，否则**一个已验收切片完成后必须停止**。
 
-The Builder is normally a strong general-purpose agent (often the Main Agent itself). Do not create permanent technology-specific specialist agents without demonstrated need.
+Builder 通常是强通才 Agent，主线程也可以承担此角色。没有明确需求时，不要创建永久技术 Specialist。
 
-Use `docs/TASK-PACKET-TEMPLATE.md` for a bounded slice when useful.
+有助于界定范围时，使用 `docs/TASK-PACKET-TEMPLATE.md`。
 
-At the end, use `docs/HANDOFF-TEMPLATE.md`.
+结束时使用 `docs/HANDOFF-TEMPLATE.md`。
 
-If the maintainer says only:
+当 Maintainer 只说：
 
-> Continue FlowPilot according to the repository plan.
+> 按仓库计划继续开发 FlowPilot。
 
-you must be able to identify the current phase and next appropriate slice from the repository.
+Agent 必须能从仓库中识别当前阶段和下一个正确切片。
 
-## Documentation language
+## 文档语言
 
-English durable documentation is canonical. Simplified Chinese mirrors live under `docs/zh-CN/`, with root mirrors `README.zh-CN.md` and `AGENTS.zh-CN.md`.
+简体中文是所有长期项目文档的唯一默认语言和规范源。长期文档直接保存在稳定主路径中，例如 `README.md`、`AGENTS.md`、`docs/*.md`、`docs/adr/*.md` 和 `design/*.md`；不维护英文副本或 `zh-CN/` 镜像树。
 
-Follow `docs/DOCUMENTATION-POLICY.md`.
+遵守 `docs/DOCUMENTATION-POLICY.md`。
 
-For a task that materially changes a durable bilingual document:
-- Builder MUST update the corresponding Chinese mirror before Gatekeeper review.
-- Gatekeeper MUST treat a missing/outdated mirror as blocking for that documentation change.
-- Code-only changes that do not alter documented semantics do not require mirror edits.
+领域术语、代码标识符、Schema 名、API、命令和路径在保留英文更准确时可以继续使用英文。中文化不得改变既有产品、架构、安全、验收或运行时语义。
 
-Codex planning, implementation, and acceptance MUST use the English canonical version when language versions disagree.
+Codex 的规划、实现和验收必须使用主路径上的中文规范文档。代码变更没有改变已记录语义时，不要求为了改动而改动文档。
 
-## Definition of done
+## 完成定义
 
-A task is done only when:
-- implementation/design artifact exists
-- relevant validation was actually performed
-- applicable acceptance criteria are mapped to evidence
-- project state is updated when current truth changed
-- handoff is left for the next agent
+任务只有同时满足以下条件才算完成：
 
-"Works on my machine" or "looks good" is not sufficient.
+- 实现 / 设计产物已存在
+- 实际执行了相关验证
+- 适用的验收条目已映射到证据
+- 当前事实变化时，项目状态已更新
+- 已为下一位 Agent 留下 handoff
+
+“我这里能跑”或“看起来不错”都不是充分的完成标准。

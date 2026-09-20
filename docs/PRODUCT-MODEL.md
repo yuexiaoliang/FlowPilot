@@ -1,262 +1,230 @@
-# FlowPilot Product Model
+# FlowPilot 产品模型
 
-FlowPilot is an intent-first automation runtime.
+FlowPilot 是一个**意图优先**的自动化运行时。
 
-The user expresses **meaning** in natural language. FlowPilot compiles that meaning into structured, versioned artifacts that machines can execute deterministically.
+用户用自然语言表达**语义**。FlowPilot 将这些语义编译成结构化、可版本化、可由机器确定性执行的产物。
 
-> The closer a layer is to the human, the more natural-language it should be.  
-> The closer a layer is to execution, the more structured and deterministic it must be.
+> 越接近人，越自然语言。
+> 越接近执行，越结构化、越确定。
 
-## Core principle
+## 核心原则
 
-**Users write semantics; the system stores references.**
+**用户写语义，系统保存引用。**
 
-Users should never need to write internal syntax such as:
+普通用户不应该需要写：
 
-```
-@goal/publish-wechat
-source://industry-learning
-goal_01JXYZ...
-```
+- `@goal/publish-wechat`
+- `source://industry-learning`
+- `goal_01JXYZ...`
 
-Those are implementation details.
+这些都是实现细节。
 
-A user-facing task may simply say:
+用户只需要写自然语言任务，例如：
 
-```md
-# 每天发布行业文章
+    # 每天发布行业文章
+    每天早上 8 点检查我的行业学习内容。
+    如果今天有新的文章，就发布到微信公众号。
+    数据来自我的行业学习仓库。
+    正式发布之前让我确认。
 
-每天早上 8 点检查我的行业学习内容。
-
-如果今天有新的文章，就发布到微信公众号。
-
-数据来自我的行业学习仓库。
-
-正式发布之前让我确认。
-```
-
-FlowPilot may internally compile that to stable IDs, schedules, source bindings, policies, and workflow revisions.
+FlowPilot 内部可以把它编译成稳定 ID、schedule、Source binding、policy 和 Workflow revision。
 
 ---
 
-# Primary entities
+# 核心实体
 
-## Goal — what outcome the user wants
+## Goal — 用户想达到什么结果
 
-A Goal represents durable intent.
+Goal 表示稳定的目标意图。
 
-Example:
+示例：
 
-```md
-# 发布微信公众号文章
+    # 发布微信公众号文章
+    把准备好的文章发布到微信公众号。
+    需要标题、正文和封面，摘要可选。
+    如果需要登录或安全验证，让我接管。
+    正式发布前让我确认。
+    只有真正发布成功才算完成，保存草稿不算完成。
 
-把准备好的文章发布到微信公众号。
+Goal **不描述**按钮路径、selector、schedule 或数据存放位置。
 
-需要标题、正文和封面。
-摘要可以没有。
+Goal 回答：
 
-如果需要登录或安全验证，让我接管。
-正式发布前让我确认。
+> 完成后，现实世界里应该出现什么结果？
 
-只有真正发布成功才算完成。
-保存草稿不算完成。
-```
+内部会编译成 GoalPlan，包含：
 
-A Goal does **not** describe button paths, selectors, schedule, or where data is stored.
-
-Goal answers:
-
-> What result should exist when this is finished?
-
-Internally, a Goal is compiled into a structured GoalPlan containing:
 - intent
-- required/optional inputs
+- required / optional inputs
 - success criteria
-- failure/non-success criteria
-- safety/confirmation policy
+- failure / non-success criteria
+- safety / confirmation policy
 - semantic capabilities
 
-The natural-language source remains the human-readable source of truth.
+自然语言 Source 仍然是人类可读事实源。
 
-## Task — when and under what rules to pursue a Goal
+## Task — 什么时候、按什么规则追求 Goal
 
-A Task represents automation policy around a Goal.
+Task 是围绕 Goal 的自动化执行策略。
 
-Example:
+示例：
 
-```md
-# 每日行业文章发布
+    # 每日行业文章发布
+    每天早上 8 点运行。
+    从我的行业学习仓库中找到今天最新的文章。
+    如果今天没有新内容，就跳过。
+    发布到微信公众号。
+    只发布从未发布过的版本。
+    正式发布之前让我确认。
 
-每天早上 8 点运行。
+Task 回答：
 
-从我的行业学习仓库中找到今天最新的文章。
+> 什么时候执行？使用什么数据？有哪些规则？
 
-如果今天没有新内容，就跳过。
+内部 TaskPlan 可能包含：
 
-发布到微信公众号。
-
-只发布从未发布过的版本。
-
-正式发布之前让我确认。
-```
-
-Task answers:
-
-> When should this happen, with which data and policies?
-
-Internally a TaskPlan may contain:
-- trigger/schedule
+- trigger / schedule
 - resolved Goal reference
 - resolved Source references
 - data selection rules
 - input bindings
-- deduplication/idempotency strategy
+- deduplication / idempotency strategy
 - missed schedule policy
 - confirmation policy
-- retry/backoff policy
+- retry / backoff policy
 
-Users do not author these internal references directly.
+用户不直接编写这些内部引用。
 
-## Source — where data is allowed to come from
+## Source — 数据被允许从哪里来
 
-A Source is an explicitly authorized data boundary.
+Source 是显式授权的数据边界。
 
-Examples:
-- selected local folder
-- local Git repository
-- GitHub repository
+例如：
+
+- 本地文件夹
+- 本地 Git 仓库
+- GitHub Repository
 - Google Drive folder
 - HTTP API
 - database
 - RSS feed
 
-A Source has:
-- stable internal ID
-- user-visible semantic name
-- connector/type
-- scoped permissions
-- location/configuration
-- capability metadata
-- optional cursor/watermark metadata
+Source 包含：
 
-User language:
+- stable internal ID
+- 面向用户的语义名称
+- connector / type
+- scoped permissions
+- location / configuration
+- capability metadata
+- 可选 cursor / watermark
+
+用户写：
 
 > 数据来自我的行业学习仓库。
 
-Internal resolution:
+内部解析为：
 
-```
+```text
 sourceId = src_...
 ```
 
-The internal ID must not be required in the Markdown.
+Markdown 不要求用户写这个内部 ID。
 
-## Flow — how a Goal is achieved
+## Flow — 如何实现 Goal
 
-A Flow is a versioned executable strategy.
+Flow 是可版本化的执行策略。
 
-Example:
+例如：
 
-```
-Check login
-→ Open editor
-→ Fill title
-→ Fill content
-→ Upload cover
-→ Publish
-→ Verify success
-```
+    Check login
+    → Open editor
+    → Fill title
+    → Fill content
+    → Upload cover
+    → Publish
+    → Verify success
 
-Flow is compiled/discovered from the Goal and current platform environment.
+Flow 根据 Goal 和当前平台环境被发现 / 编译。
 
-A Goal can remain stable while Flow revisions change repeatedly.
+Goal 可以长期稳定，而 Flow revision 可以不断变化。
 
-Repair changes the Flow, not the Goal.
+Repair 修改 Flow，不修改 Goal。
 
-## Run — one concrete execution
+## Run — 一次具体执行
 
-A Run is a historical execution record.
+Run 是历史执行记录。
 
-It binds immutable versions/snapshots:
+它绑定不可变版本 / 快照：
 
-```
-TaskPlan revision
-GoalPlan revision
-Flow revision
-Source snapshot / commit / file hashes
-Resolved InputBundle
-Run policy
-Result/evidence
-```
+- TaskPlan revision
+- GoalPlan revision
+- Flow revision
+- Source snapshot / commit / file hashes
+- resolved InputBundle
+- Run policy
+- result / evidence
 
-This makes every execution reproducible and auditable.
+这样每次执行都可追溯、可审计。
 
 ---
 
-# Compilation layers
+# 编译层
 
-User-facing source:
+用户层 Source：
 
-```
-Goal.md
-Task.md
-Preferences.md
-```
+- Goal.md
+- Task.md
+- Preferences.md
 
-Compilation pipeline:
+编译链：
 
-```
-Natural Language / Markdown
-        ↓
-Semantic Resolution
-        ↓
-GoalPlan / TaskPlan
-        ↓
-Flow Discovery / Selection
-        ↓
-Versioned Flow
-        ↓
-Runtime Run
-```
+    Natural Language / Markdown
+            ↓
+    Semantic Resolution
+            ↓
+    GoalPlan / TaskPlan
+            ↓
+    Flow Discovery / Selection
+            ↓
+    Versioned Flow
+            ↓
+    Runtime Run
 
-The persisted structured plans are compiled artifacts.
+结构化 Plan 是编译产物。
 
-The human-facing Markdown must remain readable without FlowPilot.
+人类可见 Markdown 离开 FlowPilot 后也必须仍然可读。
 
 ---
 
-# Semantic resolution
+# 语义解析
 
-When a Task says:
+当 Task 写：
 
 > 发布到微信公众号。
 
-FlowPilot should semantically resolve the phrase to an existing compatible Goal.
+FlowPilot 应解析到已有兼容 Goal。
 
-If there is one unambiguous match, bind it silently.
+如果只有一个无歧义匹配，静默绑定。
 
-If there are multiple material matches, do not guess.
+如果有多个实质匹配，不猜。
 
-Example contextual UI:
+可以临时显示：
 
-```
-你说的“发布到微信公众号”是指：
+    你说的“发布到微信公众号”是指：
+    ○ 发布文章
+    ○ 发布视频
 
-○ 发布文章
-○ 发布视频
-```
+用户选择后，内部 TaskPlan 保存稳定 Goal reference；原 Markdown 仍保持自然语言。
 
-After the user chooses, the internal TaskPlan stores the stable Goal reference.
-
-The Markdown can remain human-readable and unchanged.
-
-The same rule applies to Sources, accounts, platforms, policies, and other entities.
+Source、account、platform、policy 等实体遵守同样原则。
 
 ---
 
-# No user-facing DSL
+# 禁止用户层 DSL
 
-Do not introduce required syntax for ordinary users such as:
+普通用户不能被要求写：
+
 - `@goal/...`
 - `@source/...`
 - YAML IDs
@@ -266,15 +234,17 @@ Do not introduce required syntax for ordinary users such as:
 - retry codes
 - workflow node syntax
 
-FlowPilot may offer rich editor mentions/autocomplete visually, but the underlying user-visible text should remain normal human language.
+编辑器可以提供富文本 mention / autocomplete，但最终用户可见文本仍应是正常人类语言。
 
-The UI may attach hidden semantic metadata to text spans, but exported Markdown must remain understandable as prose.
+UI 可以把可见短语绑定到隐藏的内部实体引用，但这种语义元数据不能污染用户可见文本。
+
+导出的 Markdown 必须能独立理解。
 
 ---
 
-# Versioning
+# 版本
 
-Each compiled artifact is versioned independently:
+以下产物独立版本化：
 
 - Goal source revision
 - GoalPlan revision
@@ -282,21 +252,24 @@ Each compiled artifact is versioned independently:
 - TaskPlan revision
 - Flow revision
 
-A Run references exact versions.
+Run 保存 exact versions。
 
-When Markdown changes:
-1. detect source hash change
-2. recompile
-3. compare old/new structured plan
-4. require user review only for material behavior/safety changes
-5. create a new plan revision
-6. keep prior revision for audit/history
+Markdown 修改后：
+
+1. 检测 source hash 变化；
+2. 重新编译；
+3. 比较 old / new structured plan；
+4. 只有行为 / 安全发生实质变化时才要求用户 Review；
+5. 创建新 plan revision；
+6. 保留旧 revision 供审计。
 
 ---
 
-# Product model example
+# 设计后果
 
-Human source:
+## 完整模型示例
+
+人类源文本：
 
 ```md
 # 每天发布行业文章
@@ -313,9 +286,9 @@ Human source:
 正式发布前让我确认。
 ```
 
-Compiled:
+编译结果：
 
-```
+```text
 TaskPlan
 ├── Schedule: daily 08:00
 ├── Missed policy: run on next start
@@ -330,9 +303,9 @@ TaskPlan
 └── Confirmation: before irreversible publish
 ```
 
-Then:
+随后进入：
 
-```
+```text
 TaskPlan
    ↓
 Source Resolver
@@ -346,17 +319,14 @@ Flow revision
 Run
 ```
 
----
+FlowPilot 不是 configuration-first。
 
-# Design consequence
+主要交互是：
 
-FlowPilot is not configuration-first.
+1. 表达意图；
+2. FlowPilot 理解 / 编译；
+3. 只 Review 实质歧义或风险；
+4. 执行；
+5. 只有需要观察、选择、比较或介入时才出现上下文 UI。
 
-The primary interaction is:
-1. express intent
-2. let FlowPilot understand/compile it
-3. review only material ambiguity or risk
-4. run
-5. show contextual UI when observation, choice, comparison, or intervention is useful
-
-The product should not force users to understand the machine representation.
+产品不应该迫使用户理解机器层表示。

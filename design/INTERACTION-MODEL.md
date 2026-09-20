@@ -1,241 +1,182 @@
-# FlowPilot Interaction Model
+# FlowPilot 交互模型
 
-[简体中文](zh-CN/INTERACTION-MODEL.md)
+FlowPilot 使用三个产品界面层级：**Simple**、**Execution** 和 **Inspection**。它们代表交互和信息层级，不一定是独立窗口、路由或导航项。一个工作区可以在它们之间移动或组合它们，同时保留用户上下文。
 
-FlowPilot uses three product surfaces: **Simple**, **Execution**, and
-**Inspection**. They are levels of interaction and information, not necessarily
-separate windows, routes, or navigation items. One workspace may move between or
-compose them while preserving the user's context.
-
-## Surface hierarchy
+## 界面层级
 
 ```text
 Simple Surface
-  intent → concise understanding → essential next action → minimal result
-                         ↓ run
+  意图 → 简洁理解 → 必要下一步 → 最小结果
+                         ↓ 运行
 Execution Surface
-  useful progress → confirmation / takeover / recovery → verified outcome
-                         ↓ inspect
+  有用进度 → 确认 / 接管 / 恢复 → 已验证结果
+                         ↓ 检查
 Inspection Surface
-  structured plans → provenance → timeline/evidence → revisions/diffs
+  结构化计划 → 来源 → 时间线/证据 → 修订/差异
 ```
 
-The default path starts on the Simple Surface. A state transition opens the
-Execution Surface when work begins or needs active attention. Inspection is
-always user-invoked except when a failure must reveal a specific piece of
-evidence to make recovery understandable. Opening Inspection must not discard
-the current Simple or Execution context.
+默认路径从 Simple Surface 开始。工作开始或需要主动关注时，状态转变打开 Execution Surface。Inspection 始终由用户主动进入；唯一例外是某项失败必须显示特定证据，才能让恢复变得可理解。打开 Inspection 不能丢失当前的 Simple 或 Execution 上下文。
 
 ## 1. Simple Surface
 
-### Purpose
+### 目的
 
-Let the user express, review, and pursue an outcome without learning FlowPilot's
-internal model.
+让用户在不学习 FlowPilot 内部模型的情况下表达、检查和推进目标结果。
 
-### Contains
+### 包含
 
-- natural-language/Markdown intent;
-- a concise understanding of schedule, data, action, exceptional policy, and
-  required confirmation when those are material;
-- semantic names for Goals, Tasks, Sources, accounts, and destinations;
-- the one essential next action;
-- minimal success, skipped, cancelled, or failure state;
-- contextual prompts only when a current unresolved condition exists;
-- an `Inspect details` affordance when underlying detail is available.
+- 自然语言/Markdown 意图；
+- 在相关时对日程、数据、操作、异常策略和所需确认给出简洁理解；
+- Goal、Task、Source、账号和目的地的语义名称；
+- 唯一必要的下一步操作；
+- 最小成功、跳过、取消或失败状态；
+- 仅在当前存在未解决条件时出现的上下文提示；
+- 存在底层详情时的 `检查详情` 入口。
 
-### Excludes by default
+### 默认不包含
 
-- internal IDs and serialized plans;
-- cron expressions, selectors, workflow nodes, retry codes, and model prompts;
-- raw logs, event streams, screenshots, hashes, and database concepts;
-- empty panels for Sources, approvals, repair, or runtime tools;
-- navigation organized around internal entity types.
+- 内部 ID 和序列化计划；
+- cron 表达式、选择器、工作流节点、重试代码和模型提示词；
+- 原始日志、事件流、截图、哈希和数据库概念；
+- 为 Source、批准、修复或运行时工具准备的空面板；
+- 按内部实体类型组织的导航。
 
-### Completion rule
+### 完成规则
 
-The Simple Surface is complete when a user can understand what FlowPilot believes
-will happen, identify any material uncertainty, and choose the next action
-without opening the Inspector.
+当用户无需打开 Inspector 就能理解 FlowPilot 认为将发生什么、识别任何实质性不确定性，并选择下一步操作时，Simple Surface 才算完整。
 
 ## 2. Execution Surface
 
-### Purpose
+### 目的
 
-Make active work, consequential decisions, and recoverable intervention visible
-without turning execution into a monitoring dashboard.
+让执行中的工作、具有后果的决策和可恢复介入保持可见，同时不将执行变成监控 Dashboard。
 
-### Contains
+### 包含
 
-- a short current-status statement and useful milestone progress;
-- the exact input preview when the user must know what will be acted on;
-- pending confirmation before an irreversible action;
-- Human Takeover with the live context, reason, and return-control action;
-- actionable failure or pause with safe recovery choices;
-- cancellation when safe and applicable;
-- a route to inspect the Run timeline and evidence.
+- 简短的当前状态说明和有用的里程碑进度；
+- 当用户必须知道将操作什么时，显示确切输入预览；
+- 不可逆操作之前的待确认状态；
+- 带真实上下文、原因和交还控制操作的 Human Takeover；
+- 带安全恢复选项的可操作失败或暂停；
+- 在安全且适用时允许取消；
+- 检查 Run 时间线和证据的入口。
 
-### Excludes by default
+### 默认不包含
 
-- every deterministic Step and browser event;
-- continuously scrolling logs or low-level timing data;
-- raw target descriptors, selector candidates, model requests, or stack traces;
-- speculative recovery actions that policy has not allowed;
-- success before postconditions have been verified.
+- 每一个确定性 Step 和浏览器事件；
+- 持续滚动的日志或低层计时数据；
+- 原始目标描述符、选择器候选、模型请求或堆栈信息；
+- 策略尚未允许的推测性恢复操作；
+- 验证后置条件之前的成功状态。
 
-### Progress rule
+### 进度规则
 
-Show progress at milestones the user can understand, such as `Preparing inputs`,
-`Opening the publisher`, `Waiting for your confirmation`, and `Verifying the
-result`. Do not surface every internal Step unless it becomes relevant to a
-failure or is explicitly inspected.
+在用户可以理解的里程碑上显示进度，例如“正在准备输入”“正在打开发布平台”“等待你的确认”和“正在验证结果”。不要展示每一个内部 Step，除非它与失败相关或用户显式检查。
 
 ## 3. Inspection Surface
 
-### Purpose
+### 目的
 
-Expose the structured truth needed for audit, diagnosis, professional review,
-and trust without imposing it on ordinary operation.
+暴露审计、诊断、专业评审和建立信任所需的结构化事实，同时不把这些内容强加给普通操作路径。
 
-### Contains, when applicable
+### 在适用时包含
 
-- original Goal/Task source and exact GoalPlan/TaskPlan revisions;
-- semantic bindings and normalized schedule with timezone;
-- Source permission scope, snapshot/version, selected paths, and hashes;
-- the immutable InputBundle used for a Run;
-- Flow revision and human-readable Step structure;
-- Run timeline, typed states/errors, postcondition evidence, and redacted logs;
-- screenshots or page evidence with sensitive data handled safely;
-- repair proposal, bounded diff, validation result, and old/new revisions;
-- confirmation and Human Takeover events;
-- model provenance where AI materially interpreted, derived, discovered, or
-  repaired something.
+- 原始 Goal/Task 源文本和确切的 GoalPlan/TaskPlan 修订；
+- 语义绑定和带时区的规范化日程；
+- Source 权限范围、快照/版本、选中路径和哈希；
+- Run 使用的不可变 InputBundle；
+- Flow 修订和人类可读的 Step 结构；
+- Run 时间线、类型化状态/错误、后置条件证据和已脱敏日志；
+- 在安全处理敏感数据后的截图或页面证据；
+- 修复提议、有界差异、验证结果和新旧修订；
+- 确认和 Human Takeover 事件；
+- 当 AI 实质性地解释、派生、发现或修复内容时，提供模型来源信息。
 
-### Rules
+### 规则
 
-- Enter from the object or statement being explained; do not make the user hunt
-  in a global diagnostics area.
-- Preserve exact version relationships. A Run's detail must not silently update
-  to the latest TaskPlan, GoalPlan, Source content, or Flow revision.
-- Start with structured, readable sections. Raw redacted evidence is a deeper
-  disclosure, not the first view.
-- Label user-authored source, compiled interpretation, deterministic runtime
-  facts, and AI-derived content distinctly.
-- Closing Inspection returns to the originating context and restores focus.
+- 从需要解释的对象或陈述进入；不要让用户在全局诊断区域中寻找。
+- 保留精确的版本关系。Run 详情不能静默更新为最新 TaskPlan、GoalPlan、Source 内容或 Flow 修订。
+- 从结构化、可读的分区开始。原始且已脱敏的证据属于更深一级披露，不是首屏。
+- 清楚区分用户创作的源文本、编译解释、确定性运行时事实和 AI 派生内容。
+- 关闭 Inspection 会返回来源上下文并恢复焦点。
 
-## Movement between surfaces
+## 界面层级之间的移动
 
-Information changes surface only for a reason:
+信息只有在有原因时才改变层级：
 
-| Event | From → to | What becomes visible | What happens after resolution |
+| 事件 | 从 → 到 | 新显示的内容 | 解决之后 |
 | --- | --- | --- | --- |
-| User submits or re-analyzes intent | Simple → Simple | Concise understanding and material changes | Remains as the current understanding summary. |
-| Missing Source authorization | Simple → contextual Simple | Required capability, requested scope, and connect action | Picker closes; semantic Source name and connection state remain. |
-| Material semantic ambiguity | Simple → contextual Simple | Bounded choices and consequence of the unresolved phrase | Resolver closes; chosen meaning remains in the summary/binding. |
-| Input is ready to review | Simple → Simple or Execution | Concrete selected content needed to judge this Run | Collapses to a summary after acceptance; exact bundle remains inspectable. |
-| Run starts | Simple → Execution | User-meaningful milestones and cancel/inspect actions | Ends in a minimal result and keeps the Run inspectable. |
-| Irreversible action is next | Execution → contextual Execution | Exact action, destination, material input, and confirm/cancel choices | Confirmation card resolves into an event; execution continues or stops. |
-| User/security action is required | Execution → Human Takeover | Reason, live interaction context, safe instructions, return-control action | Runtime re-snapshots and resumes only from a recognized safe state. |
-| Recoverable typed failure | Execution → contextual Execution | Impact, evidence-based explanation, and allowed recovery actions | Selected recovery is recorded; resolved card becomes timeline evidence. |
-| Repair is proposed | Execution → contextual Execution/Inspection | User impact and bounded old/new difference when review is required | Accepted repair creates a new Flow revision; prior revision remains. |
-| User chooses `Inspect details` | Simple or Execution → Inspection | Detail anchored to the selected statement/object | Close/back restores the originating surface and focus. |
+| 用户提交或重新分析意图 | Simple → Simple | 简洁理解和实质性变化 | 作为当前理解摘要保留。 |
+| 缺少 Source 授权 | Simple → 上下文 Simple | 所需能力、请求范围和连接操作 | 选择器关闭；语义 Source 名称和连接状态保留。 |
+| 实质性语义歧义 | Simple → 上下文 Simple | 有界选择和未解决短语的影响 | 处理器关闭；选定含义保留在摘要/绑定中。 |
+| 输入已可检查 | Simple → Simple 或 Execution | 判断本次 Run 所需的具体选中内容 | 接受后折叠为摘要；确切 bundle 仍可检查。 |
+| Run 开始 | Simple → Execution | 用户可理解的里程碑及取消/检查操作 | 以最小结果结束，并保持 Run 可检查。 |
+| 下一步是不可逆操作 | Execution → 上下文 Execution | 确切操作、目的地、实质输入和确认/取消选项 | 确认卡解析为一个事件；执行继续或停止。 |
+| 需要用户/安全操作 | Execution → Human Takeover | 原因、实时交互上下文、安全说明、交还控制操作 | Runtime 重新获取快照，仅从已识别安全状态恢复。 |
+| 可恢复的类型化失败 | Execution → 上下文 Execution | 影响、基于证据的解释和允许的恢复操作 | 记录所选恢复方式；已解决卡片成为时间线证据。 |
+| 提议修复 | Execution → 上下文 Execution/Inspection | 需要评审时，显示用户影响和有界的新旧差异 | 接受的修复创建新 Flow 修订；保留旧修订。 |
+| 用户选择 `检查详情` | Simple 或 Execution → Inspection | 锚定到所选陈述/对象的详情 | 关闭/返回会恢复来源界面和焦点。 |
 
-No transition may silently change the user's natural-language source, Source
-permissions, confirmation policy, immutable InputBundle, or version bound to an
-existing Run.
+任何转场都不能静默改变用户的自然语言源文本、Source 权限、确认策略、不可变 InputBundle，或已有 Run 绑定的版本。
 
-## Contextual interaction triggers
+## 上下文交互触发器
 
-### Source connection
+### Source 连接
 
-Appear only when the intent references data or a capability for which no
-compatible authorized Source can be resolved. State why access is needed and
-the requested scope before opening the system picker. Natural language may name
-a Source but never grants access by itself. Do not show Source setup as a
-mandatory first-run checklist.
+仅当意图引用的数据或能力无法解析到兼容且已授权的 Source 时出现。在打开系统选择器前，说明为什么需要访问以及请求的范围。自然语言可以命名 Source，但自身绝不授予权限。不要将 Source 设置显示为强制的首次运行清单。
 
-After authorization, show the semantic name and a concise scope confirmation.
-The Source ID, provider metadata, snapshot, and permission details belong in
-Inspection or an explicit management task.
+授权后，显示语义名称和简洁的范围确认。Source ID、提供方元数据、快照和权限详情属于 Inspection 或显式管理任务。
 
-### Ambiguity
+### 歧义
 
-Appear only when competing interpretations would materially change outcome,
-data, destination, timing, or safety. Offer a small set of human-readable
-choices anchored to the ambiguous phrase and explain the meaningful difference.
-Bind silently when there is one unambiguous compatible match. Never ask the user
-to choose an ID.
+仅当多个解释会实质性改变结果、数据、目的地、时间或安全性时出现。提供一小组锚定到歧义短语的人类可读选项，并解释有意义的差异。只有一个明确兼容项时静默绑定。绝不要求用户选择 ID。
 
-### Confirmation
+### 确认
 
-Appear immediately before the consequential boundary it protects, not at initial
-authoring and not after the action. It states the exact irreversible action,
-destination, and material input. Confirm and cancel are explicit; dismissal does
-not count as confirmation. The policy and event remain inspectable.
+在其保护的具有后果的边界之前立即出现，而不是在初始创作时，也不是在操作之后。它说明确切的不可逆操作、目的地和实质输入。确认和取消都是显式操作；关闭不等于确认。策略和事件保持可检查。
 
 ### Human Takeover
 
-Appear for login, QR, CAPTCHA, MFA, security challenge, consent, account warning,
-ambiguous destructive action, or another typed state that requires human
-operation or judgment. Preserve the real browser context. Clearly distinguish
-what the user must do from what FlowPilot will verify afterward. Returning
-control triggers a fresh snapshot and safe-state check; it does not imply
-success.
+在登录、QR、CAPTCHA、MFA、安全挑战、同意流程、账号警告、有歧义的破坏性操作，或其他需要人工操作/判断的类型化状态时出现。保留真实浏览器上下文。清楚区分用户要做什么，以及之后 FlowPilot 将验证什么。交还控制会触发新的快照和安全状态检查；它不代表成功。
 
 ### Inspector
 
-Offer `Inspect details` beside an understanding, selected input, active or past
-Run, pause, failure, result, or repair when structured truth exists. Do not make
-Inspector a required step on the golden path. Deep links must identify the exact
-object/version while displaying human-readable names first.
+当结构化事实存在时，在理解、选中输入、当前或历史 Run、暂停、失败、结果或修复旁提供 `检查详情`。不要让 Inspector 成为黄金路径的必经步骤。深层链接必须识别确切对象/版本，同时优先显示人类可读名称。
 
-### Repair review
+### 修复评审
 
-Appear when a repair changes behavior materially, crosses a policy review
-boundary, or needs user judgment. Show the smallest meaningful old/new
-difference and its effect. Do not expose a full workflow editor by default and
-do not silently overwrite the previous Flow revision.
+当修复实质性改变行为、跨越策略评审边界或需要用户判断时出现。展示最小而有意义的新旧差异及其影响。不要默认暴露完整工作流编辑器，也不要静默覆盖旧 Flow 修订。
 
-## Default-surface prohibition list
+## 默认界面禁止清单
 
-The following must not appear on the default path unless the current state makes
-one item directly actionable:
+以下内容不得出现在默认路径上，除非当前状态使其中某项可以直接采取操作：
 
-- Goal, Task, Source, InputBundle, Flow, or Run internal IDs;
-- serialized GoalPlan, TaskPlan, Workflow IR, or database records;
-- cron expressions, selectors, target descriptors, workflow graphs, retry codes,
-  and provider/model configuration;
-- Source hashes, Git SHAs, file paths beyond the user-relevant selection summary,
-  and permission internals;
-- every runtime Step, raw events, stack traces, network data, or unredacted logs;
-- dormant Source pickers, confirmation cards, takeover frames, diff viewers, and
-  recovery controls;
-- analytics, counters, charts, and status grids that do not advance the current
-  outcome;
-- controls that imply FlowPilot may bypass a security challenge or expand access.
+- Goal、Task、Source、InputBundle、Flow 或 Run 的内部 ID；
+- 序列化 GoalPlan、TaskPlan、Workflow IR 或数据库记录；
+- cron 表达式、选择器、目标描述符、工作流图、重试代码和提供方/模型配置；
+- Source 哈希、Git SHA、超出用户相关选择摘要的文件路径，以及权限内部细节；
+- 每个运行时 Step、原始事件、堆栈、网络数据或未脱敏日志；
+- 休眠的 Source 选择器、确认卡、接管框架、差异查看器和恢复控件；
+- 不能推进当前目标结果的分析、计数器、图表和状态网格；
+- 暗示 FlowPilot 可以绕过安全挑战或扩大访问范围的控件。
 
-Hiding these items does not permit omitting them from provenance when the
-runtime contract requires them. Required truth lives in Inspection.
+隐藏这些内容并不意味着可以从运行时契约所要求的来源记录中省略它们。必需的事实存在于 Inspection 中。
 
-## Navigation and continuity
+## 导航与连续性
 
-- Intent Home is the primary entry.
-- Opening an existing Goal or Task returns to its human-authored source and
-  current concise understanding, not to a generated configuration form.
-- Active execution remains associated with its originating Task/Goal context.
-- Results and past Runs are reached from that context or a concise recent-work
-  entry, not through a mandatory operations dashboard.
-- Inspection is contextual and closable; it is not a competing home screen.
-- Back, close, and resume preserve unsaved intent and return focus predictably.
-- A new top-level destination requires evidence of a distinct recurring user
-  goal. An internal entity type alone is not sufficient.
+- Intent Home 是主要入口。
+- 打开已有 Goal 或 Task 会回到其人类创作的源文本和当前简洁理解，而不是生成的配置表单。
+- 活跃执行始终与其来源 Task/Goal 上下文关联。
+- 从该上下文或简洁的最近工作入口访问结果和历史 Run，而不是强制通过运维 Dashboard。
+- Inspection 是上下文性的、可关闭的，不是一个竞争性的首页。
+- 返回、关闭和恢复会保留未保存意图，并以可预测方式恢复焦点。
+- 新的顶层目的地需要证据证明它服务于一项独立且反复出现的用户目标。内部实体类型本身不足以成为理由。
 
-Exact labels and navigation composition are finalized in later screen specs;
-these invariants already constrain them.
+确切标签和导航组成会在后续屏幕规格中最终确定；这些不变量已经对它们形成约束。
 
-## Concrete example across the surfaces
+## 具体示例在三个界面层级中的表现
 
-User source:
+用户源文本：
 
 ```md
 每天早上 8 点检查我的行业学习仓库。
@@ -245,53 +186,35 @@ User source:
 
 ### Simple Surface
 
-The source remains editable as ordinary Markdown. After analysis, FlowPilot
-shows:
+源文本保持为可编辑的普通 Markdown。分析后，FlowPilot 显示：
 
 ```text
-I understood
-When        Every day at 08:00 (your timezone)
-Data        Industry learning repository → today's newest article
-Action      Publish a WeChat Official Account article
-No content  Skip
-Before publish  Ask for confirmation
+我的理解
+时间        每天 08:00（你的时区）
+数据        行业学习仓库 → 今天最新文章
+操作        发布微信公众号文章
+没有内容时  跳过
+发布之前    请求确认
 ```
 
-If `行业学习仓库` is not authorized, a Source connection card appears at the
-Data line and asks for the relevant folder/repository scope. If two compatible
-publishing Goals exist, a compact choice appears at the Action line. Neither
-interaction exposes IDs. Once resolved, the page returns to the concise
-understanding with semantic names.
+如果 `行业学习仓库` 尚未授权，Source 连接卡片出现在“数据”一行，并请求相关文件夹/仓库范围。如果存在两个兼容的发布 Goal，则在“操作”一行出现紧凑选择。两种交互都不暴露 ID。问题解决后，页面返回使用语义名称的简洁理解。
 
 ### Execution Surface
 
-At trigger time, FlowPilot resolves the Source and creates an immutable
-InputBundle before the Flow starts. The user sees meaningful milestones and a
-concrete preview of the selected article and cover. Immediately before publish,
-execution pauses with:
+触发时，FlowPilot 在 Flow 开始前解析 Source 并创建不可变 InputBundle。用户会看到有意义的里程碑，以及选中文章和封面的具体预览。正式发布之前，执行暂停并显示：
 
 ```text
-Ready to publish
-Article      <human-readable title>
-Destination  <WeChat account name>
+准备发布
+文章      <人类可读标题>
+目的地    <微信公众号账号名称>
 
-[Cancel]  [Confirm publish]
+[取消]  [确认发布]
 ```
 
-If login or QR verification is required, the confirmation is not treated as
-authentication. FlowPilot enters Human Takeover, displays the real page, and
-resumes only after a fresh safe-state check. After publishing, the default result
-states success only when the success postcondition is verified.
+如果需要登录或 QR 验证，确认不会被视为认证。FlowPilot 进入 Human Takeover，显示真实页面，并且仅在重新检查安全状态后恢复。发布后，只有在成功后置条件通过验证时，默认结果才会显示成功。
 
 ### Inspection Surface
 
-`Inspect details` for this Run reveals the exact TaskPlan and GoalPlan revisions,
-normalized schedule and timezone, Source authorization and snapshot, selected
-paths/hashes, immutable InputBundle, Flow revision, confirmation event, Run
-timeline, Step evidence, and verified success criterion. If repair occurred, it
-also shows the old/new Flow revisions and bounded diff. The original Markdown is
-shown separately from compiled artifacts and remains unchanged.
+本次 Run 的 `检查详情` 会显示确切 TaskPlan 和 GoalPlan 修订、规范化日程及时区、Source 授权和快照、选中路径/哈希、不可变 InputBundle、Flow 修订、确认事件、Run 时间线、Step 证据和已验证的成功标准。如果发生修复，还会显示新旧 Flow 修订和有界差异。原始 Markdown 与编译产物分开显示，并保持不变。
 
-This example is the review baseline for D0.1: the ordinary path is understandable
-without Inspection, and the underlying truth is available without turning the
-ordinary path into a dashboard.
+这个示例是 D0.1 的评审基线：普通路径无需 Inspection 即可理解，底层事实随时可用，但不会把普通路径变成 Dashboard。

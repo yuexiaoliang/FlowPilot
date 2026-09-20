@@ -1,55 +1,53 @@
-# FlowPilot Development Plan
+# FlowPilot 开发计划
 
-This document is the canonical implementation sequence.
+本文件是 FlowPilot 的规范实现顺序。
 
-FlowPilot is developed through **gates**, not feature accumulation. A later phase starts only when the current phase has acceptance evidence in `ACCEPTANCE.md`.
+FlowPilot 通过 **Gate** 推进，而不是简单堆功能。只有当前阶段在 `ACCEPTANCE.md` 中具备验收证据后，才能进入下一阶段。
 
-GitHub Issues are optional. The repository documents are the source of truth.
-
----
-
-# Delivery model
-
-```
-D0 Design Contract
-        ↓
-P0 Interactive Mock Prototype
-        ↓
-E0 Engineering Foundation
-        ↓
-E1 Intent Compiler (Goal / Task)
-        ↓
-E2 Source / InputBundle / Scheduling Semantics
-        ↓
-E3 Deterministic Workflow Runtime
-        ↓
-E4 AI Discovery / Repair
-        ↓
-E5 Human Takeover / Risk
-        ↓
-E6 WeChat Official Accounts MVP
-        ↓
-H0 Hardening / Runner / Expansion
-```
-
-The reason for this order is deliberate:
-
-1. validate the product interaction before building infrastructure
-2. keep human-facing semantics separate from machine execution
-3. prove deterministic execution before adding self-healing AI
-4. validate safety/intervention before real-platform expansion
+GitHub Issues 是可选的；仓库文档才是事实源。
 
 ---
 
-# D0 — Design Contract
+# 交付模型
 
-## Objective
+    D0 Design Contract
+            ↓
+    P0 Interactive Mock Prototype
+            ↓
+    E0 Engineering Foundation
+            ↓
+    E1 Intent Compiler (Goal / Task)
+            ↓
+    E2 Source / InputBundle / Scheduling Semantics
+            ↓
+    E3 Deterministic Workflow Runtime
+            ↓
+    E4 AI Discovery / Repair
+            ↓
+    E5 Human Takeover / Risk
+            ↓
+    E6 WeChat Official Accounts MVP
+            ↓
+    H0 Hardening / Runner / Expansion
 
-Turn approved product principles and visual direction into an implementation-ready contract so future agents do not redesign FlowPilot while coding it.
+采用这个顺序是刻意的：
 
-## Required artifacts
+1. 在搭基础设施前先验证产品交互；
+2. 将面向人的语义与机器执行分离；
+3. 在加入 AI 自愈前先证明确定性执行；
+4. 在接真实平台前先验证安全与人工介入。
 
-Create under `design/`:
+---
+
+# D0 — 设计契约（Design Contract）
+
+## 目标
+
+把已确认的产品原则和视觉方向变成可以直接实现的设计合同，避免后续 Agent 在写代码时重新设计 FlowPilot。
+
+## 必须产出
+
+在 `design/` 下创建：
 
 - `README.md`
 - `DESIGN-PRINCIPLES.md`
@@ -59,278 +57,275 @@ Create under `design/`:
 - `SCREEN-SPECS.md`
 - `FLOWS.md`
 
-## Must encode
+## 必须表达
 
-- Simple by default, transparent on demand
-- intent-first, not dashboard-first
-- natural language/Markdown is the primary authoring surface
-- no required user-facing DSL or IDs
-- progressive disclosure
-- contextual/ephemeral UI
-- professional Inspector available on demand
-- minimal navigation
-- clear separation of Simple / Execution / Inspection surfaces
+- 默认简单，按需透明
+- intent-first，而不是 dashboard-first
+- 自然语言 / Markdown 是主要创作入口
+- 不要求用户编写 DSL / ID
+- 渐进披露
+- 上下文式 / 临时 UI
+- 专业 Inspector 按需出现
+- 最少导航
+- Simple / Execution / Inspection 三层清晰分离
 
-## Golden screens
+## 核心屏幕
 
-At minimum specify:
+至少规范：
 
 1. Intent Home
 2. AI Understanding Review
-3. contextual Source Connection
+3. 上下文式 Source Connection
 4. Input Preview
 5. Execution
 6. Confirmation / Human Takeover
 7. Result
 8. Inspector / professional detail
 9. Repair Diff
-10. existing Task/Goal view
+10. 已存在 Task / Goal 的查看页
 
-## Exit
+## 退出条件
 
-Acceptance D0.
-
----
-
-# P0 — Interactive Mock Prototype
-
-## Objective
-
-Validate the product experience before connecting production infrastructure.
-
-Build a real Electron + React desktop prototype with **mock services only**.
-
-## Golden path
-
-```
-Intent
-→ AI Understanding
-→ Source resolution
-→ Input preview
-→ Run
-→ Human confirmation
-→ Success
-→ Inspect details
-```
-
-## Mock only
-
-Do not require:
-- real LLM calls
-- real WeChat
-- production BrowserDriver
-- real scheduler
-- complex SQLite
-- real Git parsing
-
-Use deterministic mock fixtures.
-
-## Prototype behavior
-
-The user should be able to type naturally:
-
-```md
-每天早上 8 点检查我的行业学习仓库。
-
-如果今天有新的文章，就发布到微信公众号。
-
-正式发布之前让我确认。
-```
-
-The prototype should:
-- present FlowPilot's structured understanding
-- request Source connection only when missing
-- show an input preview
-- simulate execution
-- pause for confirmation
-- complete successfully
-- reveal professional details only when requested
-
-## Exit
-
-Acceptance P0.
+Acceptance D0。
 
 ---
 
-# E0 — Engineering Foundation
+# P0 — 交互式 Mock 原型
 
-## Objective
+## 目标
 
-Create a deterministic repository/runtime foundation suitable for multi-agent development.
+在接入生产基础设施前验证产品体验。
 
-## Deliverables
+构建真实的 Electron + React 桌面原型，但**只使用 Mock service**。
+
+## 黄金路径
+
+    Intent
+    → AI Understanding
+    → Source resolution
+    → Input preview
+    → Run
+    → Human confirmation
+    → Success
+    → Inspect details
+
+## 只做 Mock
+
+不要依赖：
+
+- 真实 LLM
+- 真实微信
+- 生产 BrowserDriver
+- 真实 Scheduler
+- 复杂 SQLite
+- 真实 Git 解析
+
+使用确定性 Mock fixture。
+
+## 原型行为
+
+用户应该可以自然输入：
+
+    每天早上 8 点检查我的行业学习仓库。
+    如果今天有新的文章，就发布到微信公众号。
+    正式发布之前让我确认。
+
+原型应该：
+
+- 展示 FlowPilot 的结构化理解
+- 只有缺少 Source 时才请求连接
+- 展示本次 Input Preview
+- 模拟执行
+- 在发布前暂停确认
+- 完成成功态
+- 只有用户需要时才展开专业详情
+
+## 退出条件
+
+Acceptance P0。
+
+---
+
+# E0 — 工程基础
+
+## 目标
+
+建立适合多 Agent 持续开发的确定性工程底座。
+
+## 交付
 
 - pnpm workspace
-- pinned Node/pnpm policy
+- 固定 Node / pnpm 策略
 - strict TypeScript
-- Electron main/preload/renderer
+- Electron main / preload / renderer
 - React + Vite
 - ESLint + Prettier
 - Vitest
 - Playwright Test
 - typed IPC skeleton
-- secure Electron defaults
+- 安全 Electron 默认配置
 - GitHub Actions
-- local deterministic fixture web application
+- 本地确定性 fixture web app
 
-Required root commands:
+根命令：
 
-```
-pnpm dev
-pnpm build
-pnpm typecheck
-pnpm lint
-pnpm test
-pnpm test:e2e
-pnpm package
-```
+    pnpm dev
+    pnpm build
+    pnpm typecheck
+    pnpm lint
+    pnpm test
+    pnpm test:e2e
+    pnpm package
 
-Fixture variants:
-- normal flow
-- changed DOM/layout
-- ambiguous/interstitial
+Fixture 至少支持：
+
+- 正常 flow
+- DOM / layout 改动
+- 歧义 / interstitial
 - auth expired
 - security challenge
 - upload
-- publish success/failure
+- publish success / failure
 
-## Exit
+## 退出条件
 
-Acceptance E0.
+Acceptance E0。
 
 ---
 
-# E1 — Intent Compiler: Goal and Task
+# E1 — 意图编译器：Goal 与 Task
 
-## Objective
+## 目标
 
-Compile ordinary natural-language/Markdown intent into versioned structured plans without exposing machine syntax to users.
+把普通自然语言 / Markdown 编译为可版本化的结构化计划，同时不把机器语法暴露给用户。
 
 ## Goal
 
-Implement:
-- Goal source/revisions
+实现：
+
+- Goal source / revision
 - GoalPlan schema
 - intent
-- required/optional inputs
-- success/non-success criteria
-- human confirmation/intervention policy
+- required / optional inputs
+- success / non-success criteria
+- human confirmation / intervention policy
 
 ## Task
 
-Implement:
-- Task source/revisions
+实现：
+
+- Task source / revision
 - TaskPlan schema
-- semantic Goal reference
+- 语义 Goal reference
 - schedule interpretation
-- Source references
-- selection rules
-- policies
-- source-hash → compiled-plan linkage
+- Source reference
+- selection rule
+- policy
+- source-hash → compiled-plan revision 关联
 
-## Semantic resolution
+## 语义解析
 
-Natural-language phrases resolve to stable internal entities.
+自然语言短语解析到稳定内部实体。
 
-Unambiguous:
-- bind silently
+无歧义：静默绑定。
 
-Materially ambiguous:
-- produce contextual clarification UI
+有实质歧义：返回上下文式 clarification UI。
 
-Never require ordinary users to write:
+普通用户绝不能被要求写：
+
 - `@goal/...`
 - `@source/...`
-- UUIDs
+- UUID
 - cron
-- selectors
+- selector
 - retry DSL
 
-## Provider boundary
+## Provider 边界
 
-Use provider-neutral structured-model interfaces.
+使用 provider-neutral structured-model 接口。
 
-Initially support deterministic fake providers/fixtures for tests before real providers.
+先用 fake / deterministic provider 支持测试，再接真实 provider。
 
-## Exit
+## 退出条件
 
-Acceptance E1.
+Acceptance E1。
 
 ---
 
-# E2 — Source, InputBundle, and Scheduling Semantics
+# E2 — Source、InputBundle 与调度语义
 
-## Objective
+## 目标
 
-Connect authorized external data to Tasks reproducibly and safely.
+把经过授权的外部数据安全、可复现地连接到 Task。
 
-## Initial Sources
+## 初始 Source
 
 - Local Folder
 - Local Git Repository
 
-## Source rules
+## Source 规则
 
-- explicit user authorization
+- 用户显式授权
 - scoped root
-- read-only by default
-- no arbitrary filesystem expansion from prose
-- provider interface isolated from domain model
+- 默认只读
+- 自然语言不能扩大文件系统权限
+- provider 接口与 domain model 隔离
 
 ## InputBundle
 
-Before execution:
+执行前：
 
-```
-Task trigger
-→ resolve Source
-→ select content
-→ bind Goal inputs
-→ capture immutable provenance
-→ validate
-→ create InputBundle
-```
+    Task trigger
+    → resolve Source
+    → select content
+    → bind Goal inputs
+    → capture immutable provenance
+    → validate
+    → create InputBundle
 
-A running Flow must not silently reread changing Source files.
+Flow 运行过程中不得静默重新读取变化中的 Source 文件。
 
-Git provenance:
-- source ID
-- branch/ref
+Git provenance 至少记录：
+
+- Source ID
+- branch / ref
 - exact commit SHA
 - selected paths
 - content hashes
 
-## Idempotency
+## 幂等性
 
-Recurring irreversible actions require deterministic duplicate prevention and consumption records.
+重复不可逆动作必须有确定性去重和 consumption record。
 
-A failed run must not falsely mark source input consumed.
+失败 Run 不能错误地把 Source 标记为已消费。
 
-## Schedule semantics
+## 调度语义
 
-Compile natural language to normalized schedules with explicit timezone.
+自然语言 schedule 编译为标准 schedule + 明确 timezone。
 
-Support at least:
+至少支持：
+
 - SKIP missed schedule
 - RUN_ON_NEXT_START
 
-Runtime-active local scheduling is sufficient at this phase. Background daemon/cloud runner is deferred.
+本阶段只要求 FlowPilot runtime 活跃时本地调度；后台 daemon / cloud runner 延后。
 
-## Exit
+## 退出条件
 
-Acceptance E2.
+Acceptance E2。
 
 ---
 
-# E3 — Deterministic Workflow Runtime
+# E3 — 确定性 Workflow 运行时
 
-## Objective
+## 目标
 
-Execute a known Flow repeatedly without AI.
+在不调用 AI 的情况下重复执行一个已知 Flow。
 
 ## Workflow IR
 
-Implement:
+实现：
+
 - Flow
 - immutable FlowRevision
 - Step
@@ -343,7 +338,8 @@ Implement:
 
 ## BrowserDriver
 
-Minimum surface:
+最小能力：
+
 - navigate
 - snapshot
 - find
@@ -353,68 +349,56 @@ Minimum surface:
 - waitFor
 - screenshot
 
-Runtime/domain code must not import Electron, Playwright, or CDP directly.
+runtime / domain 不能直接 import Electron、Playwright 或 CDP。
 
 ## ElectronDriver
 
-Back BrowserDriver with WebContentsView/webContents/CDP as needed.
+按需使用 WebContentsView / webContents / CDP 实现 BrowserDriver。
 
-## Execution
+## 执行
 
-Each meaningful Step:
+每个有意义 Step：
 
-```
-precondition
-→ target resolution
-→ action
-→ transition/wait
-→ postcondition
-→ evidence
-```
+    precondition
+    → target resolution
+    → action
+    → transition / wait
+    → postcondition
+    → evidence
 
-Absence of an exception is not success.
+没有抛异常不等于成功。
 
-## State machine
+## 状态机
 
-At least:
-- PENDING
-- PREPARING
-- RUNNING
-- VERIFYING
-- SUCCEEDED
-- FAILED
-- CANCELLED
+至少：PENDING、PREPARING、RUNNING、VERIFYING、SUCCEEDED、FAILED、CANCELLED。
 
-## Exit
+## 退出条件
 
-Acceptance E3.
+Acceptance E3。
 
 ---
 
-# E4 — AI Discovery and Repair
+# E4 — AI 发现与修复
 
-## Objective
+## 目标
 
-Learn a Flow from a Goal and repair only failing regions when the environment changes.
+从 Goal 学习 Flow，并在环境变化时只修复失败局部。
 
-## Discovery
+## 发现
 
-Pipeline:
+    GoalPlan
+    + sanitized page state
+    + allowed actions
+    → structured proposal
+    → schema validation
+    → policy validation
+    → trial
+    → persisted Flow revision
 
-```
-GoalPlan
-+ sanitized page state
-+ allowed actions
-→ structured proposal
-→ schema validation
-→ policy validation
-→ trial
-→ persisted Flow revision
-```
+## 修复
 
-## Repair
+RepairContext 包含：
 
-RepairContext contains:
 - typed failure
 - failed Step
 - last successful checkpoint
@@ -423,140 +407,121 @@ RepairContext contains:
 - sanitized page snapshot
 - platform hints
 
-Preferred output:
-- smallest viable patch
+默认输出最小可行 patch。
 
-A successful repair creates a new immutable Flow revision.
+成功修复创建新的 immutable Flow revision。
 
-## Required proof
+## 必须证明
 
-```
-learn fixture v1
-→ run with no AI
-→ switch fixture to v2
-→ typed failure
-→ local repair
-→ validate
-→ revision N+1
-→ next run succeeds with no AI
-```
+    learn fixture v1
+    → run with no AI
+    → switch fixture to v2
+    → typed failure
+    → local repair
+    → validate
+    → revision N+1
+    → next run succeeds with no AI
 
-## Exit
+## 退出条件
 
-Acceptance E4.
+Acceptance E4。
 
 ---
 
-# E5 — Human Takeover and Risk
+# E5 — Human Takeover 与风险
 
-## Objective
+## 目标
 
-Handle user/security intervention explicitly and safely.
+显式、安全地处理用户 / 安全验证介入。
 
-## Risk taxonomy
+## 风险分类
 
-At least:
-- LOGIN_REQUIRED
-- QR_REQUIRED
-- CAPTCHA
-- MFA_REQUIRED
-- SECURITY_CHALLENGE
-- ACCOUNT_WARNING
-- RATE_LIMIT
-- PERMISSION_DENIED
-- DESTRUCTIVE_ACTION_CONFIRMATION
-- UNKNOWN_INTERSTITIAL
+至少：LOGIN_REQUIRED、QR_REQUIRED、CAPTCHA、MFA_REQUIRED、SECURITY_CHALLENGE、ACCOUNT_WARNING、RATE_LIMIT、PERMISSION_DENIED、DESTRUCTIVE_ACTION_CONFIRMATION、UNKNOWN_INTERSTITIAL。
 
-## Runtime states
+## 运行时状态
 
-Add:
-- PAUSED_HUMAN
-- RETRY_WAIT
-- REPAIRING
+增加：PAUSED_HUMAN、RETRY_WAIT、REPAIRING。
 
-## Takeover
+## 接管
 
-User can:
-- take control
-- complete login/verification/manual decision
-- return control
+用户可以接管、完成登录 / 验证 / 手工决定，再把控制权交回。
 
-Resume only after fresh snapshot + recognized safe state.
+恢复前必须重新 snapshot 并验证已知安全状态。
 
-No CAPTCHA/MFA/security bypass.
+禁止 CAPTCHA / MFA / security bypass。
 
-## Exit
+## 退出条件
 
-Acceptance E5.
+Acceptance E5。
 
 ---
 
-# E6 — WeChat Official Accounts MVP
+# E6 — 微信公众号 MVP
 
-## Objective
+## 目标
 
-Apply the proven model/runtime to the first real platform.
+把已经验证的产品模型 / runtime 应用到第一个真实平台。
 
-## Scope
+## 范围
 
-- add account/platform
-- manual QR login
-- persistent account session
-- learn article publishing
+- 添加账号 / 平台
+- 手工二维码登录
+- 持久账号 session
+- 学习文章发布 Flow
 - title
 - body
 - cover
-- summary when applicable
+- summary（适用时）
 - publish confirmation
 - success verification
 - repair evidence
 
-No production account in CI.
+CI 不使用生产账号。
 
-No stealth/fingerprint/CAPTCHA/MFA bypass.
+禁止 stealth / fingerprint / CAPTCHA / MFA bypass。
 
-## Exit
+## 退出条件
 
-Acceptance E6.
+Acceptance E6。
 
 ---
 
-# H0 — Hardening and Expansion
+# H0 — 加固、Runner 与扩展
 
-Only after E6:
+只有 E6 后再考虑：
 
 - crash recovery
 - resumable runs
-- local background runner/daemon
+- local background runner / daemon
 - scheduler robustness
 - application updates
-- workflow/run Inspector polish
+- workflow / run Inspector polish
 - diagnostics export with redaction
 - compatibility matrix
-- performance/memory profiling
+- performance / memory profiling
 - signed installers
 - additional platforms
 - official API-backed actions
 - optional cloud runner
 - team features
 
-Any major expansion gets its own plan/ADR.
+重大扩展应有自己的计划 / ADR。
 
 ---
 
-# How an agent chooses work
+# Agent 如何选择工作
 
-Unless explicitly assigned:
+没有明确指定时：
 
-1. read `AGENTS.md`
-2. read `PROJECT-STATE.md`
-3. read this plan
-4. read `ACCEPTANCE.md`
-5. choose the smallest unfinished slice in the current phase
-6. use `TASK-PACKET-TEMPLATE.md`
-7. implement
-8. validate
-9. update PROJECT-STATE if current truth changed
-10. leave a handoff
+1. 读 `AGENTS.md`；
+2. 读 `PROJECT-STATE.md`；
+3. 读本计划；
+4. 读 `ACCEPTANCE.md`；
+5. 选择当前阶段最小未完成 slice；
+6. 需要时使用 `TASK-PACKET-TEMPLATE.md`；
+7. 实现；
+8. 验证；
+9. 当前事实变化时更新 PROJECT-STATE；
+10. 留下 handoff。
 
-Do not jump to a later phase without gate evidence.
+没有 Gate 证据时不要跳到下一阶段。

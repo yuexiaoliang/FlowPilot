@@ -1,146 +1,157 @@
-# Roadmap
+# 路线图
 
-The roadmap is risk-driven. Do not optimize for number of supported platforms before proving the runtime loop.
+路线图以风险为导向。在证明核心运行时闭环之前，不要追求支持平台的数量。
 
-## Phase 0 — Foundation
+> 注意：具体实现顺序以 `DEVELOPMENT-PLAN.md` 为准；本文件是较高层的历史 / 战略摘要。
 
-Goal: repository can be safely developed by multiple agents.
+## 阶段 0 — 基础
 
-Deliverables:
-- workspace/tooling/bootstrap
+目标：仓库可以由多个 Agent 安全开发。
+
+交付内容：
+
+- workspace / tooling / bootstrap
 - Electron shell + React renderer
-- strict TypeScript/lint/test CI
-- package boundaries
-- SQLite migration mechanism
+- strict TypeScript / lint / test CI
+- package 边界
+- SQLite migration 机制
 - typed IPC
-- security defaults
-- ADR process
-- local fixture website
+- 安全默认配置
+- ADR 流程
+- 本地 fixture 网站
 
-Exit: clean clone can install, test, build, and launch deterministically.
+退出条件：clean clone 可以确定性地完成 install、test、build 和 launch。
 
-## Phase 1 — Deterministic workflow runtime
+## 阶段 1 — 确定性 Workflow 运行时
 
-Goal: execute a known Flow without AI.
+目标：在不调用 AI 的情况下执行已知 Flow。
 
-Deliverables:
+交付内容：
+
 - Workflow IR v1
 - BrowserDriver v1
-- ElectronDriver basic navigation/snapshot/find/click/fill/upload
+- ElectronDriver 的基础 navigate / snapshot / find / click / fill / upload 能力
 - executor
-- pre/postcondition validators
-- run state machine
-- typed errors
+- precondition / postcondition validator
+- Run 状态机
+- typed error
 - structured event log
-- local fixture flow
+- 本地 fixture Flow
 
-Exit: fixture workflow executes repeatedly with zero LLM calls.
+退出条件：fixture Workflow 可以重复执行，且零 LLM 调用。
 
-## Phase 2 — Persistence and account/session model
+## 阶段 2 — 持久化与账号 / Session 模型
 
-Goal: survive app restarts.
+目标：App 重启后仍能保留状态。
 
-Deliverables:
-- platforms/accounts/flows/revisions/runs schema
-- per-account persistent Electron sessions
-- session health detection
-- account removal/session cleanup
-- encrypted secret abstraction
+交付内容：
 
-Exit: login/session and workflows persist across restarts in fixture environment.
+- platform / account / Flow / revision / Run Schema
+- 每个账号独立的 persistent Electron session
+- Session health 检测
+- 账号删除 / Session 清理
+- 加密 Secret 抽象
 
-## Phase 3 — Discovery
+退出条件：在 fixture 环境中，登录 / Session 和 Workflow 可以跨 App 重启保持。
 
-Goal: learn a flow from a goal and page state.
+## 阶段 3 — Discovery
 
-Deliverables:
+目标：从 Goal 和页面状态学习 Flow。
+
+交付内容：
+
 - provider-neutral AI gateway
 - sanitized snapshot pipeline
 - structured discovery output
-- workflow compiler/validator
-- discovery UI and review
-- cost/token/latency instrumentation
+- Workflow compiler / validator
+- Discovery UI 和审阅
+- cost / token / latency instrumentation
 
-Exit: AI can learn fixture v1 and produce a Flow that later runs without AI.
+退出条件：AI 可以学习 fixture v1，生成一个之后无需 AI 即可执行的 Flow。
 
-## Phase 4 — Repair loop
+## 阶段 4 — Repair 闭环
 
-Goal: self-heal a broken known workflow.
+目标：已知 Workflow 失效后能够自愈。
 
-Deliverables:
+交付内容：
+
 - failure classifier
 - bounded RepairContext
-- repair proposal schema
+- repair proposal Schema
 - candidate patch validation
 - safe trial execution
-- new revision creation
-- rollback/version inspection
+- 新 revision 创建
+- rollback / version inspection
 
-Test fixture v2 must intentionally break v1 selectors/layout.
+测试 fixture v2 必须故意破坏 v1 的 selector / layout。
 
-Exit:
-```
+退出条件：
+
+```text
 learn v1 → run → switch site to v2 → fail → repair → validate → revision+1 → next run succeeds without AI
 ```
 
-This is the key technical milestone.
+这是关键技术里程碑。
 
-## Phase 5 — Human takeover and risk engine
+## 阶段 5 — Human Takeover 与风险引擎
 
-Goal: safely handle non-automatable/security states.
+目标：安全处理不可自动化或涉及安全验证的状态。
 
-Deliverables:
-- pause/resume state
+交付内容：
+
+- pause / resume 状态
 - takeover UI
 - risk event taxonomy
-- QR/security/MFA fixtures
-- confirmation checkpoints
-- rate limiting/backoff
+- QR / security / MFA fixture
+- confirmation checkpoint
+- rate limiting / backoff
 
-Exit: all hard-pause fixtures stop automation and resume only after verified user intervention.
+退出条件：所有 hard-pause fixture 都会停止自动化，并且只有在用户介入经过验证后才恢复。
 
-## Phase 6 — WeChat Official Accounts MVP
+## 阶段 6 — 微信公众号 MVP
 
-Goal: real-world first adapter.
+目标：完成第一个真实平台 Adapter。
 
-Scope:
-- manual QR login
+范围：
+
+- 手工 QR login
 - persistent account session
 - article editor discovery
-- title/body/cover/summary input where supported
-- publish flow
-- confirmation before irreversible publish
+- 在适用时输入 title / body / cover / summary
+- publish Flow
+- 不可逆发布前确认
 - success verification
-- repair evidence collection
+- Repair 证据收集
 
-Do not use production accounts in automated CI.
+自动化 CI 不得使用生产账号。
 
-Exit: repeated article publishing works reliably for a controlled test account and a deliberately induced minor UI change can be repaired.
+退出条件：受控测试账号可以可靠地重复发布文章，并且故意引入的轻微 UI 变化可以被修复。
 
-## Phase 7 — Product hardening
+## 阶段 7 — 产品加固
 
 - crash recovery
-- resumable runs
+- resumable Run
 - update system
-- export/import diagnostics without secrets
-- workflow inspector
+- 不包含 Secret 的 diagnostics export / import
+- Workflow Inspector
 - platform compatibility matrix
-- performance/memory profiling
-- signed installers
+- performance / memory profiling
+- signed installer
 
-## Phase 8 — Additional platforms and API actions
+## 阶段 8 — 更多平台与 API Action
 
-Only now add additional adapters, chosen by user demand.
+只有进入此阶段后，才根据真实用户需求增加更多 Adapter。
 
-Introduce official API-backed actions where available. Browser/API implementations should share capability semantics.
+平台提供官方 API 时，引入经过授权的 API Action。Browser / API 实现应共享相同的 capability 语义。
 
-## Deferred
+## 延后事项
 
-Not part of early releases:
+早期版本不包含：
+
 - cloud browser execution
-- background publishing while desktop is off
-- team collaboration/RBAC
-- workflow marketplace
+- desktop 关闭后的 background publish
+- team collaboration / RBAC
+- Workflow marketplace
 - stealth browser / anti-detection evasion
 - CAPTCHA solving
-- arbitrary website destructive automation
+- 任意网站的破坏性自动化

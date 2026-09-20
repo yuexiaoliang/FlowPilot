@@ -1,55 +1,65 @@
-# Architecture
+# 架构
 
-## Architectural objective
+## 架构目标
 
-FlowPilot is a local-first, intent-first desktop automation runtime. Human intent is authored primarily in natural language/Markdown and compiled into structured plans. Its durable assets include versioned GoalPlans, TaskPlans, Sources, Workflows, and Run provenance. AI helps interpret intent, discover workflows, and repair them; it is not the deterministic workflow runtime.
+FlowPilot 是 local-first、intent-first 的桌面自动化运行时。
 
-## Runtime topology
+人的意图主要以自然语言 / Markdown 编写，然后编译为结构化 plan。长期资产包括 versioned GoalPlan、TaskPlan、Source、Workflow 和 Run provenance。
+
+AI 用于理解意图、发现 Workflow、修复 Workflow；它不是确定性 Workflow Runtime 本身。
+
+## 运行时拓扑
 
 ### Electron Main
-Owns:
-- application lifecycle
-- windows and WebContentsView instances
-- persistent Electron sessions/partitions
-- permissions and navigation policy
-- secure storage integration
-- IPC endpoints
+
+负责：
+
+- App 生命周期
+- Window / WebContentsView
+- persistent Electron session / partition
+- permission / navigation policy
+- secure storage
+- IPC endpoint
 - BrowserDriver implementation wiring
 - worker lifecycle
 
 ### Renderer
-Owns:
+
+负责：
+
 - React UI
-- platform/account management views
-- flow/run inspection
-- human takeover controls
-- user confirmations
+- platform / account 管理视图
+- Flow / Run inspection
+- Human Takeover 控制
+- 用户确认
 - settings
 
-Renderer has no direct filesystem/database/Node access beyond narrow preload APIs.
+Renderer 除了最小 preload API 外，没有 filesystem / database / Node 访问。
 
 ### Automation Worker / Application Services
-Owns:
-- natural-language Goal/Task compilation orchestration
+
+负责：
+
+- Goal / Task 自然语言编译编排
 - semantic entity resolution
-- Source Manager and InputBundle construction
-- scheduler/task orchestration when enabled
+- Source Manager / InputBundle construction
+- scheduler / task orchestration
 - Flow loading
-- planning of deterministic execution
+- deterministic execution planning
 - executor
 - validators
-- retries/backoff
+- retry / backoff
 - risk classification
-- discovery/repair orchestration
+- discovery / repair orchestration
 - run event stream
 
-CPU/long-running orchestration should not block Electron Main or Renderer.
+长时间 / CPU 工作不能阻塞 Electron Main 或 Renderer。
 
-## Core packages
+## 核心包
 
-Target monorepo:
+目标 monorepo：
 
-```
+```text
 apps/
   desktop/
     src/
@@ -59,73 +69,74 @@ apps/
       workers/
 
 packages/
-  domain/             # entities, IDs, error taxonomy
-  goal-ir/            # GoalPlan schema/compiler boundary
-  task-ir/            # TaskPlan schema/compiler boundary
-  source-core/        # Source providers, permissions, snapshots
-  workflow-ir/        # Flow schema and compiler primitives
-  workflow-runtime/   # executor, validator, retry, resume
-  browser-driver/     # interface + contract tests
-  electron-driver/    # WebContentsView/CDP implementation
-  playwright-driver/  # dev/test/fallback adapter
-  ai-core/            # provider-neutral AI request/result types
-  ai-discovery/       # discovery orchestration
-  ai-repair/          # local repair orchestration
-  storage/            # repositories + SQLite mapping
-  ipc-contracts/      # renderer/main typed boundary
-  observability/      # logs/events/redaction
-  platform-sdk/       # platform capabilities/adapters
+  domain/             # 实体、ID、错误分类
+  goal-ir/            # GoalPlan Schema / 编译器边界
+  task-ir/            # TaskPlan Schema / 编译器边界
+  source-core/        # Source provider、权限、快照
+  workflow-ir/        # Flow Schema 和编译原语
+  workflow-runtime/   # executor、validator、retry、resume
+  browser-driver/     # 接口和契约测试
+  electron-driver/    # WebContentsView / CDP 实现
+  playwright-driver/  # 开发、测试和 fallback adapter
+  ai-core/            # 与 Provider 无关的 AI request / result 类型
+  ai-discovery/       # Discovery 编排
+  ai-repair/          # 局部 Repair 编排
+  storage/            # repository 和 SQLite 映射
+  ipc-contracts/      # renderer / main 类型化边界
+  observability/      # 日志、事件、脱敏
+  platform-sdk/       # platform capability / adapter
 ```
 
-Not all packages need to exist on day one. Extract only when a boundary becomes real, but preserve dependency direction.
+不是第一天就必须创建所有 package；只有真实边界出现时才抽取，但依赖方向必须保持。
 
-## Product compilation model
+## 产品编译模型
 
-FlowPilot separates the human source from machine execution:
+FlowPilot 将人类 Source 与机器执行分离：
 
-```
-Goal.md / Task.md
-      ↓
-semantic compilation
-      ↓
-GoalPlan / TaskPlan
-      ↓
-Source resolution
-      ↓
-immutable InputBundle
-      ↓
-Flow discovery/selection
-      ↓
-versioned Flow
-      ↓
-Run
-```
+    Goal.md / Task.md
+          ↓
+    semantic compilation
+          ↓
+    GoalPlan / TaskPlan
+          ↓
+    Source resolution
+          ↓
+    immutable InputBundle
+          ↓
+    Flow discovery / selection
+          ↓
+    versioned Flow
+          ↓
+    Run
 
-Rules:
-- human-facing Markdown remains normal prose and must not require internal IDs or DSL syntax
-- semantic phrases are resolved to stable internal entity references
-- materially ambiguous resolution pauses for a user choice rather than guessing
-- compiled plans are versioned artifacts
-- a Run binds exact plan/Flow revisions and immutable input provenance
-- repair updates Flow revisions; it does not silently rewrite the user's Goal
+规则：
 
-See `PRODUCT-MODEL.md` and `TASK-SOURCE-RUNTIME.md`.
+- 面向用户 Markdown 必须保持正常人类语言，不要求内部 ID / DSL
+- 语义短语解析到稳定内部实体引用
+- 实质歧义时暂停并让用户选择，而不是猜
+- compiled plan 是版本化产物
+- Run 绑定 exact plan / Flow revision 和不可变 input provenance
+- Repair 更新 Flow revision，不静默改用户 Goal
 
-## Source and input model
+相关规范见 `PRODUCT-MODEL.md` 和 `TASK-SOURCE-RUNTIME.md`。
 
-A Source is an explicit permission boundary. Natural-language references never grant arbitrary filesystem or repository access.
+## Source / Input 模型
 
-Before execution, Source data is resolved into an immutable InputBundle. The workflow must not reread mutable Source data mid-run.
+Source 是显式权限边界。
 
-Scheduled/recurring tasks require deterministic idempotency and consumption semantics so the same source version is not accidentally published twice.
+自然语言引用永远不能授予任意 filesystem / repository 权限。
 
-## Browser model
+执行前把 Source 解析成不可变 InputBundle；Flow 运行中不能重新读取可变 Source。
 
-Production desktop browsing uses **Electron WebContentsView** controlled from Main. Electron documents WebContentsView as the high-control embedded-web option and discourages relying on the older webview tag.
+定时 / recurring Task 必须有 deterministic idempotency / consumption semantics。
 
-Every platform account receives an isolated persistent session/partition. Session identity must never be mixed between accounts.
+## Browser 模型
 
-The runtime talks only to:
+生产桌面浏览使用 Main 控制的 **Electron WebContentsView**。Electron 将 WebContentsView 作为高控制力的嵌入式网页方案，并不建议依赖旧的 `<webview>` tag。
+
+每个 platform account 都有隔离 persistent session / partition；不同账号不能混用 Session identity。
+
+Runtime 只通过 BrowserDriver：
 
 ```ts
 interface BrowserDriver {
@@ -141,79 +152,82 @@ interface BrowserDriver {
 }
 ```
 
-The exact interface can evolve, but callers must not know whether Electron/CDP or Playwright implements it.
+具体接口可以演进，但调用方不能知道底层到底是 Electron / CDP 还是 Playwright。
 
-## Authentication model
+## 认证模型
 
-Preferred order:
-1. persistent browser session/profile
-2. platform-supported OAuth/API credentials
-3. normal reauthentication flow
-4. human takeover for QR, CAPTCHA, MFA, security challenges
+优先顺序：
 
-Do not reverse-engineer or imitate undocumented token-refresh mechanisms as the default strategy.
+1. persistent browser session / profile
+2. 平台支持的 OAuth / API credential
+3. 正常 reauthentication
+4. QR / CAPTCHA / MFA / security challenge 时 Human Takeover
 
-Auth material is treated as secret. AI receives derived state ("logged in", "login page", "security challenge"), not raw credentials.
+不要把逆向 undocumented token refresh 作为默认登录策略。
 
-## Workflow runtime
+Auth material 是 Secret；AI 只接收“logged in / login page / security challenge”等派生状态。
 
-A run is a state machine:
+## Workflow 运行时
 
-```
-PENDING
-→ PREPARING
-→ RUNNING
-→ [PAUSED_HUMAN | REPAIRING | RETRY_WAIT]
-→ RUNNING
-→ VERIFYING
-→ SUCCEEDED
+Run state machine：
 
-Any state → FAILED / CANCELLED
-```
+    PENDING
+    → PREPARING
+    → RUNNING
+    → [PAUSED_HUMAN | REPAIRING | RETRY_WAIT]
+    → RUNNING
+    → VERIFYING
+    → SUCCEEDED
 
-Each Step follows:
-```
-check preconditions
-→ resolve target
-→ execute action
-→ await transition
-→ validate expected state
-→ record evidence
-```
+任何状态都可进入 FAILED / CANCELLED。
 
-Thrown browser errors alone never determine success.
+每个 Step：
 
-## AI discovery
+    check preconditions
+    → resolve target
+    → execute action
+    → await transition
+    → validate expected state
+    → record evidence
 
-Input should be minimized:
+浏览器操作没有抛错不代表成功。
+
+## AI 发现
+
+输入尽量最小化：
+
 - user goal
 - sanitized page snapshot
 - allowed action vocabulary
-- current URL/domain metadata
+- current URL / domain metadata
 - platform capabilities
 - prior relevant steps
 
-Output must be structured and schema validated. AI proposals do not directly mutate stored workflows. They are compiled/validated first.
+输出必须 structured + schema validated。
 
-## AI repair
+AI proposal 不能直接修改持久 Workflow，必须先 compile / validate。
 
-Repair starts from the failed step plus bounded neighboring context.
+## AI 修复
 
-Repair algorithm:
+Repair 从 failed Step + bounded neighboring context 开始。
+
+流程：
+
 1. classify failure
-2. capture sanitized current state/evidence
-3. ask repair agent for candidate patch
-4. validate candidate against policy/schema
-5. execute in a bounded sandbox/run
+2. capture sanitized current state / evidence
+3. 请求 candidate patch
+4. policy / schema validate
+5. bounded trial
 6. verify target state
-7. persist new Flow version
-8. link repair provenance and old/new diff
+7. 保存新 Flow revision
+8. 关联 repair provenance / diff
 
-Never overwrite the prior Flow version.
+永远不覆盖旧 Flow revision。
 
-## Risk engine
+## 风险引擎
 
-Typed risk events include:
+typed risk 至少：
+
 - LOGIN_REQUIRED
 - QR_REQUIRED
 - CAPTCHA
@@ -225,13 +239,14 @@ Typed risk events include:
 - DESTRUCTIVE_ACTION_CONFIRMATION
 - UNKNOWN_INTERSTITIAL
 
-Risk events can pause or stop execution. AI cannot override hard-stop policy.
+Risk 可以 pause / stop；AI 不能覆盖 hard-stop policy。
 
-## Platform abstraction
+## 平台抽象
 
-A Platform Adapter provides capabilities and hints, not a separate execution engine.
+Platform Adapter 提供 capability / hint，而不是另一套 execution engine。
 
-Example:
+概念接口：
+
 ```ts
 interface PlatformAdapter {
   id: PlatformId;
@@ -242,32 +257,32 @@ interface PlatformAdapter {
 }
 ```
 
-Generic runtime behavior stays generic.
+generic runtime 必须保持 generic。
 
-## Persistence
+## 持久化
 
-SQLite stores structured application state:
+SQLite 保存：
+
 - platforms
-- accounts (non-secret metadata)
-- goals / goal revisions / compiled GoalPlans
-- tasks / task revisions / compiled TaskPlans
-- sources / scoped permissions / source cursors
-- input bundles / source provenance / consumption records
-- flows
-- flow_versions
-- runs
-- run_steps
+- accounts（非 Secret metadata）
+- goals / goal revisions / GoalPlans
+- tasks / task revisions / TaskPlans
+- sources / permission / cursor
+- input bundles / provenance / consumption record
+- flows / flow_versions
+- runs / run_steps
 - repair_attempts
 - publish_jobs
 - event metadata
 
-Browser profiles/session storage live in application data directories, not database blobs.
+Browser profile / session storage 放在 App data 目录，不放 DB blob。
 
-Secrets are encrypted via OS-backed secure storage where feasible.
+Secret 按需使用 OS-backed secure storage 加密。
 
-## Observability
+## 可观测性
 
-Every run emits structured events with correlation IDs:
+每个 Run 发结构化 event + correlation ID，例如：
+
 - run.started
 - step.started
 - step.target_resolved
@@ -279,19 +294,21 @@ Every run emits structured events with correlation IDs:
 - human_takeover.required
 - run.succeeded / failed
 
-Logs must be useful without exposing page secrets.
+日志必须可用于排查，但不能泄漏页面 Secret。
 
-## API-first option
+## API 优先选项
 
-When a platform provides an official, authorized API for a capability, a platform adapter may implement the action through that API. Browser and API actions can coexist behind the same Flow action model where semantics match.
+平台如果提供官方、授权 API，可以由 Platform Adapter 实现对应 action。
 
-## Explicit non-goals for MVP
+Browser / API action 可以在语义一致时共享同一 Flow action model。
+
+## MVP 明确非目标
 
 - cloud browser farm
 - multi-user collaboration
-- stealth/fingerprint spoofing
-- CAPTCHA solving/bypass
+- stealth / fingerprint spoofing
+- CAPTCHA solving / bypass
 - arbitrary user-authored JavaScript execution
 - autonomous destructive actions
 - dozens of platforms
-- server-side scheduling while desktop app is offline
+- desktop 关闭时的 server-side scheduling

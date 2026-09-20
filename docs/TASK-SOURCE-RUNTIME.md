@@ -1,73 +1,63 @@
-# Task, Source, and Input Runtime
+# Task、Source 与 Input Runtime
 
-This document defines how scheduled tasks consume external user data safely and reproducibly.
+本文件定义定时 Task 如何安全、可复现地消费外部用户数据。
 
 ## Pipeline
 
-```
-Trigger
-   ↓
-TaskPlan
-   ↓
-Source Resolution
-   ↓
-Selection
-   ↓
-Immutable InputBundle
-   ↓
-GoalPlan
-   ↓
-Flow
-   ↓
-Run
-```
+    Trigger
+       ↓
+    TaskPlan
+       ↓
+    Source Resolution
+       ↓
+    Selection
+       ↓
+    Immutable InputBundle
+       ↓
+    GoalPlan
+       ↓
+    Flow
+       ↓
+    Run
 
-A workflow should never repeatedly read a mutable Source while publishing.
+发布过程中不能反复读取可变 Source。
 
-Source data is resolved and frozen before execution.
+Source 数据在执行前解析并冻结。
 
 ---
 
-# Source authorization
+# Source 授权
 
-A Source is an explicit permission boundary.
+Source 是明确的权限边界。
 
-For local files, the user chooses a folder/repository through the OS/UI.
+对于本地文件，用户通过 OS / UI 选择文件夹或仓库。
 
-Example authorization:
+授权范围示例：
 
-```
+```text
 ~/projects/industry-learning-journal
 ```
 
-FlowPilot stores an internal Source record and scoped permission.
+FlowPilot 保存内部 Source record 和 scoped permission。
 
-AI/runtime receives a Source handle/capability, not unrestricted access to the user's home directory.
+AI / runtime 获得 Source handle / capability，而不是整个用户 Home 的无限制访问。
 
-Do not grant broad filesystem access because natural language said:
+不能因为自然语言写“从我的文件里找文章”就授予广泛文件系统权限。
 
-> 从我的文件里找文章。
+未授权 Source 必须请求连接 / permission。
 
-If a Source is not authorized, FlowPilot must request connection/permission.
+## 初始 Source 类型
 
-## Initial Source types
+MVP：
 
-MVP-friendly:
 1. Local Folder
 2. Local Git Repository
 
-Later:
-- GitHub Repository
-- Google Drive
-- Dropbox/OneDrive
-- HTTP API
-- RSS
-- database
-- Notion/other connectors
+后续：GitHub Repository、Google Drive、Dropbox / OneDrive、HTTP API、RSS、database、Notion 等。
 
-Source implementations should share a common interface where practical.
+Source 实现应尽量共享统一 interface。
 
-Conceptual interface:
+概念接口：
 
 ```ts
 interface SourceProvider {
@@ -78,29 +68,29 @@ interface SourceProvider {
 }
 ```
 
-Write capability, if ever supported, must be separate and explicitly authorized.
+写权限如果未来支持，必须独立授权，不能默认包含在 read capability 中。
 
 ---
 
 # Source selection
 
-Task natural language may say:
+Task 可以自然写：
 
 > 找到今天最新的文章和封面。
 
-The Task compiler turns that into a structured selection rule.
+Task compiler 把它编译成 structured selection rule。
 
-Selection is evaluated before Flow execution.
+Selection 在 Flow 开始前执行。
 
-If multiple candidates are materially ambiguous, do not randomly choose. Surface an ambiguity resolver or use an explicit, previously learned policy.
+多个候选存在实质歧义时不能随机选择；应展示 ambiguity resolver 或使用用户已明确学习的 policy。
 
 ---
 
 # InputBundle
 
-Every Run receives an immutable InputBundle.
+每个 Run 获得不可变 InputBundle。
 
-Example:
+示例：
 
 ```json
 {
@@ -128,36 +118,38 @@ Example:
 }
 ```
 
-The actual content may be stored/referenced according to size/security policy, but the Run must retain enough immutable provenance to know exactly what was used.
+实际内容可以根据大小 / 安全策略保存或引用，但 Run 必须保留足够的不可变 provenance，明确知道到底用了什么。
 
-## Why snapshot first
+## 为什么先 snapshot
 
-Without this boundary:
-- title may come from one version while body changes mid-run
-- retries may publish a newer file than the original attempt
-- audit/reproduction becomes impossible
-- concurrent editors can cause inconsistent results
+没有这个边界会出现：
 
-Once a Run enters execution, the InputBundle must not silently change.
+- title 来自一个版本，正文中途变成另一个版本
+- retry 发布比原始 attempt 更新的数据
+- 无法审计 / 复现
+- 并发编辑造成不一致
 
-If the user wants newer data, create a new Run or explicitly restart with a new snapshot.
+Run 一旦进入执行，InputBundle 不允许静默变化。
+
+如果用户想使用新数据，应创建新 Run 或明确重新 snapshot。
 
 ---
 
 # Git provenance
 
-Git Sources are especially useful because commits provide natural immutable source versions.
+Git Source 特别适合 FlowPilot，因为 commit 是天然不可变版本。
 
-A Run should record:
+Run 应记录：
+
 - repository Source ID
-- branch/ref used for selection
+- selection 使用的 branch / ref
 - exact commit SHA
 - selected paths
 - content hashes
 
-Example:
+示例：
 
-```
+```text
 Source: industry-learning-journal
 Branch: main
 Commit: 7acf921
@@ -168,103 +160,103 @@ Files:
 
 ---
 
-# Idempotency and duplicate prevention
+# Idempotency 与防重复
 
-Scheduled publishing must not repeatedly publish the same input.
+定时发布不能重复发布相同 input。
 
-Each Task needs a deterministic consumption/idempotency key.
+每个 Task 需要 deterministic consumption / idempotency key。
 
-Possible components:
+可以由以下信息组合：
+
 - TaskPlan revision
 - Goal ID
-- Source snapshot/version
+- Source snapshot / version
 - selected content hashes
-- destination account/platform
+- destination account / platform
 - logical content identity
 
-Before creating an irreversible Run, check whether the same idempotency key has already succeeded or is already in-flight.
+创建不可逆 Run 前，检查相同 key 是否已成功或正在执行。
 
-Natural language:
+自然语言：
 
 > 只发布从未发布过的版本。
 
-Internal policy:
+内部策略：
 
-```
+```text
 dedupeStrategy = source-version-and-destination
 ```
 
-Do not rely only on timestamps.
+不能只依赖 timestamp。
 
 ## Cursor / watermark
 
-A Source/Task may maintain a cursor such as:
+Source / Task 可以维护：
+
 - last processed Git commit
 - last processed item ID
 - last successful content hash
 - feed cursor
 
-Cursor updates occur only at the appropriate success boundary. Failure must not incorrectly mark content as consumed.
+只有达到正确 success boundary 后才更新 cursor。Failure 不能把内容错误标记为已消费。
 
 ---
 
 # Scheduling
 
-Task schedule is compiled from natural language into a normalized schedule.
+Task schedule 从自然语言编译成标准 schedule。
 
-User:
+用户：
 
 > 每天早上 8 点运行。
 
-Internal:
+内部：
 
-```
+```text
 normalized schedule + timezone
 ```
 
-Store the user's chosen timezone explicitly.
+必须显式保存用户 timezone。
 
-Do not require cron syntax for ordinary users.
+普通用户不需要 cron。
 
 ## Missed schedule policy
 
-Desktop apps may be closed at scheduled time.
+桌面 App 在计划时间可能没有运行。
 
-Supported conceptual policies:
+概念 policy：
+
 - SKIP
 - RUN_ON_NEXT_START
 - CATCH_UP_WITH_LIMIT
 
-Natural language example:
+MVP 可以要求 FlowPilot runtime 正在运行。
+
+后台 daemon / cloud runner 属于后续架构阶段。
+
+自然语言可以明确 missed policy：
 
 > 如果电脑早上 8 点没有运行 FlowPilot，当天第一次启动后执行。
 
-The compiled plan stores the policy.
-
-MVP scheduling can require FlowPilot to be running.
-
-Background daemon/cloud runner are later architecture stages.
+编译后的 TaskPlan 保存对应策略。
 
 ---
 
-# Task execution lifecycle
+# Task 执行生命周期
 
-```
-SCHEDULED
-→ RESOLVING_SOURCE
-→ BUILDING_INPUT
-→ VALIDATING_INPUT
-→ READY
-→ WAITING_CONFIRMATION (optional)
-→ RUNNING
-→ SUCCEEDED / SKIPPED / FAILED / CANCELLED
-```
+    SCHEDULED
+    → RESOLVING_SOURCE
+    → BUILDING_INPUT
+    → VALIDATING_INPUT
+    → READY
+    → WAITING_CONFIRMATION（可选）
+    → RUNNING
+    → SUCCEEDED / SKIPPED / FAILED / CANCELLED
 
-SKIPPED is a valid outcome, e.g. no new content.
+SKIPPED 是合法结果，例如今天没有新内容。
 
-Reason must be recorded.
+原因必须记录，例如：
 
-Examples:
 - NO_MATCHING_INPUT
 - ALREADY_CONSUMED
 - SOURCE_UNAVAILABLE
@@ -272,99 +264,83 @@ Examples:
 
 ---
 
-# Binding Source data to Goal inputs
+# 将 Source 数据绑定到 Goal input
 
-The compiler creates semantic bindings.
+Compiler 创建语义 binding。
 
-Human language:
+例如用户说：
 
 > Markdown 第一行标题作为标题，正文作为公众号正文，同目录 cover.png 作为封面。
 
-Compiled:
+内部编译为：
 
-```
-Goal input "title"   ← document title
-Goal input "content" ← document body
-Goal input "cover"   ← associated cover image
-```
+- Goal input `title` ← document title
+- Goal input `content` ← document body
+- Goal input `cover` ← associated cover image
 
-Bindings must be validated before a Run starts.
+Run 开始前必须验证 binding。
 
-Missing required input follows the Task policy:
+缺失 required input 根据 Task policy：
+
 - ask user
 - skip
 - fail
-- derive with AI (only when explicitly safe/allowed)
+- derive with AI（只有显式允许且安全时）
 
-AI-generated derived inputs should have provenance.
+AI 派生 input 必须有 provenance。
 
 ---
 
-# Security and privacy
+# 安全与隐私
 
-Source rules:
+Source 规则：
+
 - least privilege
-- read-only by default
-- explicit user authorization
-- no unrestricted filesystem traversal
-- no Source content sent to AI unless necessary for the current compilation/resolution task
-- redact secrets where applicable
-- prompts receive only relevant excerpts
-- large repositories are searched/scoped rather than blindly uploaded
+- 默认只读
+- 显式用户授权
+- 禁止 unrestricted filesystem traversal
+- 只有当前任务真正需要时才把 Source 内容发给 AI
+- 按需脱敏
+- Prompt 只包含相关 excerpt
+- 大仓库通过搜索 / scope，不整体上传
 
-AI must never use page prompt injection or Source content instructions to expand permissions.
+Source 内容中的 prompt injection 不能扩大权限。
 
 ---
 
-# Persistence model
+# 持久化模型
 
-Planned records:
-- goals
-- goal_revisions
-- goal_plans
-- tasks
-- task_revisions
-- task_plans
-- sources
-- source_permissions
-- source_cursors
+计划中的记录包括：
+
+- goals / goal_revisions / goal_plans
+- tasks / task_revisions / task_plans
+- sources / source_permissions / source_cursors
 - input_bundles
-- runs
-- run_inputs / provenance
+- runs / run_inputs / provenance
 - consumption_records
 
-Names may evolve, but separation of responsibilities must remain.
+表名可以变化，但职责分离不能消失。
 
 ---
 
-# Local runner evolution
+# Local runner 演进
 
-Early desktop:
+早期：
 
-```
-FlowPilot Desktop
-├── Scheduler (while app/runtime active)
-├── Source Manager
-├── Task Engine
-└── Workflow Runtime
-```
+    FlowPilot Desktop
+    ├── Scheduler（runtime 活跃时）
+    ├── Source Manager
+    ├── Task Engine
+    └── Workflow Runtime
 
-Later:
+后续：
 
-```
-FlowPilot Desktop UI
-        ↓
-FlowPilot Local Runner / Daemon
-        ↓
-Scheduler + Task Engine + Sources + Runtime
-```
+    FlowPilot Desktop UI
+            ↓
+    FlowPilot Local Runner / Daemon
+            ↓
+    Scheduler + Task Engine + Sources + Runtime
 
-Potential future:
+未来可让同一 TaskPlan 运行在 Local Runner 或授权 Cloud Runner。
 
-```
-same TaskPlan
-   ↓
-Local Runner OR authorized Cloud Runner
-```
-
-Do not introduce cloud execution before local semantics, provenance, idempotency, and safety are proven.
+在本地语义、provenance、idempotency、安全没有证明前，不引入 Cloud execution。

@@ -1,29 +1,29 @@
-# ADR-XXXX: Title
+# ADR-XXXX：标题
 
 - Status: Proposed
 - Date: YYYY-MM-DD
 - Decision owners: FlowPilot maintainers
 
-## Context
+## 背景
 
-What problem or architectural pressure requires a decision?
+是什么问题或架构压力需要做决定？
 
-## Decision
+## 决策
 
-What are we choosing?
+最终选择什么？
 
-## Alternatives considered
+## 已考虑的替代方案
 
-What credible alternatives were considered and why were they not selected?
+考虑过哪些可信替代方案，为什么没有选？
 
-## Consequences
+## 影响
 
-### Positive
+### 正面影响
 
-### Negative / trade-offs
+### 负面影响 / 取舍
 
-### Migration / compatibility impact
+### 迁移 / 兼容性影响
 
-## Validation
+## 验证
 
-How will we know this decision is working?
+如何判断这个决定在现实中有效？

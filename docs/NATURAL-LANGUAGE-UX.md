@@ -1,25 +1,25 @@
-# Natural-Language UX Principles
+# 自然语言 UX 原则
 
-FlowPilot intentionally moves beyond traditional form-first application design.
+FlowPilot 有意跨出传统“表单优先”应用设计。
 
-Natural language is the control plane. GUI is a contextual visualization/manipulation layer.
+**自然语言是控制层，GUI 是上下文式的可视化 / 操作层。**
 
-## Core UX statement
+## 核心 UX 陈述
 
-> Natural language describes intent.  
-> Structured plans execute it.  
-> UI appears when humans need to observe, choose, compare, approve, or intervene.
+> 自然语言描述意图。
+> 结构化计划负责执行。
+> 只有在人需要观察、选择、比较、批准或介入时，UI 才出现。
 
-## Intent-first, not dashboard-first
+## Intent-first，而不是 Dashboard-first
 
-Do not assume the Home screen must primarily be dashboards, settings, charts, or navigation.
+不要默认首页必须展示 Dashboard、设置、图表或大量导航。
 
-The primary product surface should make it easy to create/open a Goal or Task and express what should happen in ordinary language.
+主要界面应该让用户能够创建 / 打开 Goal 或 Task，并用普通语言描述想发生什么。
 
-Example:
+示例：
 
-```
-What do you want FlowPilot to do?
+```text
+你希望 FlowPilot 做什么？
 
 ┌──────────────────────────────────────┐
 │ # 每天发布行业文章                   │
@@ -29,65 +29,65 @@ What do you want FlowPilot to do?
 │ 发布前让我确认。                     │
 └──────────────────────────────────────┘
 
-                              Analyze
+                                  分析
 ```
 
-The editor may support Markdown, drag/drop files, semantic suggestions, and entity selection, but should not require a DSL.
+编辑器可以支持 Markdown、拖拽文件、语义建议、实体选择，但不能要求 DSL。
 
-## AI understanding review
+## AI Understanding Review
 
-After compiling natural language, FlowPilot may show a concise interpretation:
+自然语言编译后，FlowPilot 可以简洁展示自己的理解：
 
-```
-I understood:
+```text
+我的理解：
 
-Schedule
+时间
 每天 08:00
 
-Data
+数据
 行业学习仓库 → 今天最新文章
 
-Action
+操作
 发布微信公众号文章
 
-When there is no new content
-Skip
+没有新内容时
+跳过
 
-Before publishing
-Ask for confirmation
+发布之前
+请求确认
 ```
 
-This is a **review of understanding**, not a configuration form.
+这是**理解确认**，不是配置表单。
 
-Only ambiguous or materially risky items should require interaction.
+只有存在实质歧义或风险时才要求用户交互。
 
-## Contextual / ephemeral UI
+## 上下文 / 临时 UI
 
-UI components should appear because the current state benefits from them.
+组件只因为当前状态需要它才出现。
 
-Examples:
+例如：
 
-- needs an image choice → image picker
-- needs source authorization → folder/repository picker
-- needs ambiguity resolution → compact choice UI
-- needs approval → confirmation card
-- needs comparison → diff UI
-- needs security verification → browser takeover
-- needs progress visibility → execution timeline
-- needs repair review → old/new route diff
-- needs debugging → logs/screenshot inspector
+- 需要选择图片 → image picker
+- 需要 Source 授权 → folder / repository picker
+- 需要解决歧义 → compact choice UI
+- 需要批准 → confirmation card
+- 需要比较 → diff UI
+- 需要安全验证 → browser takeover
+- 需要看进度 → execution timeline
+- 需要 Review 修复 → old / new route diff
+- 需要调试 → logs / screenshot inspector
 
-Do not permanently expose every possible control just because the system supports it.
+不要因为系统支持某个能力，就把控制项永久暴露。
 
-## Dynamic UI primitives
+## 动态 UI primitive
 
-The implementation should evolve toward a reusable set of UI primitives:
+实现应逐渐形成复用组件：
 
-- Markdown/intent editor
+- Markdown / intent editor
 - semantic entity suggestion
 - schedule interpretation chip
 - Source permission picker
-- file/content preview
+- file / content preview
 - InputBundle preview
 - ambiguity resolver
 - confirmation card
@@ -95,107 +95,111 @@ The implementation should evolve toward a reusable set of UI primitives:
 - diff viewer
 - human takeover surface
 - run evidence viewer
-- error/recovery card
+- error / recovery card
 
-AI/runtime chooses which primitive is appropriate from structured state. AI should not generate arbitrary executable UI code.
+AI / runtime 根据结构化状态选择合适 primitive；AI 不应该生成任意可执行 UI 代码。
 
-## Entity references
+## Entity reference
 
-The user sees semantic names:
+用户看到：
 
 - 我的行业学习仓库
 - 微信公众号
 - 每天早上 8 点
 
-The system stores:
+系统内部保存：
+
 - Source ID
 - Goal ID
-- account/platform IDs
+- account / platform ID
 - normalized schedule
 
-Rich text may bind a visible phrase to an internal entity reference.
+富文本可以把一个可见短语绑定到内部实体引用。
 
-Do not render internal IDs in ordinary user flows.
+普通用户流程不显示内部 ID。
 
 ## Scheduling UX
 
-Users can write:
+用户可以写：
 
 - 每天早上 8 点
 - 工作日下班后
 - 每周一上午
 - 每个月最后一天
 
-FlowPilot normalizes the schedule and shows its interpretation.
+FlowPilot 标准化 schedule 并展示自己的理解。
 
-If interpretation is materially ambiguous, ask.
+如果存在实质歧义，再询问。
 
-Do not ask users to write cron unless an advanced/debug interface explicitly exposes it.
+普通用户不需要写 cron；只有高级 / Debug 界面可以在明确需要时暴露规范化 cron。
 
 ## Source UX
 
-A user authorizes a Source through an explicit picker/connection step.
+用户通过明确的 picker / connect 过程授权 Source。
 
-Natural language may say:
+自然语言可以写：
 
 > 数据来自我的行业学习仓库。
 
-If no matching authorized Source exists, FlowPilot presents a contextual connection UI.
+如果不存在匹配的已授权 Source，FlowPilot 临时展示连接 UI。
 
-Once authorized, subsequent natural-language references can resolve semantically.
+一旦授权，后续自然语言可以语义解析到它。
 
 ## Goal UX
 
-Goal documents should focus on:
-- intended result
-- required information if the user naturally knows it
-- constraints
-- success definition
-- human intervention/approval expectations
+Goal 文档关注：
 
-Users should not define selectors, steps, waits, retries, or browser paths.
+- 想达到的结果
+- 用户自然知道的必需信息
+- 约束
+- 成功定义
+- 人工介入 / 批准预期
+
+用户不定义 selector、step、wait、retry 或浏览器路径。
 
 ## Task UX
 
-Task documents should focus on:
-- trigger/timing
-- data context/source in natural language
-- selection rules
-- which outcome should be produced
-- exceptional policies that matter to the user
+Task 文档关注：
 
-Users should not define runtime orchestration details unless they intentionally enter an advanced mode.
+- trigger / timing
+- 用自然语言表达的数据 context / Source
+- selection rule
+- 想产生的结果
+- 真正影响用户的异常规则
 
-## Advanced users
+除非用户主动进入高级模式，否则不要求 runtime orchestration 细节。
 
-Advanced/debug views may expose:
+## 高级用户
+
+高级 / Debug 视图可以暴露：
+
 - compiled GoalPlan
 - compiled TaskPlan
 - Workflow IR
 - IDs
-- normalized cron/schedules
+- normalized cron / schedules
 - source cursors
 - repair diffs
 - runtime events
 
-These are inspection tools, not required authoring syntax.
+这些是检查工具，不是必须的创作语法。
 
-## Design test
+## 设计自检
 
-Before adding a persistent form field, ask:
+增加永久表单字段前问：
 
-> Could the user state this naturally, with FlowPilot compiling it and only asking for clarification if necessary?
+> 用户能不能直接用自然语言表达，而 FlowPilot 只在必要时澄清？
 
-If yes, prefer natural-language authoring plus structured review.
+如果可以，优先自然语言创作 + 结构化 Review。
 
-Before adding a chat panel, ask:
+增加 Chat 面板前问：
 
-> Is AI actually the primary interaction here, or would a contextual UI primitive communicate the state better?
+> AI 真的是这里最适合的交互方式，还是上下文 UI primitive 更清晰？
 
-Do not turn every interaction into chat.
+不要把所有交互都变成 Chat。
 
-## Exportability
+## 可导出性
 
-A Goal/Task Markdown file should remain useful and understandable if opened in a plain text editor outside FlowPilot.
+Goal / Task Markdown 在 FlowPilot 外用普通文本编辑器打开，也应该仍然有用、可理解。
 
-This is a strong design constraint against hidden DSL pollution.
+这是防止隐藏 DSL 污染的重要设计约束。

@@ -1,67 +1,82 @@
-# ADR-0001: Desktop technology baseline
+# ADR-0001：桌面技术基线
 
 - Status: Accepted
 - Date: 2026-09-19
 - Decision owners: FlowPilot maintainers
 
-## Context
+## 背景
 
-FlowPilot needs to show real third-party web applications inside a desktop UI while controlling those exact pages, maintaining isolated persistent sessions, observing navigation and page state, and allowing user takeover. The workflow representation must outlive any particular browser automation library.
+FlowPilot 需要在桌面 UI 内展示真实第三方 Web App，同时控制用户看到的同一页面，维持隔离持久 Session，观察导航和页面状态，并支持用户接管。
 
-## Decision
+Workflow 表示不能绑定某个特定 browser automation library。
 
-Use:
-- Electron as desktop runtime
-- React + Vite as trusted renderer UI
-- WebContentsView for third-party platform pages
-- a FlowPilot-owned BrowserDriver interface
-- Electron webContents/CDP as the production embedded driver implementation
-- Playwright for E2E, fixture testing, debugging, and an optional adapter
-- TypeScript strict mode throughout
-- SQLite behind repository interfaces for local-first persistence
-- provider-neutral AI adapters for Discovery and Repair only
-- pnpm workspaces for repository organization
+## 决策
 
-The Workflow Runtime and Workflow IR are first-party FlowPilot code and must not be replaced by a general agent framework.
+采用：
 
-## Alternatives considered
+- Electron 作为 desktop runtime
+- React + Vite 作为可信 renderer UI
+- WebContentsView 承载第三方平台页面
+- FlowPilot 自己拥有 BrowserDriver interface
+- Electron webContents / CDP 作为生产 embedded driver
+- Playwright 用于 E2E、fixture、debug 和可选 adapter
+- 全项目 TypeScript strict
+- SQLite 通过 repository interface 做 local-first persistence
+- provider-neutral AI adapter 只用于 Discovery / Repair
+- pnpm workspaces
+
+Workflow Runtime 和 Workflow IR 是 FlowPilot 自有核心代码，不能被通用 Agent framework 取代。
+
+## 已考虑的替代方案
 
 ### Tauri
-Smaller footprint and strong Rust backend model, but system WebViews vary by OS. Persisted cross-platform browser workflows benefit from one Chromium-based runtime.
 
-### Playwright-launched standalone Chrome as the final UX
-Fastest prototype path, but creates a second browser surface and separates what the user sees from the application's primary UI. Useful during early development, not the target architecture.
+体积小、Rust backend 很好，但不同 OS 使用系统 WebView。持久化跨平台 Web Workflow 更需要统一 Chromium 行为模型。
 
-### Persist raw macro/selector recordings
-Simple initially, but brittle and difficult to repair or validate. FlowPilot needs semantic targets and state transitions.
+### Playwright 启动独立 Chrome 作为最终 UX
 
-### Agent executes every step with an LLM
-Flexible but costly, slow, hard to reproduce, and unnecessarily unreliable for known workflows.
+原型速度快，但会制造第二个浏览器窗口，并把用户看到的页面与产品主 UI 分开。适合早期实验，不适合作为目标架构。
 
-## Consequences
+### 保存原始宏 / selector
 
-### Positive
-- consistent Chromium-centric desktop behavior
-- user and automation operate on the same embedded page
-- workflow runtime stays browser-library independent
-- normal runs can be fast and model-free
-- account sessions map naturally to Electron partitions
+起步简单，但脆弱、难修复、难验证。FlowPilot 需要 semantic target 和 state transition。
 
-### Negative / trade-offs
-- Electron application size/memory overhead
-- WebContentsView layout requires coordination with renderer UI
-- native SQLite drivers require Electron rebuild/packaging care
-- CDP/Electron driver will require custom engineering
+### 每一步都让 LLM Agent 执行
 
-### Migration / compatibility impact
-Workflow IR may not contain Electron/Playwright object identities. Driver-specific data must remain hints/adapters so alternative drivers remain possible.
+灵活，但慢、贵、难复现，而且对已知 Workflow 没有必要。
 
-## Validation
+## 影响
 
-This decision is validated when the local fixture site can:
-1. run inside WebContentsView
-2. persist account/session state
-3. execute Flow IR through BrowserDriver
-4. intentionally break a flow
-5. repair it through a provider-neutral repair path
-6. rerun successfully without an AI call
+### 正面影响
+
+- Chromium-centric 桌面行为一致
+- 用户与自动化操作同一个 embedded page
+- Workflow Runtime 与浏览器库解耦
+- 正常 Run 快且无需模型
+- account session 自然映射到 Electron partition
+
+### 负面影响 / 取舍
+
+- Electron 体积 / 内存开销
+- WebContentsView 布局需要和 Renderer 协调
+- native SQLite driver 需要 Electron rebuild / packaging 注意
+- CDP / Electron driver 需要自定义工程
+
+### 迁移 / 兼容性影响
+
+Workflow IR 不能包含 Electron / Playwright 对象身份。
+
+driver-specific 数据只能作为 hint / adapter detail，以便未来可替换 driver。
+
+## 验证
+
+当本地 fixture site 可以：
+
+1. 在 WebContentsView 中运行；
+2. 持久 account / session；
+3. 通过 BrowserDriver 执行 Flow IR；
+4. 人为破坏一个 Flow；
+5. 通过 provider-neutral repair path 修复；
+6. 不调用 AI 再次成功运行；
+
+则该决策得到验证。

@@ -1,10 +1,8 @@
-# FlowPilot Documentation
+# FlowPilot 文档
 
-**English (canonical)** | [简体中文](./zh-CN/README.md)
+简体中文是本仓库长期文档的唯一默认语言和规范源。语言与维护规则见 [DOCUMENTATION-POLICY.md](./DOCUMENTATION-POLICY.md)。
 
-Language policy: [DOCUMENTATION-POLICY.md](./DOCUMENTATION-POLICY.md)
-
-## Project control
+## 项目控制
 
 - [PROJECT-STATE.md](./PROJECT-STATE.md)
 - [DEVELOPMENT-PLAN.md](./DEVELOPMENT-PLAN.md)
@@ -15,13 +13,13 @@ Language policy: [DOCUMENTATION-POLICY.md](./DOCUMENTATION-POLICY.md)
 - [TASK-PACKET-TEMPLATE.md](./TASK-PACKET-TEMPLATE.md)
 - [HANDOFF-TEMPLATE.md](./HANDOFF-TEMPLATE.md)
 
-## Product and UX
+## 产品与 UX
 
 - [PRODUCT-MODEL.md](./PRODUCT-MODEL.md)
 - [NATURAL-LANGUAGE-UX.md](./NATURAL-LANGUAGE-UX.md)
 - [TASK-SOURCE-RUNTIME.md](./TASK-SOURCE-RUNTIME.md)
 
-## Engineering
+## 工程
 
 - [TECH-STACK.md](./TECH-STACK.md)
 - [ARCHITECTURE.md](./ARCHITECTURE.md)
@@ -30,7 +28,7 @@ Language policy: [DOCUMENTATION-POLICY.md](./DOCUMENTATION-POLICY.md)
 - [SECURITY.md](./SECURITY.md)
 - [ROADMAP.md](./ROADMAP.md)
 
-## Architecture decisions
+## 架构决策
 
 - [adr/0000-template.md](./adr/0000-template.md)
 - [adr/0001-technology-baseline.md](./adr/0001-technology-baseline.md)

@@ -1,231 +1,151 @@
-# FlowPilot Design Principles
+# FlowPilot 设计原则
 
-[简体中文](zh-CN/DESIGN-PRINCIPLES.md)
+这些原则是可执行的规则。每项原则都说明默认可见什么、什么保持隐藏、什么事件使其出现、在哪里检查底层事实，以及什么构成契约违规。
 
-These principles are operational rules. Each one states what is visible by
-default, what remains hidden, what reveals it, where the underlying truth can be
-inspected, and what constitutes a contract violation.
+## 产品不变量
 
-## Product invariant
+> 默认简单，按需透明。
 
-> Simple by default. Transparent on demand.
+简单是移除无关决策，而不是移除事实。透明是按上下文访问证据，而不是永久暴露所有实现细节。
 
-Simplicity is the removal of irrelevant decisions, not the removal of truth.
-Transparency is contextual access to evidence, not permanent exposure of every
-implementation detail.
+当原则看似冲突时，按以下顺序处理：
 
-When principles appear to compete, apply this order:
+1. 保证安全、显式授权和诚实的运行时状态；
+2. 保留用户表达的目标结果和语义源文本；
+3. 只显示当前决策所需的信息；
+4. 确保结构化计划、来源和证据可检查；
+5. 与更高的信息密度相比，优先选择平静、易读的呈现方式。
 
-1. preserve safety, explicit authorization, and honest runtime state;
-2. preserve the user's stated outcome and semantic source text;
-3. show only the information needed for the current decision;
-4. keep the structured plan, provenance, and evidence inspectable;
-5. prefer a calm, readable presentation over greater information density.
+## 1. 默认简单
 
-## 1. Simple by default
+**规则。** 主界面呈现一个连贯的目标结果、FlowPilot 理解或当前状态的简洁说明，以及必要的下一步操作。
 
-**Rule.** The primary surface presents one coherent outcome, a concise account
-of FlowPilot's understanding or current state, and the essential next action.
+- **默认：** 自然语言意图、实质性解释、当前状态和一个主要操作。
+- **隐藏：** 诊断元数据、修订历史、原始事件、规范化日程、标识符以及与当前状态无关的控件。
+- **显示事件：** 用户要求检查，或当前歧义、风险、失败或比较需要更多信息。
+- **专业事实：** 当前 Goal、Task、Source、Flow 或 Run 的上下文 Inspector。
+- **违规：** 首屏 Dashboard、多列控制中心，或在用户表达目标结果前就暴露所有能力的表单。
 
-- **Default:** natural-language intent, material interpretation, current status,
-  and one primary action.
-- **Hidden:** diagnostic metadata, revision history, raw events, normalized
-  schedules, identifiers, and controls unrelated to the current state.
-- **Reveal event:** the user asks to inspect, or a current ambiguity, risk,
-  failure, or comparison requires more information.
-- **Professional truth:** the contextual Inspector for the current Goal, Task,
-  Source, Flow, or Run.
-- **Violation:** a landing dashboard, multi-column control center, or form that
-  exposes every capability before the user has expressed an outcome.
+## 2. 按需透明
 
-## 2. Transparent on demand
+**规则。** 每一项具有后果的解释、输入选择、操作、暂停、修复和结果，都有一条可理解的证据访问路径。
 
-**Rule.** Every consequential interpretation, input selection, action, pause,
-repair, and result has an understandable route to its evidence.
+- **默认：** 纯语言摘要；有底层详情时，显示可见的 `检查详情` 入口。
+- **隐藏：** 完整 GoalPlan/TaskPlan/Flow 数据、Source 快照来源、InputBundle 内容、Run 事件、截图和修复差异。
+- **显示事件：** 用户显式检查、展开实质项目，或解决某项失败依赖证据。
+- **专业事实：** 与确切版本和当前对象关联的结构化 Inspector 分区，而不是无关的全局日志堆。
+- **违规：** 在没有证据时声称成功、隐藏有实际后果的 AI 解释，或要求用户阅读原始日志才能理解普通失败。
 
-- **Default:** a plain-language summary and a visible `Inspect details` affordance
-  when underlying detail exists.
-- **Hidden:** full GoalPlan/TaskPlan/Flow data, Source snapshot provenance,
-  InputBundle contents, run events, screenshots, and repair diffs.
-- **Reveal event:** explicit inspection, expansion of a material item, or a
-  failure whose resolution depends on evidence.
-- **Professional truth:** structured Inspector sections linked to exact versions
-  and the current object, never an unrelated global log dump.
-- **Violation:** claiming success without evidence, hiding a consequential AI
-  interpretation, or requiring raw logs to understand an ordinary failure.
+## 3. 意图优先
 
-## 3. Intent-first
+**规则。** 从用户想让什么成为事实开始，而不是从产品配置或实现步骤开始。
 
-**Rule.** Begin with what the user wants to be true, not with product
-configuration or implementation steps.
+- **默认：** Intent Home 编辑器，或已打开 Goal/Task 的自然语言源文本。
+- **隐藏：** 连接器设置、工作流步骤、重试设置和调度实现，直到表达的意图使其变得相关。
+- **显示事件：** 分析发现缺失的 Source、实质性歧义、策略决策或执行要求。
+- **专业事实：** Inspector 中与原始源文本并列的编译理解和绑定。
+- **违规：** 用户在陈述目标结果前，必须先选择自动化模板、连接器或节点图。
 
-- **Default:** the Intent Home editor or the natural-language source of the open
-  Goal or Task.
-- **Hidden:** connector setup, workflow steps, retry settings, and scheduling
-  implementation until the expressed intent makes them relevant.
-- **Reveal event:** analysis identifies a missing Source, material ambiguity,
-  policy decision, or execution requirement.
-- **Professional truth:** compiled understanding and bindings beside the original
-  source in the Inspector.
-- **Violation:** making users choose an automation template, connector, or node
-  graph before they can state the outcome.
+## 4. 自然语言是控制面
 
-## 4. Natural language is the control plane
+**规则。** 用户以普通语言或 Markdown 表达语义；FlowPilot 在源文本背后存储稳定的机器引用和规范化策略。
 
-**Rule.** Users author semantics in ordinary language or Markdown; FlowPilot
-stores stable machine references and normalized policies behind that source.
+- **默认：** 可读的自然语言、语义名称以及简洁的解释标签或摘要。
+- **隐藏：** UUID、`@goal/...`、`@source/...`、cron、选择器、重试代码和工作流节点语法。
+- **显示事件：** 显式的专业检查或编译产物导出；绝不能成为普通使用的前置条件。
+- **专业事实：** 将原始源文本、已解析实体引用和规范化编译值作为不同层级显示。
+- **违规：** Markdown 中隐藏 FlowPilot DSL、绑定 Source 必须提供 ID，或调度 Task 必须填写 cron 表达式。
 
-- **Default:** readable prose, semantic names, and concise interpretation chips
-  or summaries.
-- **Hidden:** UUIDs, `@goal/...`, `@source/...`, cron, selectors, retry codes, and
-  workflow-node syntax.
-- **Reveal event:** explicit professional inspection or export of a compiled
-  artifact; never a prerequisite for ordinary use.
-- **Professional truth:** the original source, resolved entity references, and
-  normalized compiled values shown as distinct layers.
-- **Violation:** a hidden FlowPilot DSL inside Markdown, an ID required to bind a
-  Source, or a cron expression required to schedule a Task.
+自然语言不是权限。命名本地数据的语句不能扩大文件系统访问；授权仍然是独立、显式的交互。
 
-Natural language is not permission. A phrase that names local data cannot expand
-filesystem access; authorization remains a separate explicit interaction.
+## 5. 渐进披露
 
-## 5. Progressive disclosure
+**规则。** 详情响应用户问题或状态转变而出现；每一次披露增加一级具体程度，但不改变含义。
 
-**Rule.** Detail appears in response to a user question or a state transition,
-and each disclosure adds one level of specificity without changing meaning.
+- **默认：** 当前状态最小而完整的说明。
+- **隐藏：** 可选字段、替代分支、历史版本和实现证据。
+- **显示事件：** 展开、检查、比较、诊断，或使该详情可操作的运行时状态。
+- **专业事实：** 从摘要逐层深入结构化详情，再深入原始且已脱敏的证据，同时保留上下文。
+- **违规：** 仅用折叠面板藏起配置表单、将关键安全事实埋在披露层后，或详情视图与摘要互相矛盾。
 
-- **Default:** the smallest complete explanation of the current state.
-- **Hidden:** optional fields, alternate branches, historical versions, and
-  implementation evidence.
-- **Reveal event:** expand, inspect, compare, diagnose, or a runtime state that
-  makes the detail actionable.
-- **Professional truth:** drill-down from summary to structured detail to raw,
-  redacted evidence while preserving context.
-- **Violation:** accordions that merely hide a configuration form, critical
-  safety facts buried behind disclosure, or a detail view that contradicts its
-  summary.
+仅当信息成为当前决策的必要内容时，信息才可从 Inspection 上移到 Execution 或 Simple。条件结束后，它回到低详情层级的归属位置；用户已解决的选择仍以摘要形式可见。
 
-Information may move upward from Inspection to Execution or Simple only when it
-becomes necessary for a present decision. It returns to its lower-detail home
-when the condition ends; the user's resolved choice remains visible in summary.
+## 6. 上下文化、临时性的 UI
 
-## 6. Contextual and ephemeral UI
+**规则。** 选择器、歧义处理器、确认、接管、差异或恢复卡片，是因为当前状态需要它才存在；解决后便从主路径消失。
 
-**Rule.** A picker, resolver, confirmation, takeover, diff, or recovery card
-exists because the current state calls for it and disappears from the primary
-path after resolution.
+- **默认：** 意图和当前目标结果，不为每一种可能交互保留空占位。
+- **隐藏：** Source 选择器、歧义处理器、确认卡、浏览器接管、修复对比和恢复选项。
+- **显示事件：** 缺失授权、实质性歧义、不可逆操作、安全介入、修复提议或可操作失败等类型化要求。
+- **专业事实：** Inspector 中对应的授权范围、语义绑定、确认事件、接管事件或修复修订。
+- **违规：** 为未激活工具保留永久侧栏、预先请求权限，或在有界选择更清晰时使用通用聊天提示。
 
-- **Default:** intent and the current outcome, without empty placeholders for
-  every possible interaction.
-- **Hidden:** Source picker, ambiguity resolver, confirmation card, browser
-  takeover, repair comparison, and recovery choices.
-- **Reveal event:** a typed requirement such as missing authorization, material
-  ambiguity, irreversible action, security intervention, proposed repair, or
-  actionable failure.
-- **Professional truth:** the resulting authorization scope, semantic binding,
-  confirmation event, takeover event, or repair revision in the Inspector.
-- **Violation:** permanent side panels for inactive tools, pre-emptive permission
-  prompts, or a generic chat prompt where a bounded choice communicates better.
+## 7. 不以黑箱换取信任
 
-## 7. Trust without black-box behavior
+**规则。** FlowPilot 应在合适的时机，用合适的层级说明它理解了什么、将使用什么、正在做什么，以及如何确认结果。
 
-**Rule.** FlowPilot states what it understood, what it will use, what it is
-doing, and how it knows the result, at the level appropriate to the moment.
+- **默认：** 操作前的简洁理解、具有后果的执行前的具体输入预览、有意义的进度，以及经过验证的结果语言。
+- **隐藏：** 完整编译与运行时证据。
+- **显示事件：** 检查、解释发生变化、不确定性、修复或对结果的质疑。
+- **专业事实：** 与 Run 关联的精确 GoalPlan、TaskPlan、Source 快照、InputBundle、Flow 修订、步骤证据和结果标准。
+- **违规：** 用“AI 已处理”作为解释、静默替换输入、隐藏回退，或将“未抛异常”当作成功。
 
-- **Default:** concise understanding before action, concrete input preview before
-  consequential execution, meaningful progress, and verified result language.
-- **Hidden:** full compilation and runtime evidence.
-- **Reveal event:** inspection, changed interpretation, uncertainty, repair, or
-  disputed result.
-- **Professional truth:** exact GoalPlan, TaskPlan, Source snapshot, InputBundle,
-  Flow revision, step evidence, and result criteria associated with the Run.
-- **Violation:** “AI handled it” as an explanation, silent input substitution,
-  silent fallback, or treating absence of an exception as success.
+## 8. 最小导航
 
-## 8. Minimal navigation
+**规则。** 导航代表稳定的用户目的地，而不是内部实体或每一种产品能力。Intent Home 是主要入口；只要可能，工作都留在同一个上下文工作区中。
 
-**Rule.** Navigation represents stable user destinations, not internal entities
-or every product capability. Intent Home is the primary entry and work remains
-in one contextual workspace whenever possible.
+- **默认：** 当前工作区、清晰的回到首页方式，以及访问最近或已有工作的入口；不展示运行时内部分类体系。
+- **隐藏：** Inspector 分区、Source 管理、Flow 修订、Run 证据和设置，直到从相关上下文进入。
+- **显示事件：** 打开已有 Goal/Task、选择历史 Run、选择 `检查详情`，或进入低频管理任务。
+- **专业事实：** 保留上下文的 Inspector 路由和历史视图；返回/关闭会回到来源对象。
+- **违规：** 为 GoalPlan、TaskPlan、InputBundle、Flow 节点、日志、修复或每一种连接器类型设置永久顶层入口。
 
-- **Default:** the current workspace, a clear way home, and access to recent or
-  existing work without a taxonomy of runtime internals.
-- **Hidden:** Inspector sections, Source administration, Flow revisions, run
-  evidence, and settings until entered from relevant context.
-- **Reveal event:** opening an existing Goal/Task, selecting a past Run, choosing
-  `Inspect details`, or entering an infrequent management task.
-- **Professional truth:** context-preserving Inspector routes and history views;
-  back/close returns to the originating object.
-- **Violation:** permanent top-level destinations for GoalPlan, TaskPlan,
-  InputBundle, Flow nodes, logs, repairs, or every connector type.
+除非某个入口支持一项无法从现有工作区连贯完成的、反复出现的用户目标，否则不要增加顶层目的地。D0.1 不固定后续屏幕规格中的标签或布局；它固定的是这项判断标准。
 
-Do not add a top-level destination unless it supports a recurring user goal that
-cannot be reached coherently from the existing workspace. D0.1 does not fix
-labels or layout for later screen specifications; it fixes this test.
+## 9. 清楚表达错误和介入
 
-## 9. Error and intervention clarity
+**规则。** 不确定、失败和需要人工的状态必须被诚实命名，并且只提供安全、相关的下一步操作。
 
-**Rule.** Uncertainty, failure, and human-required states are named honestly and
-offer only safe, relevant next actions.
+- **默认：** 纯语言状态、影响和推荐的下一步；在真实的情况下保留先前已成功的进度。
+- **隐藏：** 类型化错误代码、尝试记录、截图和已脱敏诊断事件。
+- **显示事件：** `为什么？`、`检查详情`、比较或专业诊断操作。
+- **专业事实：** 类型化失败、最后成功检查点、当前证据、允许的恢复路径和不可变历史。
+- **违规：** 对跳过/部分完成使用成功样式、从未知状态自动继续、只显示笼统的“出错了”，或让 AI 尝试绕过 CAPTCHA、MFA、登录、同意流程或账号警告。
 
-- **Default:** a plain-language state, impact, and recommended next action; prior
-  successful progress remains intact where true.
-- **Hidden:** typed error codes, attempts, screenshots, and redacted diagnostic
-  events.
-- **Reveal event:** `Why?`, `Inspect details`, comparison, or a professional
-  diagnostic action.
-- **Professional truth:** typed failure, last successful checkpoint, current
-  evidence, allowed recovery paths, and immutable history.
-- **Violation:** success styling for skipped/partial work, automatic continuation
-  from an unknown state, generic “Something went wrong,” or an AI attempt to
-  bypass CAPTCHA, MFA, login, consent, or an account warning.
+确认用于不可逆操作之前。Human Takeover 用于用户必须在真实上下文中操作或判断时。两者是不同状态，不能合并为通用警告对话框。
 
-Confirmation is used before an irreversible action. Human Takeover is used when
-the user must operate or decide inside the real context. They are different
-states and must not be collapsed into a generic warning dialog.
+## 10. 从构造开始保证无障碍与可读性
 
-## 10. Accessible and readable by construction
+**规则。** 层级、状态和操作不能只依赖颜色、动效、指针精度或视觉密度。
 
-**Rule.** Hierarchy, state, and action cannot depend on color, motion, pointer
-precision, or visual density alone.
+- **默认：** 清晰的文字层级、描述性标签、可见焦点、宽裕的操作目标、易读行宽，以及通过文字和冗余线索表达的状态。
+- **隐藏：** 理解或操作当前状态所必需的信息不能只藏在悬停、动画、颜色或无标签图标之后。
+- **显示事件：** 可用键盘操作、能被辅助技术播报、且内容变化时保持焦点的披露控件。
+- **专业事实：** 辅助技术可以访问相同的语义结构和证据，包括状态更新及错误关联。
+- **违规：** 仅用颜色表达状态、不能暂停的自动轮播、上下文 UI 出现时丢失焦点，或 Inspector 在缩放后无法使用。
 
-- **Default:** clear text hierarchy, descriptive labels, visible focus, generous
-  targets, readable line lengths, and state conveyed with text plus redundant
-  cues.
-- **Hidden:** nothing required to understand or operate the current state solely
-  behind hover, animation, color, or an unlabeled icon.
-- **Reveal event:** disclosure controls that are keyboard operable, announced,
-  and preserve focus when content changes.
-- **Professional truth:** the same semantic structure and evidence available to
-  assistive technology, including status updates and error relationships.
-- **Violation:** color-only status, auto-advancing content that cannot be paused,
-  focus loss when contextual UI appears, or an Inspector unusable at zoom.
+动效应解释连续性，而不是拖延工作。尊重减少动态效果的偏好。动态执行更新应被播报，但不能持续打断用户。
 
-Motion should explain continuity, not delay work. Respect reduced-motion
-preferences. Dynamic execution updates must be announced without repeatedly
-interrupting the user.
+## UI 中的实体分离
 
-## Entity separation in the UI
+UI 可以概括实体关系，但不能合并底层概念：
 
-The UI may summarize relationships, but must not merge the underlying concepts:
-
-| Entity | Human question | Default presentation |
+| 实体 | 人的问题 | 默认呈现 |
 | --- | --- | --- |
-| Goal | What outcome should exist? | Natural-language outcome and success meaning. |
-| Task | When and under what rules? | Natural-language policy and concise interpreted schedule. |
-| Source | Where may data come from? | Semantic name and explicit authorization scope when relevant. |
-| InputBundle | What exact inputs does this Run use? | Concrete preview before execution; immutable provenance on inspection. |
-| Flow | How will the outcome be achieved? | Hidden on the ordinary path; versioned strategy on inspection. |
-| Run | What happened this time? | Current status/result; timeline and evidence on inspection. |
+| Goal | 应该产生什么目标结果？ | 自然语言结果和成功含义。 |
+| Task | 何时、按什么规则？ | 自然语言策略和简洁的已解释日程。 |
+| Source | 允许从哪里获取数据？ | 语义名称；相关时显示显式授权范围。 |
+| InputBundle | 本次 Run 使用哪些确切输入？ | 执行前的具体预览；检查时提供不可变来源。 |
+| Flow | 如何实现目标结果？ | 普通路径中隐藏；检查时显示版本化策略。 |
+| Run | 这一次发生了什么？ | 当前状态/结果；检查时显示时间线和证据。 |
 
-## Review test
+## 评审测试
 
-For every new surface, answer:
+对每个新界面回答：
 
-1. What decision or outcome matters to the user now?
-2. What is the minimum complete information needed for it?
-3. Which typed event makes any additional UI appear?
-4. Where can the user inspect the underlying structured truth?
-5. Does the exported natural-language source still make sense outside FlowPilot?
-6. Would removing internal IDs, workflow vocabulary, and raw logs break ordinary
-   use? If yes, the design violates this contract.
+1. 用户此刻关心的决策或目标结果是什么？
+2. 作出该决策所需的最小完整信息是什么？
+3. 哪个类型化事件使额外 UI 出现？
+4. 用户可以在哪里检查底层结构化事实？
+5. 导出的自然语言源文本在 FlowPilot 之外是否仍然有意义？
+6. 如果移除内部 ID、工作流词汇和原始日志，普通使用是否会中断？若会，设计就违反本契约。
