@@ -74,6 +74,10 @@ Canonical: `TECH-STACK.md`, ADR-0001
 
 Create the **Design Contract** that future implementation agents can follow without redesigning the product.
 
+Verified progress:
+- **D0.1 — Design principles + interaction hierarchy: ACCEPTED.** Gatekeeper returned PASS on 2026-09-20 for the six intended English/Chinese design artifacts. The contract operationalizes the ten principles, defines Simple / Execution / Inspection surfaces and transitions, covers all required contextual triggers, preserves written authority and reviewer guidance, and keeps dense dashboard explorations non-canonical. Validation evidence: six artifacts non-empty, matching bilingual heading structures, no trailing whitespace, 50 English and 50 Chinese headings, 50 self-review fields, and six contextual-trigger sections.
+- D0 remains **IN PROGRESS**. The remaining Design Contract artifacts are not yet accepted; do not advance to P0.
+
 Required artifacts:
 - `design/README.md`
 - `design/DESIGN-PRINCIPLES.md`
@@ -138,14 +142,8 @@ These should be resolved in D0/P0, not prematurely in backend code:
 
 ## Recommended next slice
 
-**D0.1 — Design principles + interaction hierarchy**
+**D0.2 — Design system + components**
 
-Formalize:
-- "Simple by default, transparent on demand"
-- Simple / Execution / Inspection layers
-- progressive disclosure rules
-- navigation rules
-- when contextual UI appears
-- which details are forbidden from default surfaces
+Define the implementation-ready visual foundation and reusable contextual UI primitives while preserving the accepted D0.1 hierarchy. Cover tokens, typography, spacing, motion, accessibility, and component states/behaviors for the intent, understanding, Source, input, confirmation, execution, takeover, result, inspection, ambiguity, repair, and recovery surfaces. Keep screen specifications and end-to-end flows for later D0 slices.
 
-Then proceed to component and screen specifications.
+Then proceed to screen specifications.

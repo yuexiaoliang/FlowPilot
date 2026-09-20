@@ -82,6 +82,11 @@
 
 创建 **Design Contract**，让后续实现 Agent 不需要重新设计产品。
 
+已验证进展：
+
+- **D0.1 — Design principles + interaction hierarchy：已验收。** Gatekeeper 于 2026-09-20 对六个预期的中英文设计产物返回 PASS。该合同已将十条原则操作化，定义 Simple / Execution / Inspection 界面及其转场，覆盖所有必需的上下文触发器，保留文字规范的权威性和 Reviewer 指引，并明确密集 Dashboard 探索稿不是规范设计。验证证据：六个产物均非空，中英文标题结构一致，无尾随空白，英文和中文各 50 个标题、50 个自检字段，以及六个上下文触发器章节。
+- D0 仍为**进行中**。Design Contract 的其余产物尚未验收；不要推进到 P0。
+
 必须包含：
 
 - `design/README.md`
@@ -144,15 +149,6 @@
 
 ## 下一推荐切片
 
-**D0.1 — Design principles + interaction hierarchy**
+**D0.2 — Design system + components**
 
-需要正式定义：
-
-- “默认简单，按需透明”
-- Simple / Execution / Inspection 三层
-- 渐进披露规则
-- 导航规则
-- 什么时候出现上下文 UI
-- 默认界面禁止出现哪些技术细节
-
-然后再进入组件和页面规范。
+需要在已验收的 D0.1 层级基础上，定义可实现的视觉基础和可复用的上下文 UI primitive。覆盖 tokens、字体、间距、动效、无障碍以及意图、理解、Source、输入、确认、执行、接管、结果、检查、歧义、修复和恢复界面的组件状态/行为。Screen spec 和端到端 Flow 留给后续 D0 切片。
