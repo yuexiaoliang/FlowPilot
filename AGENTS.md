@@ -132,7 +132,15 @@ Never use a live production account in CI.
 
 ## Agent execution
 
-Follow `docs/AGENT-OPERATING-PROTOCOL.md`.
+Follow `docs/AGENT-OPERATING-PROTOCOL.md` and `dev-agents/README.md`.
+
+Default bounded development loop:
+
+```
+Plan Guard → Builder → Gatekeeper → State Keeper
+```
+
+The Builder is normally a strong general-purpose agent (often the Main Agent itself). Do not create permanent technology-specific specialist agents without demonstrated need.
 
 Use `docs/TASK-PACKET-TEMPLATE.md` for a bounded slice when useful.
 
