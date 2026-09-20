@@ -1,61 +1,85 @@
 # AGENTS.md
 
-This file is mandatory reading for every coding agent working on FlowPilot.
+This file is mandatory reading for every agent working on FlowPilot.
 
-Before coding, also read:
-- `docs/DEVELOPMENT-PLAN.md`
-- `docs/ACCEPTANCE.md`
-- `docs/AGENT-WORKFLOW.md`
-- `docs/PRODUCT-MODEL.md`
-- `docs/NATURAL-LANGUAGE-UX.md`
-- `docs/TASK-SOURCE-RUNTIME.md`
-- relevant architecture/security/domain documentation and ADRs
+## Required reading order
 
-FlowPilot is **document-driven, not Issue-driven**. GitHub Issues are optional coordination artifacts and are not the source of truth for implementation order or acceptance.
+Before doing any work, read:
+
+1. `docs/PROJECT-STATE.md`
+2. `docs/DEVELOPMENT-PLAN.md`
+3. `docs/ACCEPTANCE.md`
+4. `docs/AGENT-OPERATING-PROTOCOL.md`
+5. `docs/PRODUCT-MODEL.md`
+6. `docs/NATURAL-LANGUAGE-UX.md`
+7. `docs/TASK-SOURCE-RUNTIME.md`
+8. relevant design/architecture/security/domain docs and ADRs
+
+FlowPilot is **document-driven, not Issue-driven**. GitHub Issues are optional coordination artifacts.
 
 ## Mission
 
-Build FlowPilot as a reliable desktop workflow runtime. The product learns web workflows with AI, persists them, executes them deterministically, and repairs only the failed region when websites change.
+Build FlowPilot as an intent-first desktop automation runtime.
+
+The user expresses desired outcomes and rules in natural language/Markdown. FlowPilot compiles that intent into structured plans, resolves authorized data Sources, executes deterministic versioned Flows, and uses AI for interpretation, discovery, and repair where appropriate.
 
 The architecture must remain usable without any particular LLM vendor, browser automation library, or target platform.
 
-## Non-negotiable rules
+## Non-negotiable product rules
 
-1. **Deterministic runtime first.** Never add an LLM call to a normal happy-path step when a deterministic action/validator can do the job.
-2. **AI does discovery and repair, not routine execution.**
-3. **All browser operations go through BrowserDriver.** Feature code must not call Electron webContents, CDP, or Playwright directly outside driver implementations/adapters.
-4. **Workflow data is versioned and schema-validated.** Never silently mutate an existing persisted Flow.
-5. **Preconditions and postconditions are mandatory for meaningful workflow steps.** A click is not successful merely because it did not throw.
-6. **Repair is local.** Repair the smallest failing region; do not regenerate an entire working Flow by default.
-7. **Human takeover is a first-class runtime state.** CAPTCHA, MFA, QR login, security challenges, account warnings, legal/consent screens, and ambiguous destructive actions must pause for the user.
-8. **No bot-evasion features.** Do not implement fingerprint spoofing, CAPTCHA bypass, webdriver concealment, anti-bot circumvention, or behavior intended to defeat platform security controls.
-9. **Remote web content is untrusted.** Never expose Node.js, filesystem, shell, arbitrary IPC, or secrets to embedded third-party pages.
-10. **Secrets never enter prompts by default.** Cookies, tokens, passwords, auth headers, session stores, and API keys must be redacted/excluded before AI context construction.
-11. **No architecture drift without an ADR.** Changing Electron, React, WebContentsView, BrowserDriver boundaries, persistence model, or Workflow IR requires a documented Architecture Decision Record.
-12. **Do not broaden the MVP until the learn → run → fail → repair → rerun loop is proven.**
-13. **Do not add microservices, Redis, cloud infrastructure, or a remote database for the local MVP without an approved requirement.**
-14. **Prefer boring dependencies.** Add a dependency only when it removes meaningful complexity; record why in the PR/handoff.
-15. **No hidden fallback.** If a validator, repair, or browser action is uncertain, surface a typed failure rather than pretending success.
-16. **Users write semantics; the system stores references.** Ordinary users must not be required to author internal IDs, `@goal/...`, `@source/...`, cron syntax, selectors, or another FlowPilot DSL.
-17. **Keep Goal, Task, Source, Flow, and Run separate.** Goal = outcome; Task = timing/policy; Source = authorized data boundary; Flow = executable strategy; Run = one concrete execution.
-18. **Resolve Source data before execution.** A Run executes against an immutable InputBundle; never silently reread changing files mid-run.
-19. **Scheduled irreversible actions must be idempotent.** Implement deterministic deduplication/consumption semantics before repeated publishing is considered safe.
-20. **Source permissions are scoped and explicit.** Natural-language references never grant arbitrary filesystem/repository access.
-21. **UI is contextual, not configuration-first.** Prefer natural-language authoring plus review/clarification and contextual UI primitives over permanent forms for machine-level configuration.
+1. **Simple by default, transparent on demand.**
+2. **Natural language is the control plane.** Ordinary users must not be required to author internal IDs, `@goal/...`, `@source/...`, cron syntax, selectors, workflow nodes, or another FlowPilot DSL.
+3. **Users write semantics; the system stores references.**
+4. **Keep Goal, Task, Source, InputBundle, Flow, and Run separate.**
+5. **UI is contextual, not configuration-first.** Prefer natural-language authoring plus concise understanding review and contextual UI primitives over permanent forms.
+6. **Professional detail must remain inspectable.** Simplicity must not become a black box.
+7. **Do not redesign approved product direction while implementing.** Follow the current design gate and written design contracts.
+
+## Non-negotiable runtime rules
+
+8. **Deterministic runtime first.** Do not add an LLM call to a known happy-path step when deterministic execution can do it.
+9. **All browser operations go through BrowserDriver.**
+10. **Workflow data is versioned and schema-validated.**
+11. **Meaningful Steps require preconditions/postconditions.**
+12. **Repair is local by default.**
+13. **Human takeover is a first-class runtime state.**
+14. **No bot-evasion features.** No CAPTCHA bypass, fingerprint spoofing, webdriver concealment, or anti-bot circumvention.
+15. **Remote web content is untrusted.**
+16. **Secrets do not enter prompts by default.**
+17. **Source permissions are scoped and explicit.**
+18. **Resolve Source data before execution.** A Run uses an immutable InputBundle; do not silently reread changing files mid-run.
+19. **Scheduled irreversible actions require idempotency/deduplication.**
+20. **No hidden fallback.** Uncertainty becomes a typed failure/clarification/intervention, not pretend success.
+
+## Architecture change rule
+
+No architecture drift without an ADR.
+
+Changing any locked baseline such as:
+- Electron
+- React
+- WebContentsView
+- BrowserDriver boundary
+- persistence model
+- Workflow IR semantics
+- trust/security boundaries
+
+requires a documented decision and coordinated doc updates.
 
 ## Source-of-truth order
 
-When instructions conflict, use this order:
+When instructions conflict:
 
 1. direct maintainer decision
 2. accepted ADR
 3. `docs/ACCEPTANCE.md`
 4. `docs/DEVELOPMENT-PLAN.md`
-5. product model / natural-language UX / task-source runtime documentation
-6. architecture/security/domain documentation
-7. GitHub Issues or task notes
+5. `docs/PROJECT-STATE.md` for current phase/status
+6. product/design/architecture/security docs
+7. Task Packets
+8. GitHub Issues/task notes
 
-An Issue may add scope or stricter criteria, but must not silently weaken canonical acceptance rules.
+A Task Packet or Issue may be stricter, but cannot silently weaken canonical rules.
 
 ## Layer boundaries
 
@@ -70,69 +94,63 @@ workflow runtime ──→ BrowserDriver interface
    ↓                     ↑
 domain/storage       ElectronDriver / PlaywrightDriver
    ↓
-AI interfaces ← discovery/repair only
+AI interfaces ← interpretation/discovery/repair only
 ```
 
 Forbidden:
-- renderer importing Electron main-process implementation
-- workflow-core importing React/Electron
+- renderer importing Electron main implementation
+- workflow/domain importing React/Electron
 - platform adapters bypassing BrowserDriver
 - AI provider SDK types leaking into domain models
 - database row types becoming public domain types
 
 ## Implementation style
 
-- TypeScript strict mode; avoid `any`. When unavoidable at an external boundary, validate immediately and narrow.
-- Zod schemas define untrusted/persisted/external inputs.
-- Domain code uses explicit result/error types or typed exceptions; do not rely on string matching.
-- Prefer small pure functions for state evaluation and workflow compilation.
-- IDs are stable and opaque.
-- Store timestamps in UTC ISO-8601.
-- Platform-specific behavior belongs in adapters/capabilities, not generic runtime logic.
-- Selectors are hints, not truth. Prefer semantic targets and validators.
-- Every network/AI/browser operation must support timeout/cancellation.
-- Logs must be structured and redact sensitive fields.
+- TypeScript strict mode
+- avoid unexplained `any`
+- validate untrusted/persisted/model inputs with runtime schemas
+- use typed errors/results at boundaries
+- prefer small pure functions for compilation/state evaluation
+- stable opaque IDs internally
+- UTC ISO-8601 timestamps internally; explicit user timezone for schedules
+- structured redacted logs
+- timeout/cancellation for network/AI/browser operations
 
-## Required tests for changes
+## Required validation
 
-At minimum:
-- domain/IR changes: unit tests + schema migration/compatibility tests
-- executor changes: deterministic runtime tests
-- driver changes: driver contract tests
-- database changes: migration tests
-- IPC changes: contract tests
-- repair/discovery changes: fixture-based tests with recorded/synthetic snapshots
-- user-visible critical path changes: Playwright E2E where feasible
+At minimum where applicable:
+- domain/IR changes: unit + compatibility tests
+- executor: deterministic runtime tests
+- drivers: contract tests
+- DB: migration tests
+- IPC: contract tests
+- discovery/repair: fixture-based tests
+- critical UI flow: E2E/manual design-contract evidence
+- design work: map explicitly to D0 acceptance criteria
 
 Never use a live production account in CI.
 
-## Workflow change protocol
+## Agent execution
 
-When changing Workflow IR:
-1. update `docs/WORKFLOW-IR.md`
-2. update Zod schema/types
-3. add migration/compatibility logic
-4. update fixtures
-5. add tests for old and new versions
-6. document compatibility impact
+Follow `docs/AGENT-OPERATING-PROTOCOL.md`.
 
-## Database change protocol
+Use `docs/TASK-PACKET-TEMPLATE.md` for a bounded slice when useful.
 
-Never edit an applied migration. Add a new migration. The app must either migrate atomically or leave the prior database usable.
+At the end, use `docs/HANDOFF-TEMPLATE.md`.
 
-## Agent handoff
+If the maintainer says only:
 
-Before ending work, leave the repository in a state another agent can understand:
-- tests/lint/typecheck status reported
-- completed acceptance criteria mapped to `docs/ACCEPTANCE.md`
-- unfinished work documented in the handoff, plan note, or optionally an Issue
-- no unexplained generated files
-- no secrets/auth state committed
-- architecture-affecting decisions documented
-- README/docs updated when behavior or commands change
+> Continue FlowPilot according to the repository plan.
 
-Follow the handoff format in `docs/AGENT-WORKFLOW.md`.
+you must be able to identify the current phase and next appropriate slice from the repository.
 
 ## Definition of done
 
-A task is done only when implementation, tests, validation, failure behavior, documentation, and the applicable acceptance criteria agree. "Works on my machine" is not sufficient.
+A task is done only when:
+- implementation/design artifact exists
+- relevant validation was actually performed
+- applicable acceptance criteria are mapped to evidence
+- project state is updated when current truth changed
+- handoff is left for the next agent
+
+"Works on my machine" or "looks good" is not sufficient.
