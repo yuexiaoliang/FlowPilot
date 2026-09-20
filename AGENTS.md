@@ -175,6 +175,19 @@ If the maintainer says only:
 
 you must be able to identify the current phase and next appropriate slice from the repository.
 
+## Documentation language
+
+English durable documentation is canonical. Simplified Chinese mirrors live under `docs/zh-CN/`, with root mirrors `README.zh-CN.md` and `AGENTS.zh-CN.md`.
+
+Follow `docs/DOCUMENTATION-POLICY.md`.
+
+For a task that materially changes a durable bilingual document:
+- Builder MUST update the corresponding Chinese mirror before Gatekeeper review.
+- Gatekeeper MUST treat a missing/outdated mirror as blocking for that documentation change.
+- Code-only changes that do not alter documented semantics do not require mirror edits.
+
+Codex planning, implementation, and acceptance MUST use the English canonical version when language versions disagree.
+
 ## Definition of done
 
 A task is done only when:
