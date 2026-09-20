@@ -139,18 +139,22 @@ Milestone 2 is complete when:
 
 ---
 
-# A3 — Discovery acceptance
+# A3 — Goal compilation and Discovery acceptance
 
 Milestone 3 is complete when:
 
 1. The model provider is accessed through a provider-neutral interface.
-2. A sanitized snapshot is produced before every discovery model call.
-3. Fixture-injected fake secrets do not appear in captured model request fixtures.
-4. Discovery returns structured data validated by schema.
-5. Invalid model output is rejected safely.
-6. A discovered workflow must be compiled/validated before persistence.
-7. Fixture v1 can be learned from a goal.
-8. The persisted learned Flow can later execute with zero model calls.
+2. A user can author a Goal as ordinary Markdown without internal IDs, @goal/@source syntax, cron, selectors, or FlowPilot DSL.
+3. Goal Markdown compiles into a schema-validated versioned GoalPlan.
+4. A material ambiguity in Goal/platform/account resolution produces a structured clarification request instead of a silent guess.
+5. A sanitized snapshot is produced before every discovery model call.
+6. Fixture-injected fake secrets do not appear in captured model request fixtures.
+7. Discovery returns structured data validated by schema.
+8. Invalid model output is rejected safely.
+9. A discovered workflow must be compiled/validated before persistence.
+10. Fixture v1 can be learned from a GoalPlan.
+11. The persisted learned Flow can later execute with zero model calls.
+12. Changing Goal Markdown creates a new compiled plan revision rather than silently mutating the prior plan.
 
 Required proof:
 
@@ -243,6 +247,30 @@ Evidence should include:
 - workflow revision
 - repair record if repair was exercised
 - manual validation notes
+
+
+---
+
+# A7 — Task, Source, and scheduled automation acceptance
+
+Milestone 7 is complete when:
+
+1. A user can author a Task in ordinary Markdown such as “每天早上 8 点从我的行业学习仓库找到今天最新的文章并发布到微信公众号”.
+2. The Markdown does not require internal Goal IDs, Source IDs, cron expressions, or binding syntax.
+3. FlowPilot can semantically resolve an unambiguous existing Goal and authorized Source.
+4. Material ambiguity produces contextual clarification rather than guessing.
+5. Local Folder access is scoped to a user-authorized root.
+6. Local Git Repository runs record the exact commit SHA and selected file paths/content hashes.
+7. Source data is fully resolved before the Flow begins.
+8. A Run receives an immutable InputBundle and does not silently reread changed Source files mid-run.
+9. Missing required Goal inputs follow an explicit Task policy and cannot silently become empty values.
+10. Two runs with the same irreversible destination and same deterministic idempotency key cannot both successfully publish the same source version.
+11. A failed Run does not incorrectly advance the Source consumption cursor.
+12. A successful Run records sufficient provenance to identify the exact GoalPlan, TaskPlan, Flow revision, Source snapshot, and InputBundle used.
+13. “No content today” can end as SKIPPED with a typed reason rather than FAILED.
+14. Natural-language schedules are normalized with an explicit timezone.
+15. Missed schedule policy supports at least SKIP and RUN_ON_NEXT_START.
+16. Scheduler tests use fixture/local sources and never publish to production accounts in CI.
 
 ---
 
