@@ -1,0 +1,6 @@
+# FlowPilot project-level Codex configuration.
+# Keep this intentionally minimal. Model/reasoning choices inherit from the
+# invoking Codex session so the repository does not pin itself to a stale model.
+
+[agents]
+enabled = true
