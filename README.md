@@ -50,6 +50,21 @@ FlowPilot 是**文档驱动，而不是 Issue 驱动**。
 
 仓库本身是所有人类和 AI 贡献者共享的项目记忆。简体中文是长期项目文档的唯一默认语言和规范源。
 
+当前 P0 原型使用仓库固定的 Node / pnpm 版本，根目录可执行：
+
+```sh
+corepack pnpm install
+corepack pnpm dev
+corepack pnpm typecheck
+corepack pnpm test
+corepack pnpm build
+corepack pnpm test:e2e
+```
+
+`test:e2e` 会构建并启动本地 Electron 原型，只使用确定性 Mock，不连接真实服务或生产账号。
+
+如果你要直接体验和验收当前成果，请从 [人工验收指南](./docs/MANUAL-ACCEPTANCE.md) 开始。它按实际界面列出了启动、点击步骤、预期结果、失败分支和当前尚未实现的边界。
+
 从这里开始：
 
 - [docs/README.md](./docs/README.md) —— 文档索引
@@ -58,6 +73,7 @@ FlowPilot 是**文档驱动，而不是 Issue 驱动**。
 - [docs/PROJECT-STATE.md](./docs/PROJECT-STATE.md) —— 当前阶段和下一推荐切片
 - [docs/DEVELOPMENT-PLAN.md](./docs/DEVELOPMENT-PLAN.md) —— 规范交付顺序
 - [docs/ACCEPTANCE.md](./docs/ACCEPTANCE.md) —— Gate 和完成定义
+- [docs/MANUAL-ACCEPTANCE.md](./docs/MANUAL-ACCEPTANCE.md) —— 维护者可直接执行的人工验收步骤
 - [.codex/agents/](./.codex/agents/) —— Plan Guard、Builder、Gatekeeper、State Keeper
 - [.codex/config.toml](./.codex/config.toml) —— 项目级 Codex 多 Agent 配置
 - [docs/AGENT-OPERATING-PROTOCOL.md](./docs/AGENT-OPERATING-PROTOCOL.md) —— Codex subagent 调度规则
