@@ -1,11 +1,14 @@
-import { app, BrowserWindow, session } from 'electron';
+import { app, BrowserWindow, ipcMain, session } from 'electron';
 import path from 'node:path';
 
-import { trustedRendererWebPreferences } from './security';
+import { registerShellIpc } from './ipc';
+import { configureDenyByDefaultPermissions, createTrustedRendererWebPreferences } from './security';
 
 const DEVELOPMENT_RENDERER_URL = 'http://127.0.0.1:43127';
 
 app.enableSandbox();
+
+let mainWindow: BrowserWindow | null = null;
 
 function getDevelopmentRendererUrl(): string | undefined {
   const value = process.env.VITE_DEV_SERVER_URL;
@@ -23,6 +26,7 @@ function getDevelopmentRendererUrl(): string | undefined {
 }
 
 function createMainWindow(): BrowserWindow {
+  const preloadPath = path.join(__dirname, '../preload/index.js');
   const window = new BrowserWindow({
     width: 1180,
     height: 800,
@@ -31,7 +35,7 @@ function createMainWindow(): BrowserWindow {
     show: false,
     title: 'FlowPilot',
     backgroundColor: '#F7F9FC',
-    webPreferences: trustedRendererWebPreferences,
+    webPreferences: createTrustedRendererWebPreferences(preloadPath),
   });
 
   window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
@@ -40,6 +44,11 @@ function createMainWindow(): BrowserWindow {
   });
   window.once('ready-to-show', () => {
     window.show();
+  });
+  window.once('closed', () => {
+    if (mainWindow === window) {
+      mainWindow = null;
+    }
   });
 
   const developmentUrl = getDevelopmentRendererUrl();
@@ -53,16 +62,20 @@ function createMainWindow(): BrowserWindow {
 }
 
 app.whenReady().then(() => {
-  session.defaultSession.setPermissionCheckHandler(() => false);
-  session.defaultSession.setPermissionRequestHandler((_webContents, _permission, callback) => {
-    callback(false);
+  configureDenyByDefaultPermissions(session.defaultSession);
+  const disposeShellIpc = registerShellIpc(ipcMain, {
+    getAppVersion: () => app.getVersion(),
+    isTrustedSender: (event) => mainWindow !== null && event.sender === mainWindow.webContents,
+    platform: process.platform,
   });
 
-  createMainWindow();
+  mainWindow = createMainWindow();
+
+  app.once('will-quit', disposeShellIpc);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createMainWindow();
+      mainWindow = createMainWindow();
     }
   });
 });

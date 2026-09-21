@@ -27,10 +27,17 @@ function normalizeArchivePath(filePath) {
 
 function assertArchiveContents(archivePath) {
   const files = listPackage(archivePath).map(normalizeArchivePath);
-  const requiredFiles = ['/dist/main/index.js', '/dist/renderer/index.html', '/package.json'];
+  const requiredFiles = [
+    '/dist/main/index.js',
+    '/dist/preload/index.js',
+    '/dist/renderer/index.html',
+    '/node_modules/@flowpilot/ipc-contracts/dist/index.js',
+    '/package.json',
+  ];
   const forbiddenPatterns = [
     /^\/index\.html$/,
     /^\/(?:e2e|scripts|src|playwright-report|test-results|profiles|user-data)(?:\/|$)/,
+    /^\/node_modules\/@flowpilot\/ipc-contracts\/(?:src(?:\/|$)|tsconfig\.json$)/,
     /^\/node_modules\/(?:@electron-forge|@playwright)\/[^/]+(?:\/|$)/,
     /^\/node_modules\/(?:eslint|prettier|typescript|vite|vitest)(?:\/|$)/,
     /(?:^|\/)\.env(?:\..*)?$/,

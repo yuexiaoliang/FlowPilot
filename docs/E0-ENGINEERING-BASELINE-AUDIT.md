@@ -114,7 +114,7 @@
 审计完成时建议的三个切片如下。E0.2 已于本审计之后通过独立 Gatekeeper 并退休短期 packet；当前状态与证据以 `docs/PROJECT-STATE.md` 为准。
 
 1. E0.2 工具链、CI 与 Packaging 基线：已验收，短期 packet 已退休。
-2. [`work/E0.3-desktop-shell-ipc-security.md`](../work/E0.3-desktop-shell-ipc-security.md)：补齐最小 typed preload / IPC 和 third-party WebContentsView 安全壳及回归测试。
+2. E0.3 Desktop Shell、typed IPC 与安全边界：已验收，短期 packet 已退休。
 3. [`work/E0.4-deterministic-fixture-site.md`](../work/E0.4-deterministic-fixture-site.md)：实现本地 fixture variants 和确定性 E2E 入口。
 
 这些 Task Packet 是 `DEVELOPMENT-PLAN.md` 的执行辅助，不构成第二套 Roadmap。E0.2–E0.4 全部完成后仍需独立的 E0 全量 Gate，才能把 E0 标记为完成。
@@ -134,7 +134,7 @@
 
 ### 下一推荐切片
 
-`work/E0.3-desktop-shell-ipc-security.md`
+`work/E0.4-deterministic-fixture-site.md`
 
 ### 阻塞项 / 所需 Maintainer 决策
 

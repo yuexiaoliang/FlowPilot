@@ -8,9 +8,9 @@
 
 **E0 — Engineering Foundation**
 
-状态：**进行中（E0.1、E0.2 已验收；下一切片 E0.3；E0 Gate 尚未通过）**
+状态：**进行中（E0.1–E0.3 已验收；下一切片 E0.4；E0 Gate 尚未通过）**
 
-上一阶段 **P0 — Interactive Mock Prototype** 已由独立 Gatekeeper 完成全量验收，P0 Acceptance 1–15 全部 PASS。E0.1 工程基线与缺口审计、E0.2 工具链 / CI / Packaging 基线均已由独立 Gatekeeper 验收；E0.3 与 E0.4 尚未开始，E0 Gate 仍未通过。当前没有需要 Maintainer 决策的阻塞项。
+上一阶段 **P0 — Interactive Mock Prototype** 已由独立 Gatekeeper 完成全量验收，P0 Acceptance 1–15 全部 PASS。E0.1 工程基线与缺口审计、E0.2 工具链 / CI / Packaging 基线、E0.3 Desktop Shell / typed IPC / 安全边界均已由独立 Gatekeeper 验收；E0.4 尚未开始，E0 Gate 仍未通过。当前没有需要 Maintainer 决策的阻塞项。
 
 已确认的产品方向：
 
@@ -80,7 +80,7 @@
 
 ## 当前交付目标
 
-上一阶段交付目标是构建 **Interactive Mock Prototype**，在不接入生产基础设施前验证 D0 Design Contract 的黄金路径。P0 使用确定性 Mock；P0.1 `Intent → Understanding`、P0.2 `Source resolution → contextual Source connection`、P0.3 `Input Preview → immutable mock input`、P0.4 `Execution → pre-confirmation mock Run`、P0.5 `Confirmation → pre-publication decision`、P0.6 `Result → verified mock outcome`、P0.7 `Result → Inspector provenance` 以及 P0 全量 Gate 均已验收。当前交付目标转为 E0：E0.1 审计和 E0.2 工具链 / CI / Packaging 基线已完成，下一步按单切片实现 E0.3–E0.4；在全部实现切片和独立全量 Gate 完成前，不把 E0 写成已完成。
+上一阶段交付目标是构建 **Interactive Mock Prototype**，在不接入生产基础设施前验证 D0 Design Contract 的黄金路径。P0 使用确定性 Mock；P0.1 `Intent → Understanding`、P0.2 `Source resolution → contextual Source connection`、P0.3 `Input Preview → immutable mock input`、P0.4 `Execution → pre-confirmation mock Run`、P0.5 `Confirmation → pre-publication decision`、P0.6 `Result → verified mock outcome`、P0.7 `Result → Inspector provenance` 以及 P0 全量 Gate 均已验收。当前交付目标转为 E0：E0.1 审计、E0.2 工具链 / CI / Packaging 基线和 E0.3 Desktop Shell / typed IPC / 安全边界已完成，下一步按单切片实现 E0.4；在 E0.4 和独立 E0 全量 Gate 完成前，不把 E0 写成已完成。
 
 已验证进展：
 
@@ -140,6 +140,15 @@
   - 供应链检查：`corepack pnpm audit --audit-level high` PASS；未发现高严重度已知漏洞。E0.2 仍不包含 code signing、notarization、installer maker 或跨平台发布。
   - 交付物：ESLint、Prettier、root `lint` / `format:check` / `package` / `ci:validate`、GitHub Actions workflow、Electron Forge packaging 配置及命令文档已存在；E0.3 的 preload / typed IPC / WebContentsView 安全壳和 E0.4 的 fixture site 仍待实现。
   - Maintainer 决策：无。既有 Electron、React、WebContentsView、BrowserDriver、SQLite 和信任边界未改变。
+
+- **E0.3 — Desktop Shell、typed IPC 与安全边界：已验收。** 独立 Gatekeeper 已返回 `GATEKEEPER: PASS`。本切片只补齐最小 shell boundary 和安全默认值，不扩展产品行为，也不宣称 E0 完成：
+
+  - typed IPC / preload：新增最小 `ipc-contracts` 包、单一明确 channel、`contextBridge` 暴露的 typed `flowPilot.getShellInfo` API，以及可序列化的 `AppError` / result envelope；Renderer 不直接获得 Node、filesystem、shell、database、`webContents` 或任意 channel 能力。
+  - 边界校验：main handler 在处理前校验 sender，使用 runtime schema 校验 payload，拒绝缺失、过期和额外字段，返回 typed `IPC_SENDER_NOT_TRUSTED` / `INVALID_IPC_PAYLOAD` / `IPC_HANDLER_FAILED`，内部错误不会泄漏敏感值。
+  - third-party WebContentsView：具备独立 account partition、Node integration off、context isolation / sandbox / webSecurity on、无 privileged preload、deny-by-default permissions、popup 拒绝和 allowed-origin navigation / redirect 约束；third-party 页面不能读取 `flowPilot`、Node `process` 或 `require`。
+  - 实际验证：`corepack pnpm test` PASS（64 tests）；IPC contract / sender / payload validation、trusted Renderer 与第三方 surface 安全配置测试 PASS；Electron security smoke PASS；Electron E2E PASS；dev 与 packaged Electron smoke PASS。
+  - 工程回归：`corepack pnpm typecheck`、`corepack pnpm lint`、`corepack pnpm format:check`、`corepack pnpm build` 和 `corepack pnpm audit --audit-level high` 均 PASS；`corepack pnpm package` PASS，ASAR 检查确认入口、manifest 存在且排除 root `index.html`、源码、测试、Secret、auth state、数据库和测试结果。
+  - Maintainer 决策：无。E0.4 fixture site、variants 和其确定性 WebContentsView E2E 仍待实现；E0 Gate 尚未通过。
 
 必须包含：
 
@@ -203,13 +212,12 @@
 
 ## 下一推荐切片
 
-**E0.3 — Desktop Shell、typed IPC 与安全边界**（`work/E0.3-desktop-shell-ipc-security.md`）
+**E0.4 — 本地确定性 Fixture Site**（`work/E0.4-deterministic-fixture-site.md`）
 
-在 E0.2 已验收的工具链 / CI / Packaging 基线上，补齐最小 typed preload / IPC，以及可信 Renderer 与 third-party WebContentsView 的可验证安全边界；不得把 E0.3 通过写成 E0 完成。
+在 E0.3 已验收的 typed shell boundary 和 third-party WebContentsView 安全壳上，实现本地确定性 fixture app、规定的 variants 与安全 E2E 证据；不得把 E0.4 通过写成 E0 完成。
 
 ## 当前短期工作队列
 
-仅保留接下来两个有界 E0 切片；它们不是第二套 Roadmap：
+仅保留接下来一个有界 E0 切片；它不是第二套 Roadmap：
 
-- **E0.3**：[`work/E0.3-desktop-shell-ipc-security.md`](../work/E0.3-desktop-shell-ipc-security.md)（下一切片，未开始）
-- **E0.4**：[`work/E0.4-deterministic-fixture-site.md`](../work/E0.4-deterministic-fixture-site.md)（等待 E0.3 通过，未开始）
+- **E0.4**：[`work/E0.4-deterministic-fixture-site.md`](../work/E0.4-deterministic-fixture-site.md)（下一切片，未开始）

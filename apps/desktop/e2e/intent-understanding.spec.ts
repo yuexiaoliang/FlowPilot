@@ -2,6 +2,8 @@ import { _electron as electron, expect, test } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 
+import type { FlowPilotDesktopApi } from '@flowpilot/ipc-contracts';
+
 test('deterministic Intent → Understanding → Source → Input → Execution → Confirmation → Result → Inspector walkthrough', async () => {
   const electronApp = await electron.launch({ args: ['.'] });
 
@@ -9,6 +11,40 @@ test('deterministic Intent → Understanding → Source → Input → Execution 
     const window = await electronApp.firstWindow();
     await electronApp.evaluate(({ BrowserWindow }) => {
       BrowserWindow.getAllWindows()[0]?.webContents.setZoomFactor(1);
+    });
+
+    await expect
+      .poll(() => window.evaluate(() => document.documentElement.dataset.flowpilotShellProtocol))
+      .toBe('1');
+
+    const shellBoundary = await window.evaluate(async () => {
+      const desktopWindow = globalThis as typeof globalThis & {
+        flowPilot: FlowPilotDesktopApi;
+        process?: unknown;
+        require?: unknown;
+      };
+
+      return {
+        apiKeys: Object.keys(desktopWindow.flowPilot),
+        info: await desktopWindow.flowPilot.getShellInfo(),
+        processType: typeof desktopWindow.process,
+        protocolMarker: document.documentElement.dataset.flowpilotShellProtocol,
+        requireType: typeof desktopWindow.require,
+      };
+    });
+    expect(shellBoundary).toEqual({
+      apiKeys: ['getShellInfo'],
+      info: {
+        ok: true,
+        value: {
+          appVersion: '0.0.0',
+          platform: process.platform,
+          protocolVersion: 1,
+        },
+      },
+      processType: 'undefined',
+      protocolMarker: '1',
+      requireType: 'undefined',
     });
 
     await expect(window.getByRole('heading', { name: '你希望 FlowPilot 做什么？' })).toBeVisible();

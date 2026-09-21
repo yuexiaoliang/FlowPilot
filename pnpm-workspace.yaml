@@ -1,5 +1,6 @@
 packages:
   - apps/*
+  - packages/*
 
 # Electron Forge needs physical dependency trees while packaging.
 nodeLinker: hoisted

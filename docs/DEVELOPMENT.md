@@ -47,7 +47,7 @@
 | `corepack pnpm format` | 用 Prettier 写入格式；与只读检查命令明确分离 |
 | `corepack pnpm test` | 运行 Vitest 单元 / 组件测试 |
 | `corepack pnpm build` | 编译 Electron main 并构建 renderer |
-| `corepack pnpm test:e2e` | 构建并运行确定性的 Electron 黄金路径 E2E |
+| `corepack pnpm test:e2e` | 构建、验证 third-party WebContentsView 安全壳，并运行确定性的 Electron 黄金路径 E2E |
 | `corepack pnpm ci:validate` | 解析并静态检查 GitHub Actions 的必需命令和最小权限 |
 | `corepack pnpm package` | 构建、为当前主机平台 / 架构执行 Electron Forge package，并检查 ASAR 内容边界 |
 
@@ -154,6 +154,10 @@ IPC channel / payload 放 `packages/ipc-contracts`。
 - 不提供任意文件系统路径访问
 - 不提供任意 shell / process 执行
 - 不泄漏 `webContents` object
+
+当前 E0 shell 使用 `packages/ipc-contracts` 保存唯一的 shell-info channel、严格 request/result Schema 和可序列化 `AppError`。sandboxed preload 只向可信 Renderer 暴露 `window.flowPilot.getShellInfo()`，不暴露通用 `invoke`；Main 会同时校验 sender identity 与 payload。Renderer 启动 handshake 失败时显式显示失败，不会绕过 bridge 静默继续。
+
+third-party WebContentsView 使用独立的 `persist:flowpilot:account:<opaque-key>` partition，明确关闭 Node integration、privileged preload、`<webview>`、insecure content 和 experimental features，并保持 context isolation、sandbox 与 web security。权限默认全部拒绝；popup 全部拒绝；用户触发的导航和 redirect 只能留在显式 allowlist origin 内。`test:e2e` 在加载任何真实第三方网页前用本地 Electron smoke 验证这些边界。
 
 ## 错误处理
 

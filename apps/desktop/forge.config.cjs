@@ -8,6 +8,8 @@ const config = {
       /^\/(?:e2e|scripts|src)(?:\/|$)/,
       /^\/\.flowpilot-package-node-modules(?:\/|$)/,
       /^\/(?:playwright-report|test-results|profiles|user-data)(?:\/|$)/,
+      /^\/node_modules\/@flowpilot\/ipc-contracts\/(?:src(?:\/|$)|tsconfig\.json$)/,
+      /^\/node_modules\/zod\/src(?:\/|$)/,
       /^\/(?:forge\.config\.cjs|index\.html|playwright\.config\.ts|tsconfig(?:\.[^.]+)?\.json|vite\.config\.mts)$/,
       /(?:^|\/)\.env(?:\..*)?$/,
       /\.(?:pem|key|db|db-shm|db-wal|sqlite|sqlite3)$/i,
