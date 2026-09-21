@@ -6,7 +6,7 @@
 
 ## 当前可以验收什么
 
-**P0 — Interactive Mock Prototype 已完成全量 Gate**，本文继续提供 P0.1–P0.7 Inspector provenance 的人工走查入口和回归记录模板。当前项目阶段已进入 **E0 — Engineering Foundation**；E0 尚未开始，不能把本指南当作 E0 验收。
+**P0 — Interactive Mock Prototype** 和 **E0 — Engineering Foundation** 均已完成独立全量 Gate，本文继续提供 P0.1–P0.7 Inspector provenance 的人工走查入口和回归记录模板。当前项目阶段已进入 **E1 — Intent Compiler**；本文仍主要覆盖 P0 人工走查，不替代 E1 Acceptance 或后续 Gate。
 
 | 本指南可以验收 | P0 明确范围外 |
 | --- | --- |
@@ -526,4 +526,4 @@ Inspector 关闭 / Escape / 焦点恢复：PASS / FAIL
 6. 自动测试和视觉证据在哪里；
 7. “本指南可以验收 / P0 明确范围外”表格如何变化。
 
-P0.7 提供会话级、确定性且脱敏的最小 Inspector provenance，不实现真实浏览器、平台动作、Human Takeover、持久化、完整生产 Inspector 或 Repair。上述能力属于 P0 明确范围外；P0 全量 Gate 已通过，E0.1 审计、E0.2 工具链 / CI / Packaging 基线、E0.3 Desktop Shell / typed IPC / 安全边界和 E0.4 本地 Fixture Site 均已完成，审计结论见 [`docs/E0-ENGINEERING-BASELINE-AUDIT.md`](E0-ENGINEERING-BASELINE-AUDIT.md)，下一阶段执行 [`work/E0-full-gate.md`](../work/E0-full-gate.md) 的 E0 Acceptance 1–8 全量 Gate；在该 Gate 通过前不推进 E1。
+P0.7 提供会话级、确定性且脱敏的最小 Inspector provenance，不实现真实浏览器、平台动作、Human Takeover、持久化、完整生产 Inspector 或 Repair。上述能力属于 P0 明确范围外；P0 全量 Gate 和 E0 Acceptance 1–8 全量 Gate 均已通过，E0.1 审计、E0.2 工具链 / CI / Packaging 基线、E0.3 Desktop Shell / typed IPC / 安全边界和 E0.4 本地 Fixture Site 均已完成，审计结论见 [`docs/E0-ENGINEERING-BASELINE-AUDIT.md`](E0-ENGINEERING-BASELINE-AUDIT.md)，下一阶段执行 [`work/E1.1-goal-plan-foundation.md`](../work/E1.1-goal-plan-foundation.md)；该包尚未开始，不代表 E1 Acceptance 已通过。

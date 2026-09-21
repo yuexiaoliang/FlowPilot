@@ -1,12 +1,12 @@
 # E0 工程基线与缺口审计
 
-本文件是 E0.1 审计的稳定事实记录。它记录当前 P0 原型在进入 E0 实现前的工程基线、实际验证证据、E0 Acceptance 1–8 矩阵和后续有界切片。它不替代 `docs/ACCEPTANCE.md`，也不代表 E0 Gate 已通过。
+本文件是 E0.1 审计的稳定事实记录。它记录 2026-09-21 审计时 P0 原型在进入 E0 实现前的工程基线、实际验证证据、E0 Acceptance 1–8 矩阵和后续有界切片。它不替代 `docs/ACCEPTANCE.md`；审计当时尚未完成 E0 Gate，后续 Gate 结论以 [`docs/PROJECT-STATE.md`](./PROJECT-STATE.md) 为准。
 
 审计日期：2026-09-21
 
 ## 结论摘要
 
-当前仓库已经具备可运行的 P0 Electron + React 原型、严格 TypeScript、Vitest、Playwright Electron E2E 和一组可信 Renderer 安全默认值，但**尚不满足 E0 Gate**。
+审计时，当前仓库已经具备可运行的 P0 Electron + React 原型、严格 TypeScript、Vitest、Playwright Electron E2E 和一组可信 Renderer 安全默认值，但**尚不满足 E0 Gate**。随后 E0.2–E0.4 和独立 E0 全量 Gate 已完成；当前阶段状态不在本历史审计结论中重复维护。
 
 主要阻塞缺口是：
 
@@ -117,7 +117,7 @@
 2. E0.3 Desktop Shell、typed IPC 与安全边界：已验收，短期 packet 已退休。
 3. E0.4 本地确定性 Fixture Site：已验收，短期 packet 已退休。
 
-这些 Task Packet 是 `DEVELOPMENT-PLAN.md` 的执行辅助，不构成第二套 Roadmap。E0.2–E0.4 全部完成后仍需独立的 E0 全量 Gate，才能把 E0 标记为完成。
+这些 Task Packet 是 `DEVELOPMENT-PLAN.md` 的执行辅助，不构成第二套 Roadmap。审计时要求 E0.2–E0.4 全部完成后再执行独立 E0 全量 Gate；该 Gate 后续已返回 `GATEKEEPER: PASS — E0 COMPLETE`。
 
 ## 审计交接
 
@@ -130,11 +130,11 @@
 
 ### 变更边界
 
-本切片只记录事实。Electron、React、WebContentsView、BrowserDriver、SQLite 和信任边界未改变；E0 Gate 尚未通过。
+本切片只记录审计时事实。Electron、React、WebContentsView、BrowserDriver、SQLite 和信任边界未改变；审计之后 E0 全量 Gate 已通过。
 
 ### 下一推荐切片
 
-`work/E0-full-gate.md`
+`work/E1.1-goal-plan-foundation.md`
 
 ### 阻塞项 / 所需 Maintainer 决策
 

@@ -6,11 +6,11 @@
 
 ## 当前阶段
 
-**E0 — Engineering Foundation**
+**E1 — Intent Compiler**
 
-状态：**进行中（E0.1–E0.4 已验收；等待 E0 全量 Gate；E0 尚未完成）**
+状态：**尚未开始（E0 已完成；等待 E1.1）**
 
-上一阶段 **P0 — Interactive Mock Prototype** 已由独立 Gatekeeper 完成全量验收，P0 Acceptance 1–15 全部 PASS。E0.1 工程基线与缺口审计、E0.2 工具链 / CI / Packaging 基线、E0.3 Desktop Shell / typed IPC / 安全边界、E0.4 本地确定性 Fixture Site 均已由独立 Gatekeeper 验收；E0 Acceptance 1–8 尚未进行独立全量 Gate，因此 E0 仍未完成。当前没有需要 Maintainer 决策的阻塞项。
+上一阶段 **E0 — Engineering Foundation** 已由独立 Gatekeeper 完成全量验收，E0 Acceptance 1–8 全部 PASS。P0 也已完成全量验收；当前进入 E1 的准备阶段，E1 尚未开始。当前没有需要 Maintainer 决策的阻塞项。
 
 已确认的产品方向：
 
@@ -80,7 +80,7 @@
 
 ## 当前交付目标
 
-上一阶段交付目标是构建 **Interactive Mock Prototype**，在不接入生产基础设施前验证 D0 Design Contract 的黄金路径。P0 使用确定性 Mock；P0.1 `Intent → Understanding`、P0.2 `Source resolution → contextual Source connection`、P0.3 `Input Preview → immutable mock input`、P0.4 `Execution → pre-confirmation mock Run`、P0.5 `Confirmation → pre-publication decision`、P0.6 `Result → verified mock outcome`、P0.7 `Result → Inspector provenance` 以及 P0 全量 Gate 均已验收。当前交付目标转为 E0：E0.1–E0.4 四个实现 / 基线切片均已验收，下一步只执行独立的 E0 Acceptance 1–8 全量 Gate；在该 Gate 通过前，不推进 E1，也不把 E0 写成已完成。
+上一阶段交付目标是构建 **Interactive Mock Prototype**，在不接入生产基础设施前验证 D0 Design Contract 的黄金路径；P0.1–P0.7 及 P0 全量 Gate 均已验收。随后 E0.1–E0.4 四个工程切片和独立 E0 Acceptance 1–8 全量 Gate 均已验收完成。当前交付目标转为 E1：先从 Goal source / GoalPlan 的最小 schema-validated、versioned 编译切片开始；不得跳过 E1 Gate 或提前进入 E2。
 
 已验证进展：
 
@@ -121,7 +121,7 @@
 
   全量证据：`corepack pnpm typecheck` PASS；`corepack pnpm test` PASS（15 个文件 / 55 tests）；`corepack pnpm build` PASS（29 modules）；`corepack pnpm audit --audit-level high` PASS（无已知漏洞）；1 条 Electron E2E PASS（约 22 秒，覆盖成功/取消、冻结输入、Confirmation、provenance、Tab/Shift+Tab/Escape 和 200%）；`git diff --check` 与尾随空白检查 PASS；33 个 Markdown 文件 / 210 个相对链接检查 PASS；P0.1–P0.7 七张截图均已视觉复核；D0 设计契约、`docs/MANUAL-ACCEPTANCE.md` 和 handoff 可用性均已复核。未发现阻塞性 usability issue。真实服务、Human Takeover、持久化和生产 Inspector 等是明确范围外能力，不是 P0 缺口。
 
-- **E0.1 — 工程基线与缺口审计：已验收。** 独立 Gatekeeper 已返回 `GATEKEEPER: PASS`；审计结论已从短期 Task Packet 提升为稳定文档 [`docs/E0-ENGINEERING-BASELINE-AUDIT.md`](E0-ENGINEERING-BASELINE-AUDIT.md)。E0 尚未通过全量 Gate，以下事实只表示基线和缺口已被验证：
+- **E0.1 — 工程基线与缺口审计：已验收。** 独立 Gatekeeper 已返回 `GATEKEEPER: PASS`；审计结论已从短期 Task Packet 提升为稳定文档 [`docs/E0-ENGINEERING-BASELINE-AUDIT.md`](E0-ENGINEERING-BASELINE-AUDIT.md)。在该审计时点 E0 尚未通过全量 Gate，以下事实只表示基线和缺口已被验证：
 
   - 环境：Node `v24.18.0`、pnpm `12.5.1`；workspace、lockfile 和 strict TypeScript 基线存在。
   - 实际命令：`corepack pnpm typecheck` PASS；`corepack pnpm test` PASS（15 个文件 / 55 tests）；`corepack pnpm build` PASS（29 modules）；`corepack pnpm test:e2e` PASS（1 条 Electron E2E，约 23 秒）；`corepack pnpm audit --audit-level high` PASS（无已知漏洞）。
@@ -129,26 +129,26 @@
   - 预期缺口证据：`corepack pnpm run lint` 与 `corepack pnpm run package` 均为 `ERR_PNPM_NO_SCRIPT`；clean clone 验证未执行 / 未证明。
   - E0 交付物缺口：preload、最小 typed IPC、third-party WebContentsView 安全边界、GitHub Actions CI、deterministic fixture site、Electron Forge packaging 均缺失；ESLint / Prettier 与 `lint/package` root 命令也缺失。
   - Acceptance 矩阵：1（Renderer 无 Node integration）、2（context isolation）和 8（无未记录生产 credential）在当前 trusted Renderer / P0 基线下已满足；3（最小 typed preload API）、4（third-party WebContentsView 无 privileged preload）、5（CI）和 6（fixture variants）缺失；7（root commands 文档）部分满足；clean clone 不能由当前工作区证据替代。
-  - Maintainer 决策：无。P0 产品行为、D0 设计契约、Electron / WebContentsView / BrowserDriver / SQLite 锁定架构和信任边界均未改变。
+  - Maintainer 决策：无。P0 产品行为、D0 设计契约、Electron / WebContentsView / BrowserDriver / SQLite 锁定架构和信任边界均未改变。后续 E0 全量 Gate 已另行完成。
 
-- **E0.2 — 工具链、CI 与 Packaging 基线：已验收。** 独立 Gatekeeper 已返回 `GATEKEEPER: PASS`。本切片只补齐工程门禁和本机未签名 packaging，不扩展产品行为，也不宣称 E0 完成：
+- **E0.2 — 工具链、CI 与 Packaging 基线：已验收。** 独立 Gatekeeper 已返回 `GATEKEEPER: PASS`。在该切片验收时，本切片只补齐工程门禁和本机未签名 packaging，不扩展产品行为，也不单独宣称 E0 完成：
 
   - 独立 clean copy 验证：`corepack pnpm install --frozen-lockfile`、`corepack pnpm typecheck`、`corepack pnpm lint`、`corepack pnpm format:check`、`corepack pnpm ci:validate`、`corepack pnpm test`、`corepack pnpm build`、`corepack pnpm test:e2e` 和 `corepack pnpm package` 均 PASS。
   - CI contract 已验证 workflow 使用固定 Node / Corepack / pnpm、frozen lockfile、只读 `contents` 权限，并包含 typecheck、lint、format check、test 和 build；CI 不使用生产账号或真实服务。
   - dev smoke：`127.0.0.1:43127` 返回 HTTP 200，Electron Renderer 成功加载，停止开发服务后端口已释放；现有 P0 E2E 行为保持通过。
   - Packaging smoke：生成当前主机平台的本地未签名 Electron Forge 产物；ASAR 必须包含 `dist/main/index.js`、`dist/renderer/index.html` 和 manifest，并明确排除 root `index.html`、源码、测试、`.env` / 密钥、browser profile / auth state、本地数据库和测试结果。
   - 供应链检查：`corepack pnpm audit --audit-level high` PASS；未发现高严重度已知漏洞。E0.2 仍不包含 code signing、notarization、installer maker 或跨平台发布。
-  - 交付物：ESLint、Prettier、root `lint` / `format:check` / `package` / `ci:validate`、GitHub Actions workflow、Electron Forge packaging 配置及命令文档已存在；E0.3 的 preload / typed IPC / WebContentsView 安全壳和 E0.4 的 fixture site 仍待实现。
+  - 交付物：ESLint、Prettier、root `lint` / `format:check` / `package` / `ci:validate`、GitHub Actions workflow、Electron Forge packaging 配置及命令文档已存在；在该切片之后 E0.3 的 preload / typed IPC / WebContentsView 安全壳和 E0.4 的 fixture site 仍待实现，随后已补齐。
   - Maintainer 决策：无。既有 Electron、React、WebContentsView、BrowserDriver、SQLite 和信任边界未改变。
 
-- **E0.3 — Desktop Shell、typed IPC 与安全边界：已验收。** 独立 Gatekeeper 已返回 `GATEKEEPER: PASS`。本切片只补齐最小 shell boundary 和安全默认值，不扩展产品行为，也不宣称 E0 完成：
+- **E0.3 — Desktop Shell、typed IPC 与安全边界：已验收。** 独立 Gatekeeper 已返回 `GATEKEEPER: PASS`。在该切片验收时，本切片只补齐最小 shell boundary 和安全默认值，不扩展产品行为，也不单独宣称 E0 完成：
 
   - typed IPC / preload：新增最小 `ipc-contracts` 包、单一明确 channel、`contextBridge` 暴露的 typed `flowPilot.getShellInfo` API，以及可序列化的 `AppError` / result envelope；Renderer 不直接获得 Node、filesystem、shell、database、`webContents` 或任意 channel 能力。
   - 边界校验：main handler 在处理前校验 sender，使用 runtime schema 校验 payload，拒绝缺失、过期和额外字段，返回 typed `IPC_SENDER_NOT_TRUSTED` / `INVALID_IPC_PAYLOAD` / `IPC_HANDLER_FAILED`，内部错误不会泄漏敏感值。
   - third-party WebContentsView：具备独立 account partition、Node integration off、context isolation / sandbox / webSecurity on、无 privileged preload、deny-by-default permissions、popup 拒绝和 allowed-origin navigation / redirect 约束；third-party 页面不能读取 `flowPilot`、Node `process` 或 `require`。
   - 实际验证：`corepack pnpm test` PASS（64 tests）；IPC contract / sender / payload validation、trusted Renderer 与第三方 surface 安全配置测试 PASS；Electron security smoke PASS；Electron E2E PASS；dev 与 packaged Electron smoke PASS。
   - 工程回归：`corepack pnpm typecheck`、`corepack pnpm lint`、`corepack pnpm format:check`、`corepack pnpm build` 和 `corepack pnpm audit --audit-level high` 均 PASS；`corepack pnpm package` PASS，ASAR 检查确认入口、manifest 存在且排除 root `index.html`、源码、测试、Secret、auth state、数据库和测试结果。
-  - Maintainer 决策：无。E0.4 fixture site、variants 和其确定性 WebContentsView E2E 仍待实现；E0 Gate 尚未通过。
+  - Maintainer 决策：无。该切片之后 E0.4 fixture site、variants 和其确定性 WebContentsView E2E 仍待实现；随后已补齐并通过 E0 全量 Gate。
 
 - **E0.4 — 本地确定性 Fixture Site：已验收。** 独立 Gatekeeper 已返回 `GATEKEEPER: PASS`。本切片只提供本地测试表面和安全隔离证据，不实现 BrowserDriver、Workflow Runtime、Repair、Human Takeover 或真实平台动作：
 
@@ -157,7 +157,24 @@
   - 端口边界：`FLOWPILOT_FIXTURE_PORT` 只能是 `1024–65535` 的整数，明确拒绝 P0 Renderer 端口 `43127`；不随机选端口、不静默回退，fixture smoke 结束后验证端口释放。
   - 实际 WebContentsView 隔离验证：Electron fixture smoke 在真实 `WebContentsView` 中逐场景加载，确认页面看不到 `window.flowPilot`、Node `process` 或 `require`，没有 privileged preload；独立 partition、权限、popup、越界导航和外部请求均保持拒绝。
   - 实际验证：fixture 单元 / server 测试 PASS（7 tests）；desktop 测试 PASS（64 tests）；Electron fixture security smoke PASS；P0 golden-path E2E PASS；Electron dev / packaged smoke PASS；`corepack pnpm install --frozen-lockfile` PASS；`corepack pnpm package` PASS；`corepack pnpm audit --audit-level high` PASS。
-  - 约束与剩余边界：场景不访问外部网络、不使用生产 credential、不执行真实发布；E0 Acceptance 1–8 尚未进行独立全量 Gate，不能推进 E1。
+  - 约束与剩余边界：场景不访问外部网络、不使用生产 credential、不执行真实发布；在该切片验收时 E0 Acceptance 1–8 尚未进行独立全量 Gate，随后已由独立 Gatekeeper 完成。
+
+- **E0 — Engineering Foundation 全量 Gate：已完成。** 独立 Gatekeeper 于 2026-09-21 基于 clean copy `HEAD 1864a73` 返回 `GATEKEEPER: PASS — E0 COMPLETE`，逐条确认 `docs/ACCEPTANCE.md` 的 E0 Acceptance 1–8 全部 PASS。该结论已把 E0 从“等待 Gate”推进为完成阶段，但不改变 E0 的范围边界，也不替代后续 E1 Gate：
+
+  | Acceptance | 已验证事实与证据 |
+  | --- | --- |
+  | 1. Renderer 没有 Node integration | PASS：trusted Renderer 配置关闭 `nodeIntegration`；实际 third-party WebContentsView smoke 也确认页面拿不到 Node 能力。 |
+  | 2. context isolation 开启 | PASS：trusted Renderer 与 third-party WebContentsView 均使用 context isolation / sandbox / webSecurity 安全配置，并有 Electron smoke 证据。 |
+  | 3. preload API 最小且 typed | PASS：最小 `ipc-contracts`、sandbox-compatible preload、`contextBridge` typed `flowPilot.getShellInfo`、sender / payload runtime validation 和 typed error envelope 均已验证；没有通用任意 channel / filesystem / shell API。 |
+  | 4. third-party WebContentsView 没有 privileged preload | PASS：真实 WebContentsView fixture smoke 逐场景确认 `window.flowPilot`、Node `process`、`require` 均为不可用；独立 partition、权限、popup、越界导航和外部请求均受控。 |
+  | 5. CI 跑 typecheck / lint / test / build | PASS：GitHub Actions workflow 使用固定 Node / Corepack / pnpm 与 frozen install；CI contract、typecheck、lint、format、test、build 均通过。 |
+  | 6. deterministic fixture site 支持所需 variants | PASS：`@flowpilot/fixture-site` 提供 9 个显式场景；fixture 7 tests、desktop 64 tests、Electron fixture smoke 和 P0 E2E 均通过。 |
+  | 7. root commands 有文档 | PASS：README / `docs/DEVELOPMENT.md` 记录 install、dev、fixture、typecheck、lint、format、test、build、E2E、CI contract 和 package；`43127`、`43128` 及合法 `54321` 覆盖值 smoke 均验证并释放端口。 |
+  | 8. 不依赖未记录的生产 credential | PASS：clean copy、fixture、E2E 和 package 均只使用 loopback / fake asset / 本地状态；audit high PASS；ASAR 检查 591 个文件，排除 root `index.html`、源码、测试、Secret、auth state、数据库和测试结果。 |
+
+  全量验证证据：clean copy `corepack pnpm install --frozen-lockfile` PASS；`corepack pnpm typecheck` PASS；`corepack pnpm lint` PASS；`corepack pnpm format:check` PASS；`corepack pnpm ci:validate` PASS；`corepack pnpm test` PASS（fixture 7 + desktop 64）；`corepack pnpm build` PASS；Electron fixture smoke / security smoke / P0 E2E PASS；`corepack pnpm package` PASS（ASAR 591 files）；`corepack pnpm audit --audit-level high` PASS；端口 `43127`、`43128`、合法覆盖端口 `54321` 的启动、Renderer / fixture smoke 和释放均 PASS；`git diff --check`、尾随空白检查 PASS；Markdown 34 个文件 / 215 个相对链接 PASS。
+
+  E0 范围边界保持明确：尚未实现 E1 Intent Compiler、真实 AI / 平台、生产 BrowserDriver、SQLite persistence、Repair、Human Takeover runtime 或生产账号；下一阶段只能按 `DEVELOPMENT-PLAN.md` 进入 E1，并需独立 E1 Gate。
 
 必须包含：
 
@@ -221,60 +238,64 @@
 
 ## 下一推荐切片
 
-**E0 全量 Gate — Acceptance 1–8 独立复核**（`work/E0-full-gate.md`）
+**E1.1 — Goal source / GoalPlan 基础编译切片**（`work/E1.1-goal-plan-foundation.md`）
 
-逐条复核 `docs/ACCEPTANCE.md` 的 E0 1–8，使用 E0.1–E0.4 的真实证据和 clean-environment / CI / dev / packaged / fixture smoke 结果；只有独立 Gatekeeper 返回 PASS 后才能把 E0 标记完成。不得在该 Gate 前推进 E1。
+实现一个 provider-neutral、deterministic 的 Goal source → schema-validated versioned GoalPlan 最小闭环；保留自然语言 source 可读性和旧 revision 可审计性，不提前实现 Task、Source、InputBundle、真实 AI 或 E2。
 
 ## 当前短期工作队列
 
-E0.4 已验收并退休；当前只保留一个有界的全量 Gate 复核包，它不是第二套 Roadmap：
+E0 已完成，E0 全量 Gate packet 已退休；当前只保留一个有界 E1 实现包，它不是第二套 Roadmap：
 
-- **E0 全量 Gate**：[`work/E0-full-gate.md`](../work/E0-full-gate.md)（下一步，未开始）
+- **E1.1**：[`work/E1.1-goal-plan-foundation.md`](../work/E1.1-goal-plan-foundation.md)（下一步，未开始）
 
-## E0 Handoff
+## 当前 Handoff
 
 ### 角色
 
 State Keeper
 
-### 本轮完成
+### 任务
 
-- E0.4 本地确定性 Fixture Site 已由独立 Gatekeeper 返回 `GATEKEEPER: PASS`。
-- `@flowpilot/fixture-site`、9 个显式场景、`43128` 受校验端口边界和实际 WebContentsView 隔离证据已记录。
-- E0.4 短期 packet 已退休；没有实现包继续留在 E0 队列中。
+E0 全量 Gate 完成后的阶段切换与 E1.1 下一切片交接。
+
+### 已完成
+
+- 独立 Gatekeeper 基于 clean copy `HEAD 1864a73` 返回 `GATEKEEPER: PASS — E0 COMPLETE`。
+- E0 Acceptance 1–8 全部 PASS，真实命令、Electron / WebContentsView smoke、fixture、package、端口释放、audit 和文档证据已记录。
+- E0 全量 Gate packet 已退休；E0 不再保留实现包。
 
 ### 变更文件
 
 - `docs/PROJECT-STATE.md`
 - `docs/E0-ENGINEERING-BASELINE-AUDIT.md`
 - `docs/MANUAL-ACCEPTANCE.md`
-- `work/E0-full-gate.md`
+- `work/E1.1-goal-plan-foundation.md`
 
 ### 已执行验证
 
-- 文档相对链接检查、尾随空白检查、`git diff --check` 均 PASS。
-- E0.4 Gatekeeper 已提供并复核：fixture 7 tests、desktop 64 tests、Electron fixture smoke、P0 E2E、package、frozen install、audit high 以及 dev / packaged smoke 证据。
+- 文档相对链接、尾随空白、`git diff --check` 均 PASS。
+- E0 Gatekeeper 证据：clean copy frozen install、typecheck、lint、format、CI contract、fixture 7 tests、desktop 64 tests、build、Electron fixture / security / P0 E2E、package ASAR 591、audit、43127 / 43128 / 54321 smoke 与端口释放，以及 Markdown 34 files / 215 links。
 
 ### 验收映射
 
-- E0.4 fixture package、9 个场景、端口约束和 actual WebContentsView 隔离：PASS。
-- E0 Acceptance 1–8：等待独立全量 Gate；不能据 E0.4 单切片提前宣称 E0 完成。
+- E0 Acceptance 1–8：PASS，详见本文件的 E0 全量 Gate 矩阵。
+- E1：尚未开始；E1.1 仅作为下一有界实现包，不代表任何 E1 Acceptance 已通过。
 
 ### 产品 / 架构 / 安全说明
 
-本轮只同步已验证事实和队列。没有改变 Electron、WebContentsView、BrowserDriver、IPC、持久化或信任边界；fixture 只使用 loopback、fake asset 和无 credential 的本地状态。
+本轮只同步已验证事实和队列，没有实现 E1，也没有改变 Electron、WebContentsView、BrowserDriver、IPC、持久化或信任边界。E0 的 fixture、typed shell 和 packaging 仍是本地确定性 / 无生产 credential 范围。
 
 ### 已知限制
 
-E0 尚未通过全量 Gate。E1 Intent Compiler 不得开始；真实平台、生产 credential、BrowserDriver、Repair、Human Takeover runtime 和持久化仍不属于本轮。
+E1 Goal / Task compiler、真实 AI provider、Source / InputBundle、Workflow Runtime、Repair、Human Takeover runtime、真实平台和生产 persistence 均尚未实现。
 
 ### 剩余工作
 
-执行 `work/E0-full-gate.md`，独立逐条复核 E0 Acceptance 1–8，并根据 Gatekeeper 结论决定是否推进 E0。
+执行 `work/E1.1-goal-plan-foundation.md`，通过 Plan Guard → Builder → Gatekeeper → State Keeper 闭环；不得提前开始 Task 或 E2。
 
 ### 下一推荐切片
 
-`work/E0-full-gate.md`
+`work/E1.1-goal-plan-foundation.md`
 
 ### 阻塞项 / 所需 Maintainer 决策
 
