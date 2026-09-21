@@ -16,7 +16,8 @@
     "typecheck": "corepack pnpm --filter @flowpilot/ipc-contracts build && tsc -p tsconfig.main.json --noEmit && tsc -p tsconfig.renderer.json --noEmit && tsc -p tsconfig.test.json --noEmit",
     "test": "corepack pnpm --filter @flowpilot/ipc-contracts build && vitest run",
     "test:electron-security": "electron ./scripts/electron-security-smoke.cjs",
-    "test:e2e": "corepack pnpm run build && corepack pnpm run test:electron-security && playwright test",
+    "test:electron-fixture": "corepack pnpm --filter @flowpilot/fixture-site build && node ./scripts/run-fixture-electron-smoke.mjs",
+    "test:e2e": "corepack pnpm run build && corepack pnpm run test:electron-security && corepack pnpm run test:electron-fixture && playwright test",
     "package": "corepack pnpm run build && node ./scripts/run-forge.mjs && corepack pnpm run package:verify",
     "package:verify": "node ./scripts/verify-package.mjs"
   },

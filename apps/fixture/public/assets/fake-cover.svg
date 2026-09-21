@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-labelledby="title description">
+  <title id="title">FlowPilot fake cover</title>
+  <desc id="description">A deterministic local-only fixture asset.</desc>
+  <rect width="640" height="360" fill="#eef4fb"/>
+  <path d="M80 250L220 110L330 220L470 80L560 170" fill="none" stroke="#2f6fa7" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="80" cy="250" r="24" fill="#ffffff" stroke="#2f6fa7" stroke-width="10"/>
+  <circle cx="220" cy="110" r="24" fill="#ffffff" stroke="#2f6fa7" stroke-width="10"/>
+  <circle cx="330" cy="220" r="24" fill="#ffffff" stroke="#2f6fa7" stroke-width="10"/>
+  <circle cx="470" cy="80" r="24" fill="#ffffff" stroke="#2f6fa7" stroke-width="10"/>
+  <circle cx="560" cy="170" r="24" fill="#ffffff" stroke="#2f6fa7" stroke-width="10"/>
+</svg>

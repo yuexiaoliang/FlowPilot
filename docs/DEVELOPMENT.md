@@ -41,13 +41,14 @@
 | --- | --- |
 | `corepack pnpm install --frozen-lockfile` | 按锁文件安装固定依赖；CI 和 clean-environment 验证使用此命令 |
 | `corepack pnpm dev` | 在 `127.0.0.1:43127` 启动 Vite 和 Electron 开发模式 |
+| `corepack pnpm fixture:dev` | 在 `127.0.0.1:43128` 启动本地确定性 Fixture Site；可用 `FLOWPILOT_FIXTURE_PORT` 显式覆盖端口 |
 | `corepack pnpm typecheck` | 检查 main、renderer 和 test TypeScript |
 | `corepack pnpm lint` | 使用 ESLint 检查 TypeScript、React Hooks 和工程脚本，warning 也会失败 |
 | `corepack pnpm format:check` | 用 Prettier 检查代码和工程配置，不修改文件 |
 | `corepack pnpm format` | 用 Prettier 写入格式；与只读检查命令明确分离 |
 | `corepack pnpm test` | 运行 Vitest 单元 / 组件测试 |
 | `corepack pnpm build` | 编译 Electron main 并构建 renderer |
-| `corepack pnpm test:e2e` | 构建、验证 third-party WebContentsView 安全壳，并运行确定性的 Electron 黄金路径 E2E |
+| `corepack pnpm test:e2e` | 构建、在 third-party WebContentsView 中验证 Fixture 隔离与状态，并运行确定性的 Electron 黄金路径 E2E |
 | `corepack pnpm ci:validate` | 解析并静态检查 GitHub Actions 的必需命令和最小权限 |
 | `corepack pnpm package` | 构建、为当前主机平台 / 架构执行 Electron Forge package，并检查 ASAR 内容边界 |
 
@@ -115,11 +116,33 @@ CI 不得向真实服务发布。
 
 ## 确定性 Fixture
 
-在仓库里建立内部测试站点，不直接拿真实微信公众号做 repair 测试。
+`apps/fixture` 是独立 workspace app，只监听 loopback。默认地址是 `http://127.0.0.1:43128`；需要避开本机端口冲突时，必须显式设置 `FLOWPILOT_FIXTURE_PORT=54321`，不会随机选择或静默回退端口。`/health` 提供就绪检查，`/manifest` 返回可重放的 route/state 清单。
 
-至少有 v1 / v2 / v3，可人为破坏已知 Workflow。
+稳定场景如下：
 
-这能避免 flaky test 和真实误操作。
+| Route | 初始状态 | 用途 |
+| --- | --- | --- |
+| `/fixture/v1/normal` | `EDITOR_READY` | 正常编辑、确认和本地发布模拟 |
+| `/fixture/v1/upload` | `UPLOAD_REQUIRED` | 仅使用仓库内 `fake-cover.svg` 的上传模拟 |
+| `/fixture/v1/publish-success` | `PUBLISH_READY` | 确定性成功后置状态 |
+| `/fixture/v1/publish-failure` | `PUBLISH_READY` | 确定性失败后置状态 |
+| `/fixture/v2/dom-change` | `EDITOR_READY_DOM_CHANGED` | DOM / layout 改变但保留语义控件 |
+| `/fixture/v2/ambiguity` | `TARGET_AMBIGUOUS` | 两个等价目标，要求调用方不得猜测 |
+| `/fixture/v2/interstitial` | `INTERSTITIAL_REQUIRED` | 阻塞式中间页 |
+| `/fixture/v3/auth-expired` | `AUTH_REQUIRED` | 登录过期，只允许人工处理 |
+| `/fixture/v3/security-challenge` | `SECURITY_CHALLENGE` | 安全挑战，明确停止且不绕过 |
+
+Fixture 不克隆真实平台、不访问外部网络、不保存 credential，也不执行真实发布。Electron E2E 通过 `createThirdPartyWebContentsView` 加载全部场景，验证页面拿不到 `window.flowPilot`、Node `process`、`require` 或 privileged preload，权限、popup 和越界导航保持默认拒绝。测试结束后服务器必须释放端口。
+
+可分别运行：
+
+```sh
+corepack pnpm fixture:dev
+corepack pnpm --filter @flowpilot/fixture-site test
+corepack pnpm --filter @flowpilot/desktop test:electron-fixture
+```
+
+这些 v1 / v2 / v3 场景为后续 BrowserDriver、Discovery 和 Repair 提供测试表面，但 Fixture 本身不承载它们的运行时语义。这能避免 flaky test 和真实误操作。
 
 ## 依赖策略
 

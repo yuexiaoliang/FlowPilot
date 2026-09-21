@@ -115,7 +115,7 @@
 
 1. E0.2 工具链、CI 与 Packaging 基线：已验收，短期 packet 已退休。
 2. E0.3 Desktop Shell、typed IPC 与安全边界：已验收，短期 packet 已退休。
-3. [`work/E0.4-deterministic-fixture-site.md`](../work/E0.4-deterministic-fixture-site.md)：实现本地 fixture variants 和确定性 E2E 入口。
+3. E0.4 本地确定性 Fixture Site：已验收，短期 packet 已退休。
 
 这些 Task Packet 是 `DEVELOPMENT-PLAN.md` 的执行辅助，不构成第二套 Roadmap。E0.2–E0.4 全部完成后仍需独立的 E0 全量 Gate，才能把 E0 标记为完成。
 
@@ -134,7 +134,7 @@
 
 ### 下一推荐切片
 
-`work/E0.4-deterministic-fixture-site.md`
+`work/E0-full-gate.md`
 
 ### 阻塞项 / 所需 Maintainer 决策
 

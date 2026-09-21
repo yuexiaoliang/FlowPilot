@@ -55,6 +55,7 @@ FlowPilot 是**文档驱动，而不是 Issue 驱动**。
 ```sh
 corepack pnpm install
 corepack pnpm dev
+corepack pnpm fixture:dev
 corepack pnpm typecheck
 corepack pnpm lint
 corepack pnpm format:check
@@ -64,7 +65,7 @@ corepack pnpm test:e2e
 corepack pnpm package
 ```
 
-`test:e2e` 会构建并启动本地 Electron 原型，只使用确定性 Mock，不连接真实服务或生产账号。
+`dev` 在 `127.0.0.1:43127` 启动桌面原型；`fixture:dev` 在 `127.0.0.1:43128` 启动只用于测试的确定性站点。`test:e2e` 会构建并启动本地 Electron 原型，在隔离的 third-party WebContentsView 中验证 Fixture，并运行 P0 黄金路径；全程不连接真实服务或生产账号。
 
 `package` 会先构建应用，再用 Electron Forge 为当前主机平台和架构生成未签名产物，并检查 ASAR 中包含运行入口且不包含源码、测试、Secret、浏览器身份状态或本地数据库。产物位于 `out/desktop/`；它是工程 smoke，不是可公开分发的签名安装包。
 

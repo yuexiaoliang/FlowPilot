@@ -42,4 +42,10 @@ export default defineConfig(
       'react-hooks/exhaustive-deps': 'error',
     },
   },
+  {
+    files: ['apps/fixture/public/**/*.js'],
+    languageOptions: {
+      globals: globals.browser,
+    },
+  },
 );

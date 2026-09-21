@@ -8,9 +8,9 @@
 
 **E0 — Engineering Foundation**
 
-状态：**进行中（E0.1–E0.3 已验收；下一切片 E0.4；E0 Gate 尚未通过）**
+状态：**进行中（E0.1–E0.4 已验收；等待 E0 全量 Gate；E0 尚未完成）**
 
-上一阶段 **P0 — Interactive Mock Prototype** 已由独立 Gatekeeper 完成全量验收，P0 Acceptance 1–15 全部 PASS。E0.1 工程基线与缺口审计、E0.2 工具链 / CI / Packaging 基线、E0.3 Desktop Shell / typed IPC / 安全边界均已由独立 Gatekeeper 验收；E0.4 尚未开始，E0 Gate 仍未通过。当前没有需要 Maintainer 决策的阻塞项。
+上一阶段 **P0 — Interactive Mock Prototype** 已由独立 Gatekeeper 完成全量验收，P0 Acceptance 1–15 全部 PASS。E0.1 工程基线与缺口审计、E0.2 工具链 / CI / Packaging 基线、E0.3 Desktop Shell / typed IPC / 安全边界、E0.4 本地确定性 Fixture Site 均已由独立 Gatekeeper 验收；E0 Acceptance 1–8 尚未进行独立全量 Gate，因此 E0 仍未完成。当前没有需要 Maintainer 决策的阻塞项。
 
 已确认的产品方向：
 
@@ -80,7 +80,7 @@
 
 ## 当前交付目标
 
-上一阶段交付目标是构建 **Interactive Mock Prototype**，在不接入生产基础设施前验证 D0 Design Contract 的黄金路径。P0 使用确定性 Mock；P0.1 `Intent → Understanding`、P0.2 `Source resolution → contextual Source connection`、P0.3 `Input Preview → immutable mock input`、P0.4 `Execution → pre-confirmation mock Run`、P0.5 `Confirmation → pre-publication decision`、P0.6 `Result → verified mock outcome`、P0.7 `Result → Inspector provenance` 以及 P0 全量 Gate 均已验收。当前交付目标转为 E0：E0.1 审计、E0.2 工具链 / CI / Packaging 基线和 E0.3 Desktop Shell / typed IPC / 安全边界已完成，下一步按单切片实现 E0.4；在 E0.4 和独立 E0 全量 Gate 完成前，不把 E0 写成已完成。
+上一阶段交付目标是构建 **Interactive Mock Prototype**，在不接入生产基础设施前验证 D0 Design Contract 的黄金路径。P0 使用确定性 Mock；P0.1 `Intent → Understanding`、P0.2 `Source resolution → contextual Source connection`、P0.3 `Input Preview → immutable mock input`、P0.4 `Execution → pre-confirmation mock Run`、P0.5 `Confirmation → pre-publication decision`、P0.6 `Result → verified mock outcome`、P0.7 `Result → Inspector provenance` 以及 P0 全量 Gate 均已验收。当前交付目标转为 E0：E0.1–E0.4 四个实现 / 基线切片均已验收，下一步只执行独立的 E0 Acceptance 1–8 全量 Gate；在该 Gate 通过前，不推进 E1，也不把 E0 写成已完成。
 
 已验证进展：
 
@@ -150,6 +150,15 @@
   - 工程回归：`corepack pnpm typecheck`、`corepack pnpm lint`、`corepack pnpm format:check`、`corepack pnpm build` 和 `corepack pnpm audit --audit-level high` 均 PASS；`corepack pnpm package` PASS，ASAR 检查确认入口、manifest 存在且排除 root `index.html`、源码、测试、Secret、auth state、数据库和测试结果。
   - Maintainer 决策：无。E0.4 fixture site、variants 和其确定性 WebContentsView E2E 仍待实现；E0 Gate 尚未通过。
 
+- **E0.4 — 本地确定性 Fixture Site：已验收。** 独立 Gatekeeper 已返回 `GATEKEEPER: PASS`。本切片只提供本地测试表面和安全隔离证据，不实现 BrowserDriver、Workflow Runtime、Repair、Human Takeover 或真实平台动作：
+
+  - fixture package：新增 workspace package `@flowpilot/fixture-site`（`apps/fixture`），只监听 loopback，提供 `/health`、`/manifest` 和本地 fake upload asset；根命令 `fixture:dev` 默认使用 `127.0.0.1:43128`。
+  - 9 个显式、可重放场景均已覆盖：`v1/normal`、`v1/upload`、`v1/publish-success`、`v1/publish-failure`、`v2/dom-change`、`v2/ambiguity`、`v2/interstitial`、`v3/auth-expired`、`v3/security-challenge`。
+  - 端口边界：`FLOWPILOT_FIXTURE_PORT` 只能是 `1024–65535` 的整数，明确拒绝 P0 Renderer 端口 `43127`；不随机选端口、不静默回退，fixture smoke 结束后验证端口释放。
+  - 实际 WebContentsView 隔离验证：Electron fixture smoke 在真实 `WebContentsView` 中逐场景加载，确认页面看不到 `window.flowPilot`、Node `process` 或 `require`，没有 privileged preload；独立 partition、权限、popup、越界导航和外部请求均保持拒绝。
+  - 实际验证：fixture 单元 / server 测试 PASS（7 tests）；desktop 测试 PASS（64 tests）；Electron fixture security smoke PASS；P0 golden-path E2E PASS；Electron dev / packaged smoke PASS；`corepack pnpm install --frozen-lockfile` PASS；`corepack pnpm package` PASS；`corepack pnpm audit --audit-level high` PASS。
+  - 约束与剩余边界：场景不访问外部网络、不使用生产 credential、不执行真实发布；E0 Acceptance 1–8 尚未进行独立全量 Gate，不能推进 E1。
+
 必须包含：
 
 - `design/README.md`
@@ -212,12 +221,61 @@
 
 ## 下一推荐切片
 
-**E0.4 — 本地确定性 Fixture Site**（`work/E0.4-deterministic-fixture-site.md`）
+**E0 全量 Gate — Acceptance 1–8 独立复核**（`work/E0-full-gate.md`）
 
-在 E0.3 已验收的 typed shell boundary 和 third-party WebContentsView 安全壳上，实现本地确定性 fixture app、规定的 variants 与安全 E2E 证据；不得把 E0.4 通过写成 E0 完成。
+逐条复核 `docs/ACCEPTANCE.md` 的 E0 1–8，使用 E0.1–E0.4 的真实证据和 clean-environment / CI / dev / packaged / fixture smoke 结果；只有独立 Gatekeeper 返回 PASS 后才能把 E0 标记完成。不得在该 Gate 前推进 E1。
 
 ## 当前短期工作队列
 
-仅保留接下来一个有界 E0 切片；它不是第二套 Roadmap：
+E0.4 已验收并退休；当前只保留一个有界的全量 Gate 复核包，它不是第二套 Roadmap：
 
-- **E0.4**：[`work/E0.4-deterministic-fixture-site.md`](../work/E0.4-deterministic-fixture-site.md)（下一切片，未开始）
+- **E0 全量 Gate**：[`work/E0-full-gate.md`](../work/E0-full-gate.md)（下一步，未开始）
+
+## E0 Handoff
+
+### 角色
+
+State Keeper
+
+### 本轮完成
+
+- E0.4 本地确定性 Fixture Site 已由独立 Gatekeeper 返回 `GATEKEEPER: PASS`。
+- `@flowpilot/fixture-site`、9 个显式场景、`43128` 受校验端口边界和实际 WebContentsView 隔离证据已记录。
+- E0.4 短期 packet 已退休；没有实现包继续留在 E0 队列中。
+
+### 变更文件
+
+- `docs/PROJECT-STATE.md`
+- `docs/E0-ENGINEERING-BASELINE-AUDIT.md`
+- `docs/MANUAL-ACCEPTANCE.md`
+- `work/E0-full-gate.md`
+
+### 已执行验证
+
+- 文档相对链接检查、尾随空白检查、`git diff --check` 均 PASS。
+- E0.4 Gatekeeper 已提供并复核：fixture 7 tests、desktop 64 tests、Electron fixture smoke、P0 E2E、package、frozen install、audit high 以及 dev / packaged smoke 证据。
+
+### 验收映射
+
+- E0.4 fixture package、9 个场景、端口约束和 actual WebContentsView 隔离：PASS。
+- E0 Acceptance 1–8：等待独立全量 Gate；不能据 E0.4 单切片提前宣称 E0 完成。
+
+### 产品 / 架构 / 安全说明
+
+本轮只同步已验证事实和队列。没有改变 Electron、WebContentsView、BrowserDriver、IPC、持久化或信任边界；fixture 只使用 loopback、fake asset 和无 credential 的本地状态。
+
+### 已知限制
+
+E0 尚未通过全量 Gate。E1 Intent Compiler 不得开始；真实平台、生产 credential、BrowserDriver、Repair、Human Takeover runtime 和持久化仍不属于本轮。
+
+### 剩余工作
+
+执行 `work/E0-full-gate.md`，独立逐条复核 E0 Acceptance 1–8，并根据 Gatekeeper 结论决定是否推进 E0。
+
+### 下一推荐切片
+
+`work/E0-full-gate.md`
+
+### 阻塞项 / 所需 Maintainer 决策
+
+无。

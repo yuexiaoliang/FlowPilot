@@ -38,6 +38,7 @@ function assertArchiveContents(archivePath) {
     /^\/index\.html$/,
     /^\/(?:e2e|scripts|src|playwright-report|test-results|profiles|user-data)(?:\/|$)/,
     /^\/node_modules\/@flowpilot\/ipc-contracts\/(?:src(?:\/|$)|tsconfig\.json$)/,
+    /^\/node_modules\/@flowpilot\/fixture-site(?:\/|$)/,
     /^\/node_modules\/(?:@electron-forge|@playwright)\/[^/]+(?:\/|$)/,
     /^\/node_modules\/(?:eslint|prettier|typescript|vite|vitest)(?:\/|$)/,
     /(?:^|\/)\.env(?:\..*)?$/,
