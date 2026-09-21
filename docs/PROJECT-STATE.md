@@ -8,9 +8,9 @@
 
 **E1 — Intent Compiler**
 
-状态：**尚未开始（E0 已完成；等待 E1.1）**
+状态：**进行中（E1.1 已验收；等待 E1.2）**
 
-上一阶段 **E0 — Engineering Foundation** 已由独立 Gatekeeper 完成全量验收，E0 Acceptance 1–8 全部 PASS。P0 也已完成全量验收；当前进入 E1 的准备阶段，E1 尚未开始。当前没有需要 Maintainer 决策的阻塞项。
+上一阶段 **E0 — Engineering Foundation** 已由独立 Gatekeeper 完成全量验收，E0 Acceptance 1–8 全部 PASS。E1.1 Goal source / GoalPlan 基础编译切片也已由独立 Gatekeeper 验收；当前 E1 正在进行，下一步是 E1.2 Task source / TaskPlan 基础编译切片。当前没有需要 Maintainer 决策的阻塞项。
 
 已确认的产品方向：
 
@@ -80,7 +80,7 @@
 
 ## 当前交付目标
 
-上一阶段交付目标是构建 **Interactive Mock Prototype**，在不接入生产基础设施前验证 D0 Design Contract 的黄金路径；P0.1–P0.7 及 P0 全量 Gate 均已验收。随后 E0.1–E0.4 四个工程切片和独立 E0 Acceptance 1–8 全量 Gate 均已验收完成。当前交付目标转为 E1：先从 Goal source / GoalPlan 的最小 schema-validated、versioned 编译切片开始；不得跳过 E1 Gate 或提前进入 E2。
+上一阶段交付目标是构建 **Interactive Mock Prototype**，在不接入生产基础设施前验证 D0 Design Contract 的黄金路径；P0.1–P0.7 及 P0 全量 Gate 均已验收。随后 E0.1–E0.4 四个工程切片和独立 E0 Acceptance 1–8 全量 Gate 均已验收完成。当前交付目标是完成 E1 Intent Compiler：E1.1 Goal source / GoalPlan 已验收，下一步只做 E1.2 Task source / TaskPlan 基础编译；不得跳过 E1 Gate 或提前进入 E2。
 
 已验证进展：
 
@@ -176,6 +176,15 @@
 
   E0 范围边界保持明确：尚未实现 E1 Intent Compiler、真实 AI / 平台、生产 BrowserDriver、SQLite persistence、Repair、Human Takeover runtime 或生产账号；下一阶段只能按 `DEVELOPMENT-PLAN.md` 进入 E1，并需独立 E1 Gate。
 
+- **E1.1 — Goal source / GoalPlan 基础编译：已验收。** 独立 Gatekeeper 已返回 `GATEKEEPER: PASS`。本切片只建立 Goal 的 provider-neutral、deterministic 编译边界，不宣称 E1 完成，也不实现 Task、Source、InputBundle、Workflow Runtime 或 SQLite persistence：
+
+  - 交付物：workspace package `@flowpilot/goal-ir`；`GoalSource` / `GoalPlan` v1 schema、typed compiler / provider / error boundary、`GoalPlan` policy validation、revision compatibility decoder 和 append-only `InMemoryGoalRevisionStore`。
+  - 版本与 provenance：source body 使用 SHA-256 source hash；source / plan revision 均记录 UTC ISO-8601 时间；source revision 与 compiled-plan revision 独立递增，source 变更产生新的 plan revision，旧 source / plan revision 可按版本读取和审计；不接入 SQLite。
+  - Provider 与安全边界：provider-neutral `StructuredGoalProvider` 和 deterministic fixture provider 不访问网络或真实 credential；schema-invalid、schema-valid 但 policy-unsafe output、unsupported version、stale revision、provider failure 和 cancellation 均返回 typed failure，不静默接受、覆盖旧 revision 或泄漏内部错误。
+  - 真实验证：`@flowpilot/goal-ir` 通过 14 个 goal-ir tests；fixture site 7 tests、desktop 64 tests 保持通过；独立 Gatekeeper 复核的 frozen install、typecheck、lint、format check、CI contract、build、Electron E2E、audit high 和 `git diff --check` 均 PASS。
+  - E1 Acceptance 映射：1（Goal 普通 Markdown）、4（schema-validated versioned GoalPlan）、8（source 文本可读）、9（修改 source 生成新 revision）、10（旧 plan 可审计）、11（provider-neutral interface）、12（fake / deterministic provider）和 13（invalid / unsafe output 被拒绝）已由该切片证据覆盖；E1 Acceptance 2、3、5、6、7 仍待后续切片全量覆盖。
+  - 范围边界：没有实现 Task source / TaskPlan、schedule、Goal/Source 语义解析、ambiguity UI、Source reference、InputBundle、真实 AI provider、网络、生产 credential 或 E2；E1 仍未完成。
+
 必须包含：
 
 - `design/README.md`
@@ -238,15 +247,15 @@
 
 ## 下一推荐切片
 
-**E1.1 — Goal source / GoalPlan 基础编译切片**（`work/E1.1-goal-plan-foundation.md`）
+**E1.2 — Task source / TaskPlan 基础编译切片**（`work/E1.2-task-plan-foundation.md`）
 
-实现一个 provider-neutral、deterministic 的 Goal source → schema-validated versioned GoalPlan 最小闭环；保留自然语言 source 可读性和旧 revision 可审计性，不提前实现 Task、Source、InputBundle、真实 AI 或 E2。
+在已验收的 Goal IR 边界上，建立普通 Markdown Task source → schema-validated versioned TaskPlan 的最小 provider-neutral、deterministic 闭环；只覆盖 Task source / revision、TaskPlan v1、自然语言 trigger / timing 的结构化表达和可审计 revision，不提前实现 Source、InputBundle、调度执行、Workflow、真实 AI 或 E2。
 
 ## 当前短期工作队列
 
-E0 已完成，E0 全量 Gate packet 已退休；当前只保留一个有界 E1 实现包，它不是第二套 Roadmap：
+E0 已完成，E0 全量 Gate packet 已退休；E1.1 已验收并退休；当前只保留一个有界 E1 实现包，它不是第二套 Roadmap：
 
-- **E1.1**：[`work/E1.1-goal-plan-foundation.md`](../work/E1.1-goal-plan-foundation.md)（下一步，未开始）
+- **E1.2**：[`work/E1.2-task-plan-foundation.md`](../work/E1.2-task-plan-foundation.md)（下一步，未开始）
 
 ## 当前 Handoff
 
@@ -256,46 +265,50 @@ State Keeper
 
 ### 任务
 
-E0 全量 Gate 完成后的阶段切换与 E1.1 下一切片交接。
+E1.1 Goal source / GoalPlan 基础编译验收后的状态同步与 E1.2 下一切片交接。
 
 ### 已完成
 
-- 独立 Gatekeeper 基于 clean copy `HEAD 1864a73` 返回 `GATEKEEPER: PASS — E0 COMPLETE`。
-- E0 Acceptance 1–8 全部 PASS，真实命令、Electron / WebContentsView smoke、fixture、package、端口释放、audit 和文档证据已记录。
-- E0 全量 Gate packet 已退休；E0 不再保留实现包。
+- 独立 Gatekeeper 对 E1.1 返回 `GATEKEEPER: PASS`；`@flowpilot/goal-ir` 的 GoalSource / GoalPlan v1、SHA-256 / UTC provenance、独立 append-only revision、provider-neutral deterministic provider、schema / policy typed rejection 和 in-memory store 均已验证。
+- E1.1 通过 14 个 goal-ir tests；fixture site 7 tests、desktop 64 tests 以及 Gatekeeper 复核的 frozen install、typecheck、lint、format、CI contract、build、Electron E2E、audit high 和 `git diff --check` 均 PASS。
+- E1.1 packet 已退休；E1.2 Task source / TaskPlan 基础编译 packet 已建立。E1 仍未完成。
 
 ### 变更文件
 
 - `docs/PROJECT-STATE.md`
 - `docs/E0-ENGINEERING-BASELINE-AUDIT.md`
 - `docs/MANUAL-ACCEPTANCE.md`
-- `work/E1.1-goal-plan-foundation.md`
+- E1.1 Goal source / GoalPlan packet（已退休）
+- `work/E1.2-task-plan-foundation.md`
+
+E1.1 已验收产物：`packages/goal-ir/`、`package.json`、`pnpm-lock.yaml`。
 
 ### 已执行验证
 
-- 文档相对链接、尾随空白、`git diff --check` 均 PASS。
-- E0 Gatekeeper 证据：clean copy frozen install、typecheck、lint、format、CI contract、fixture 7 tests、desktop 64 tests、build、Electron fixture / security / P0 E2E、package ASAR 591、audit、43127 / 43128 / 54321 smoke 与端口释放，以及 Markdown 34 files / 215 links。
+- E1.1 Gatekeeper 证据：`@flowpilot/goal-ir` 14 tests、fixture 7 tests、desktop 64 tests；frozen install、typecheck、lint、format、CI contract、build、Electron E2E、audit high 和 `git diff --check` 均 PASS。
+- 本轮 State Keeper 验证：文档相对链接、尾随空白、`git diff --check` 均 PASS；已确认 E1.1 packet 删除且没有残留引用。
 
 ### 验收映射
 
 - E0 Acceptance 1–8：PASS，详见本文件的 E0 全量 Gate 矩阵。
-- E1：尚未开始；E1.1 仅作为下一有界实现包，不代表任何 E1 Acceptance 已通过。
+- E1.1：覆盖 E1 Acceptance 1、4、8、9、10、11、12、13；E1 Acceptance 2、3、5、6、7 尚待后续 Task / semantic resolution 切片完成。
+- E1：进行中但尚未完成；E1.2 仅作为下一有界实现包，不代表 E1 已通过。
 
 ### 产品 / 架构 / 安全说明
 
-本轮只同步已验证事实和队列，没有实现 E1，也没有改变 Electron、WebContentsView、BrowserDriver、IPC、持久化或信任边界。E0 的 fixture、typed shell 和 packaging 仍是本地确定性 / 无生产 credential 范围。
+本轮只同步 E1.1 已验证事实和执行队列，没有实现 E1.2，也没有改变 Electron、WebContentsView、BrowserDriver、IPC、持久化或信任边界。E1.1 仅使用 in-memory store、deterministic fixtures、无网络 / 无真实 provider / 无生产 credential；SQLite、Source、InputBundle 和运行时仍未开始。
 
 ### 已知限制
 
-E1 Goal / Task compiler、真实 AI provider、Source / InputBundle、Workflow Runtime、Repair、Human Takeover runtime、真实平台和生产 persistence 均尚未实现。
+E1 Task source / TaskPlan、完整 Goal / Task semantic reference、ambiguity clarification、真实 AI provider、Source / InputBundle、Workflow Runtime、Repair、Human Takeover runtime、真实平台和 production persistence 均尚未实现。
 
 ### 剩余工作
 
-执行 `work/E1.1-goal-plan-foundation.md`，通过 Plan Guard → Builder → Gatekeeper → State Keeper 闭环；不得提前开始 Task 或 E2。
+执行 `work/E1.2-task-plan-foundation.md`，通过 Plan Guard → Builder → Gatekeeper → State Keeper 闭环；不得提前开始 E2。
 
 ### 下一推荐切片
 
-`work/E1.1-goal-plan-foundation.md`
+`work/E1.2-task-plan-foundation.md`
 
 ### 阻塞项 / 所需 Maintainer 决策
 

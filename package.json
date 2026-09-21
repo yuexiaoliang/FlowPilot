@@ -10,13 +10,13 @@
   "scripts": {
     "dev": "corepack pnpm --filter @flowpilot/desktop dev",
     "fixture:dev": "corepack pnpm --filter @flowpilot/fixture-site dev",
-    "build": "corepack pnpm --filter @flowpilot/fixture-site build && corepack pnpm --filter @flowpilot/desktop build",
-    "typecheck": "corepack pnpm --filter @flowpilot/fixture-site typecheck && corepack pnpm --filter @flowpilot/desktop typecheck",
+    "build": "corepack pnpm --filter @flowpilot/goal-ir build && corepack pnpm --filter @flowpilot/fixture-site build && corepack pnpm --filter @flowpilot/desktop build",
+    "typecheck": "corepack pnpm --filter @flowpilot/goal-ir typecheck && corepack pnpm --filter @flowpilot/fixture-site typecheck && corepack pnpm --filter @flowpilot/desktop typecheck",
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "ci:validate": "node ./scripts/validate-ci.mjs",
-    "test": "corepack pnpm --filter @flowpilot/fixture-site test && corepack pnpm --filter @flowpilot/desktop test",
+    "test": "corepack pnpm --filter @flowpilot/goal-ir test && corepack pnpm --filter @flowpilot/fixture-site test && corepack pnpm --filter @flowpilot/desktop test",
     "test:e2e": "corepack pnpm --filter @flowpilot/fixture-site build && corepack pnpm --filter @flowpilot/desktop test:e2e",
     "package": "corepack pnpm --filter @flowpilot/desktop package"
   },

@@ -134,7 +134,7 @@
 
 ### 下一推荐切片
 
-`work/E1.1-goal-plan-foundation.md`
+`work/E1.2-task-plan-foundation.md`
 
 ### 阻塞项 / 所需 Maintainer 决策
 
