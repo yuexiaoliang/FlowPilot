@@ -1,0 +1,36 @@
+{
+  "name": "@flowpilot/desktop",
+  "private": true,
+  "version": "0.0.0",
+  "main": "dist/main/index.js",
+  "scripts": {
+    "dev": "concurrently -k -n renderer,main,desktop -c cyan,magenta,green \"vite --host 127.0.0.1 --port 43127 --strictPort\" \"tsc -p tsconfig.main.json --watch --preserveWatchOutput\" \"wait-on tcp:127.0.0.1:43127 dist/main/index.js && cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:43127 electron .\"",
+    "build": "tsc -p tsconfig.main.json && vite build",
+    "typecheck": "tsc -p tsconfig.main.json --noEmit && tsc -p tsconfig.renderer.json --noEmit && tsc -p tsconfig.test.json --noEmit",
+    "test": "vitest run",
+    "test:e2e": "corepack pnpm run build && playwright test"
+  },
+  "dependencies": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@testing-library/dom": "10.4.2",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.3",
+    "@testing-library/user-event": "14.6.7",
+    "@types/node": "26.6.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "concurrently": "10.0.5",
+    "cross-env": "10.1.0",
+    "electron": "44.4.3",
+    "jsdom": "30.1.0",
+    "typescript": "7.0.2",
+    "vite": "8.3.0",
+    "vitest": "5.0.1",
+    "wait-on": "9.1.0"
+  }
+}

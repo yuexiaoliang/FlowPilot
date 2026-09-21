@@ -1,0 +1,17 @@
+{
+  "name": "flowpilot",
+  "private": true,
+  "version": "0.0.0",
+  "packageManager": "pnpm@12.5.1",
+  "engines": {
+    "node": ">=24.15.0 <25",
+    "pnpm": ">=12 <13"
+  },
+  "scripts": {
+    "dev": "corepack pnpm --filter @flowpilot/desktop dev",
+    "build": "corepack pnpm --filter @flowpilot/desktop build",
+    "typecheck": "corepack pnpm --filter @flowpilot/desktop typecheck",
+    "test": "corepack pnpm --filter @flowpilot/desktop test",
+    "test:e2e": "corepack pnpm --filter @flowpilot/desktop test:e2e"
+  }
+}
