@@ -124,9 +124,7 @@ describe('Intent to Understanding workspace', () => {
     expect(screen.queryByText('正在理解这段意图…')).not.toBeInTheDocument();
     expect(screen.getByText('分析已取消，意图文本仍然保留。')).toBeVisible();
     expect(screen.getByLabelText('用自然语言描述你的意图')).toHaveValue(EXAMPLE_INTENT);
-    await waitFor(() =>
-      expect(screen.getByRole('button', { name: '分析我的意图' })).toHaveFocus(),
-    );
+    await waitFor(() => expect(screen.getByRole('button', { name: '分析我的意图' })).toHaveFocus());
   });
 
   it('marks the prior review as stale after the source changes', async () => {
@@ -138,7 +136,10 @@ describe('Intent to Understanding workspace', () => {
     await user.click(screen.getByRole('button', { name: '分析我的意图' }));
     const understandingHeading = await screen.findByRole('heading', { name: '我的理解' });
     await waitFor(() => expect(understandingHeading).toHaveFocus());
-    await user.type(screen.getByLabelText('用自然语言描述你的意图'), '\n如果电脑没有启动，稍后再运行。');
+    await user.type(
+      screen.getByLabelText('用自然语言描述你的意图'),
+      '\n如果电脑没有启动，稍后再运行。',
+    );
 
     expect(screen.getByText('需要更新')).toBeVisible();
     expect(

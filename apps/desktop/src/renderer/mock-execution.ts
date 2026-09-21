@@ -1,9 +1,7 @@
 import type { MockInputBundle } from './mock-input';
 
 export type MockExecutionErrorCode =
-  | 'EXECUTION_PREPARATION_CANCELLED'
-  | 'INPUT_BUNDLE_UNAVAILABLE'
-  | 'EXECUTION_PREPARATION_FAILED';
+  'EXECUTION_PREPARATION_CANCELLED' | 'INPUT_BUNDLE_UNAVAILABLE' | 'EXECUTION_PREPARATION_FAILED';
 
 export class MockExecutionError extends Error {
   readonly code: MockExecutionErrorCode;
@@ -18,9 +16,7 @@ export class MockExecutionError extends Error {
 }
 
 export type MockExecutionMilestoneId =
-  | 'PREPARING_INPUT'
-  | 'OPENING_DESTINATION'
-  | 'PREPARING_IRREVERSIBLE_ACTION';
+  'PREPARING_INPUT' | 'OPENING_DESTINATION' | 'PREPARING_IRREVERSIBLE_ACTION';
 
 export type MockExecutionMilestone = Readonly<{
   id: MockExecutionMilestoneId;

@@ -1,20 +1,27 @@
 {
   "name": "@flowpilot/desktop",
+  "productName": "FlowPilot",
   "private": true,
   "version": "0.0.0",
+  "description": "FlowPilot intent-first desktop automation runtime",
+  "author": "FlowPilot maintainers",
+  "license": "UNLICENSED",
   "main": "dist/main/index.js",
+  "config": {
+    "forge": "./forge.config.cjs"
+  },
   "scripts": {
     "dev": "concurrently -k -n renderer,main,desktop -c cyan,magenta,green \"vite --host 127.0.0.1 --port 43127 --strictPort\" \"tsc -p tsconfig.main.json --watch --preserveWatchOutput\" \"wait-on tcp:127.0.0.1:43127 dist/main/index.js && cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:43127 electron .\"",
     "build": "tsc -p tsconfig.main.json && vite build",
     "typecheck": "tsc -p tsconfig.main.json --noEmit && tsc -p tsconfig.renderer.json --noEmit && tsc -p tsconfig.test.json --noEmit",
     "test": "vitest run",
-    "test:e2e": "corepack pnpm run build && playwright test"
-  },
-  "dependencies": {
-    "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "test:e2e": "corepack pnpm run build && playwright test",
+    "package": "corepack pnpm run build && node ./scripts/run-forge.mjs && corepack pnpm run package:verify",
+    "package:verify": "node ./scripts/verify-package.mjs"
   },
   "devDependencies": {
+    "@electron-forge/cli": "8.0.0-alpha.10",
+    "@electron/asar": "4.3.0",
     "@playwright/test": "1.63.0",
     "@testing-library/dom": "10.4.2",
     "@testing-library/jest-dom": "6.9.1",
@@ -28,6 +35,8 @@
     "cross-env": "10.1.0",
     "electron": "44.4.3",
     "jsdom": "30.1.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
     "typescript": "7.0.2",
     "vite": "8.3.0",
     "vitest": "5.0.1",

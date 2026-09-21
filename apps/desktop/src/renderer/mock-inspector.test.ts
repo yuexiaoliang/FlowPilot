@@ -5,10 +5,7 @@ import {
   recordMockConfirmationDecision,
   type MockConfirmationDecisionKind,
 } from './mock-confirmation';
-import {
-  loadMockInspectorProvenance,
-  type MockInspectorError,
-} from './mock-inspector';
+import { loadMockInspectorProvenance, type MockInspectorError } from './mock-inspector';
 import { prepareMockInputBundle } from './mock-input';
 import {
   createMockCancelledResult,
@@ -91,9 +88,9 @@ describe('deterministic Mock Inspector provenance', () => {
     const result = await createResult('CONFIRMED');
     const mutableResult = { ...result } as MockTerminalResult;
 
-    await expect(
-      loadMockInspectorProvenance(mutableResult, { delayMs: 0 }),
-    ).rejects.toMatchObject<Partial<MockInspectorError>>({
+    await expect(loadMockInspectorProvenance(mutableResult, { delayMs: 0 })).rejects.toMatchObject<
+      Partial<MockInspectorError>
+    >({
       code: 'INSPECTOR_CONTEXT_UNAVAILABLE',
       retryable: false,
     });

@@ -151,7 +151,10 @@ export function InputPreview({
 
   if (phase === 'loading') {
     return (
-      <section className="input-preview input-preview-loading" aria-labelledby="input-loading-title">
+      <section
+        className="input-preview input-preview-loading"
+        aria-labelledby="input-loading-title"
+      >
         <p className="preview-state-label">输入预览 · 正在准备</p>
         <h2 ref={loadingHeadingRef} id="input-loading-title" tabIndex={-1}>
           <span className="spinner" aria-hidden="true" />
@@ -187,7 +190,11 @@ export function InputPreview({
         <p>{error.message}</p>
         <div className="preview-actions">
           {!isStale && error.retryable ? (
-            <button type="button" className="primary-button" onClick={() => void startPreparation()}>
+            <button
+              type="button"
+              className="primary-button"
+              onClick={() => void startPreparation()}
+            >
               重新准备
             </button>
           ) : null}

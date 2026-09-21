@@ -35,6 +35,30 @@
 
 文档中优先使用 root script，而不是 package-specific 命令。
 
+当前根目录命令：
+
+| 命令 | 作用 |
+| --- | --- |
+| `corepack pnpm install --frozen-lockfile` | 按锁文件安装固定依赖；CI 和 clean-environment 验证使用此命令 |
+| `corepack pnpm dev` | 在 `127.0.0.1:43127` 启动 Vite 和 Electron 开发模式 |
+| `corepack pnpm typecheck` | 检查 main、renderer 和 test TypeScript |
+| `corepack pnpm lint` | 使用 ESLint 检查 TypeScript、React Hooks 和工程脚本，warning 也会失败 |
+| `corepack pnpm format:check` | 用 Prettier 检查代码和工程配置，不修改文件 |
+| `corepack pnpm format` | 用 Prettier 写入格式；与只读检查命令明确分离 |
+| `corepack pnpm test` | 运行 Vitest 单元 / 组件测试 |
+| `corepack pnpm build` | 编译 Electron main 并构建 renderer |
+| `corepack pnpm test:e2e` | 构建并运行确定性的 Electron 黄金路径 E2E |
+| `corepack pnpm ci:validate` | 解析并静态检查 GitHub Actions 的必需命令和最小权限 |
+| `corepack pnpm package` | 构建、为当前主机平台 / 架构执行 Electron Forge package，并检查 ASAR 内容边界 |
+
+`package` 输出到根目录 `out/desktop/`。当前只验证本机未签名、未 notarize 的 package；code signing、notarization、installer maker、自动发布和跨平台产物都不属于 E0.2。package smoke 要求运行入口存在，并拒绝源码、测试、`.env`、密钥、browser profile / auth state、本地数据库和测试结果进入 ASAR。
+
+Electron Forge 目前精确固定为 `8.0.0-alpha.10`：最新稳定的 7.x 仍通过 Git subdependency 拉取旧 `@electron/rebuild`，会触发 pnpm 12 的 `blockExoticSubdeps`，并带来 high-severity audit 结果。当前固定版本通过 frozen install、`pnpm audit --audit-level high` 和本机 packaging smoke；Forge 发布无这些问题的稳定版后，应在独立依赖升级切片中替换，不能静默漂移版本。
+
+pnpm 使用 `nodeLinker: hoisted` 满足 Electron Forge 的物理依赖树要求。由于 Forge 对 pnpm workspace 的 app-root 解析仍有限制，packaging wrapper 只在 Forge 运行期间把 desktop 的 `node_modules` 临时映射到 workspace 根，结束后恢复原目录；该目录和临时备份都不得进入产物。
+
+GitHub Actions 使用固定 Node `24.15.0`、Corepack 和 pnpm `12.5.1`，以 frozen lockfile 运行 typecheck、lint、format check、workflow contract、test 和 build。CI 不运行真实平台、生产账号或发布操作。
+
 ## 分支与提交
 
 - `main` 保持可发布。

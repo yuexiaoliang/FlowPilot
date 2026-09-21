@@ -42,12 +42,7 @@ type ExecutionPanelProps = {
 };
 
 type ExecutionPhase =
-  | 'loading'
-  | 'paused'
-  | 'failure'
-  | 'result-loading'
-  | 'result-failure'
-  | 'result';
+  'loading' | 'paused' | 'failure' | 'result-loading' | 'result-failure' | 'result';
 
 const UNKNOWN_EXECUTION_ERROR = new MockExecutionError(
   'EXECUTION_PREPARATION_FAILED',
@@ -80,8 +75,9 @@ export function ExecutionPanel({
   const [error, setError] = useState<MockExecutionError | null>(null);
   const [confirmationOpen, setConfirmationOpen] = useState(false);
   const [decision, setDecision] = useState<MockConfirmationDecision | null>(null);
-  const [currentResultMilestone, setCurrentResultMilestone] =
-    useState<MockResultMilestone | null>(null);
+  const [currentResultMilestone, setCurrentResultMilestone] = useState<MockResultMilestone | null>(
+    null,
+  );
   const [result, setResult] = useState<MockTerminalResult | null>(null);
   const [resultError, setResultError] = useState<MockResultError | null>(null);
 
@@ -268,7 +264,10 @@ export function ExecutionPanel({
 
   if (phase === 'failure' && error !== null) {
     return (
-      <section className="execution-panel execution-failure" aria-labelledby="execution-failure-title">
+      <section
+        className="execution-panel execution-failure"
+        aria-labelledby="execution-failure-title"
+      >
         <p className="execution-state-label">模拟运行 · 未开始</p>
         <h2 ref={failureHeadingRef} id="execution-failure-title" tabIndex={-1}>
           还不能准备本次运行
@@ -334,10 +333,7 @@ export function ExecutionPanel({
 
   if (phase === 'result-failure' && resultError !== null && decision?.kind === 'CONFIRMED') {
     return (
-      <section
-        className="execution-panel execution-failure"
-        aria-labelledby="result-failure-title"
-      >
+      <section className="execution-panel execution-failure" aria-labelledby="result-failure-title">
         <p className="execution-state-label">模拟运行 · 结果未验证</p>
         <h2 ref={resultFailureHeadingRef} id="result-failure-title" tabIndex={-1}>
           还不能验证模拟结果
@@ -419,7 +415,7 @@ export function ExecutionPanel({
           <p>
             {isPaused
               ? pausedDescription
-              : currentMilestone?.description ?? '正在建立本次会话的临时 Mock 运行。'}
+              : (currentMilestone?.description ?? '正在建立本次会话的临时 Mock 运行。')}
           </p>
         </div>
         <span className={isPaused ? 'execution-badge execution-badge-paused' : 'execution-badge'}>

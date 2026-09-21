@@ -12,9 +12,7 @@ export type MockUnderstanding = {
 };
 
 export type MockUnderstandingErrorCode =
-  | 'EMPTY_INTENT'
-  | 'INTENT_NOT_RECOGNIZED'
-  | 'ANALYSIS_CANCELLED';
+  'EMPTY_INTENT' | 'INTENT_NOT_RECOGNIZED' | 'ANALYSIS_CANCELLED';
 
 export class MockUnderstandingError extends Error {
   readonly code: MockUnderstandingErrorCode;

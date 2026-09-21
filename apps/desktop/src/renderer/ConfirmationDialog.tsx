@@ -122,9 +122,7 @@ export function ConfirmationDialog({
     try {
       onDecision(recordMockConfirmationDecision(context, kind));
     } catch (caughtError: unknown) {
-      setError(
-        isMockConfirmationError(caughtError) ? caughtError : UNKNOWN_CONFIRMATION_ERROR,
-      );
+      setError(isMockConfirmationError(caughtError) ? caughtError : UNKNOWN_CONFIRMATION_ERROR);
       setPhase('failure');
       onAnnouncement('确认上下文已失效。没有记录决定，也没有执行发布。');
       requestAnimationFrame(() => headingRef.current?.focus());
@@ -143,7 +141,9 @@ export function ConfirmationDialog({
     }
 
     const focusable = Array.from(
-      dialogRef.current?.querySelectorAll<HTMLElement>('[data-confirmation-focusable]:not(:disabled)') ?? [],
+      dialogRef.current?.querySelectorAll<HTMLElement>(
+        '[data-confirmation-focusable]:not(:disabled)',
+      ) ?? [],
     );
 
     if (focusable.length === 0) {
@@ -233,13 +233,12 @@ export function ConfirmationDialog({
 
         <div className="confirmation-impact">
           <strong>不可逆影响</strong>
-          <span>真实发布会让订阅者看到这篇文章；本原型只记录你的决定，不会连接微信或执行发布。</span>
+          <span>
+            真实发布会让订阅者看到这篇文章；本原型只记录你的决定，不会连接微信或执行发布。
+          </span>
         </div>
 
-        <p
-          id="confirmation-status"
-          className={`confirmation-status confirmation-status-${phase}`}
-        >
+        <p id="confirmation-status" className={`confirmation-status confirmation-status-${phase}`}>
           {phase === 'loading'
             ? '正在复核固定输入、目的地和确认策略，决定操作暂时不可用。'
             : phase === 'failure'

@@ -43,9 +43,7 @@ test('deterministic Intent → Understanding → Source → Input → Execution 
 
     await window.getByRole('button', { name: '选择范围' }).click();
     await window.getByRole('button', { name: '取消选择' }).click();
-    await expect(
-      window.getByRole('heading', { name: '还不能使用行业学习仓库' }),
-    ).toBeFocused();
+    await expect(window.getByRole('heading', { name: '还不能使用行业学习仓库' })).toBeFocused();
     await expect(window.getByText(/没有获得任何文件访问权限/u)).toBeVisible();
 
     await window.getByRole('button', { name: '重新选择' }).click();
@@ -57,9 +55,7 @@ test('deterministic Intent → Understanding → Source → Input → Execution 
     await window.getByRole('radio', { name: /行业学习仓库/u }).check();
     await window.getByRole('button', { name: '授权所选范围' }).click();
     await expect(window.getByRole('heading', { name: /正在检查只读授权/u })).toBeFocused();
-    await expect(
-      window.getByRole('heading', { name: /正在解析已授权的数据来源/u }),
-    ).toBeVisible();
+    await expect(window.getByRole('heading', { name: /正在解析已授权的数据来源/u })).toBeVisible();
     await expect(window.getByRole('heading', { name: '行业学习仓库已连接' })).toBeFocused();
     await expect(window.getByText('所选的行业学习 Git 仓库')).toBeVisible();
     await expect(
@@ -68,9 +64,7 @@ test('deterministic Intent → Understanding → Source → Input → Execution 
       ),
     ).toBeVisible();
     await expect(
-      window.getByText(
-        '理解已形成，数据来源已获得只读授权；可以开始准备本次输入。',
-      ),
+      window.getByText('理解已形成，数据来源已获得只读授权；可以开始准备本次输入。'),
     ).toBeVisible();
     await expect(window.getByRole('button', { name: '选择范围' })).toHaveCount(0);
 
@@ -83,16 +77,10 @@ test('deterministic Intent → Understanding → Source → Input → Execution 
     });
 
     await window.getByRole('button', { name: '准备本次输入' }).click();
-    await expect(
-      window.getByRole('heading', { name: '正在选择并冻结本次输入…' }),
-    ).toBeFocused();
+    await expect(window.getByRole('heading', { name: '正在选择并冻结本次输入…' })).toBeFocused();
     await window.getByRole('button', { name: '取消输入准备' }).click();
-    await expect(
-      window.getByRole('heading', { name: '还不能准备本次输入' }),
-    ).toBeFocused();
-    await expect(
-      window.getByText('输入准备已取消。没有创建可继续使用的本次输入。'),
-    ).toBeVisible();
+    await expect(window.getByRole('heading', { name: '还不能准备本次输入' })).toBeFocused();
+    await expect(window.getByText('输入准备已取消。没有创建可继续使用的本次输入。')).toBeVisible();
 
     await window.getByRole('button', { name: '重新准备' }).click();
     await expect(window.getByRole('heading', { name: '本次输入已准备' })).toBeFocused();
@@ -108,7 +96,11 @@ test('deterministic Intent → Understanding → Source → Input → Execution 
       }),
     ).toBeVisible();
     await expect(window.getByText('必需字段已齐全')).toBeVisible();
-    await expect(window.getByText('进入预览后，这篇文章和封面不会静默刷新。若意图或来源改变，必须重新创建一份输入。')).toBeVisible();
+    await expect(
+      window.getByText(
+        '进入预览后，这篇文章和封面不会静默刷新。若意图或来源改变，必须重新创建一份输入。',
+      ),
+    ).toBeVisible();
 
     await window.getByRole('button', { name: '展开正文' }).click();
     await expect(window.getByText(/自动化的起点应该是人真正想得到的结果/u)).toBeVisible();
@@ -122,15 +114,11 @@ test('deterministic Intent → Understanding → Source → Input → Execution 
     });
 
     await window.getByRole('button', { name: '继续准备运行' }).click();
-    await expect(
-      window.getByRole('heading', { name: '正在准备已冻结的输入' }),
-    ).toBeFocused();
+    await expect(window.getByRole('heading', { name: '正在准备已冻结的输入' })).toBeFocused();
     await expect(window.getByText(/核对文章、正文和封面仍来自同一份演示快照/u)).toBeVisible();
 
     await window.getByRole('button', { name: '停止运行准备' }).click();
-    await expect(
-      window.getByRole('heading', { name: '还不能准备本次运行' }),
-    ).toBeFocused();
+    await expect(window.getByRole('heading', { name: '还不能准备本次运行' })).toBeFocused();
     await expect(window.getByText(/没有打开确认界面，也没有执行或发布/u)).toBeVisible();
     await expect(window.getByRole('button', { name: '模拟运行已创建' })).toBeDisabled();
 
@@ -183,9 +171,7 @@ test('deterministic Intent → Understanding → Source → Input → Execution 
 
     await window.getByRole('button', { name: '检查详情' }).click();
     await expect(window.getByRole('button', { name: '检查详情', exact: true })).toBeFocused();
-    await expect(
-      window.getByRole('heading', { name: '本次模拟运行的检查详情' }),
-    ).toBeVisible();
+    await expect(window.getByRole('heading', { name: '本次模拟运行的检查详情' })).toBeVisible();
     await window.keyboard.press('Shift+Tab');
     await expect(window.getByRole('button', { name: /Run timeline/u })).toBeFocused();
     await window.keyboard.press('Tab');
@@ -247,9 +233,7 @@ test('deterministic Intent → Understanding → Source → Input → Execution 
 
     await window.getByRole('button', { name: '检查详情' }).click();
     await expect(window.getByRole('button', { name: '检查详情', exact: true })).toBeFocused();
-    await expect(
-      window.getByRole('heading', { name: '本次模拟运行的检查详情' }),
-    ).toBeVisible();
+    await expect(window.getByRole('heading', { name: '本次模拟运行的检查详情' })).toBeVisible();
     await window.keyboard.press('Tab');
     await expect(window.getByRole('button', { name: '关闭检查详情' })).toBeFocused();
     await expect(window.getByText('SUCCEEDED')).toBeVisible();
@@ -311,9 +295,7 @@ test('deterministic Intent → Understanding → Source → Input → Execution 
     await expect(window.getByText('让自动化真正可维护：从意图到确定性执行').last()).toBeVisible();
     await expect(window.getByRole('button', { name: '模拟运行已创建' })).toBeDisabled();
     await window.getByRole('button', { name: '检查详情' }).click();
-    await expect(
-      window.getByRole('heading', { name: '本次模拟运行的检查详情' }),
-    ).toBeVisible();
+    await expect(window.getByRole('heading', { name: '本次模拟运行的检查详情' })).toBeVisible();
     await window.getByRole('button', { name: /Source 与 InputBundle/u }).click();
     await expect(
       window.locator('#inspector-section-source').getByText('演示快照 · 固定内容版本 1 · 不可变'),

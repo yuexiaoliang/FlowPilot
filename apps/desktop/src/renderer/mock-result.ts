@@ -134,9 +134,7 @@ export async function runMockActionAndVerify(
   });
 }
 
-export function createMockCancelledResult(
-  decision: MockConfirmationDecision,
-): MockTerminalResult {
+export function createMockCancelledResult(decision: MockConfirmationDecision): MockTerminalResult {
   assertDecisionContext(decision, 'CANCELLED');
 
   return Object.freeze({

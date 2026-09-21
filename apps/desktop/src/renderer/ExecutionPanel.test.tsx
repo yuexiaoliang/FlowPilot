@@ -25,8 +25,10 @@ describe('deterministic Execution panel', () => {
     const bundle = await createBundle();
     const runner: ExecutionRunner = (input, options) =>
       runMockExecution(input, { ...options, milestoneDelayMs: 0 });
-    const resultRunner = (decision: Parameters<typeof runMockActionAndVerify>[0], options?: Parameters<typeof runMockActionAndVerify>[1]) =>
-      runMockActionAndVerify(decision, { ...options, milestoneDelayMs: 0 });
+    const resultRunner = (
+      decision: Parameters<typeof runMockActionAndVerify>[0],
+      options?: Parameters<typeof runMockActionAndVerify>[1],
+    ) => runMockActionAndVerify(decision, { ...options, milestoneDelayMs: 0 });
     const onAnnouncement = vi.fn();
 
     render(
@@ -68,9 +70,7 @@ describe('deterministic Execution panel', () => {
   it('stops preparation as a recoverable failure and returns to the same input', async () => {
     const user = userEvent.setup();
     const bundle = await createBundle();
-    const runner: ExecutionRunner = vi.fn(
-      () => new Promise<MockExecutionPause>(() => undefined),
-    );
+    const runner: ExecutionRunner = vi.fn(() => new Promise<MockExecutionPause>(() => undefined));
     const onReturnToInput = vi.fn();
 
     render(

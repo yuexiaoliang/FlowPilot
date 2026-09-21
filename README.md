@@ -56,12 +56,17 @@ FlowPilot 是**文档驱动，而不是 Issue 驱动**。
 corepack pnpm install
 corepack pnpm dev
 corepack pnpm typecheck
+corepack pnpm lint
+corepack pnpm format:check
 corepack pnpm test
 corepack pnpm build
 corepack pnpm test:e2e
+corepack pnpm package
 ```
 
 `test:e2e` 会构建并启动本地 Electron 原型，只使用确定性 Mock，不连接真实服务或生产账号。
+
+`package` 会先构建应用，再用 Electron Forge 为当前主机平台和架构生成未签名产物，并检查 ASAR 中包含运行入口且不包含源码、测试、Secret、浏览器身份状态或本地数据库。产物位于 `out/desktop/`；它是工程 smoke，不是可公开分发的签名安装包。
 
 如果你要直接体验和验收当前成果，请从 [人工验收指南](./docs/MANUAL-ACCEPTANCE.md) 开始。它按实际界面列出了启动、点击步骤、预期结果、失败分支和当前尚未实现的边界。
 

@@ -176,7 +176,9 @@ export function App({ analyzer = analyzeIntent }: AppProps) {
               onChange={(event) => {
                 setIntent(event.target.value);
               }}
-              aria-describedby={error?.code === 'EMPTY_INTENT' ? 'analysis-error-message' : 'editor-help'}
+              aria-describedby={
+                error?.code === 'EMPTY_INTENT' ? 'analysis-error-message' : 'editor-help'
+              }
               aria-invalid={error?.code === 'EMPTY_INTENT'}
               spellCheck="false"
             />
@@ -238,7 +240,11 @@ export function App({ analyzer = analyzeIntent }: AppProps) {
                   </div>
                 </div>
                 {error.code !== 'EMPTY_INTENT' && error.retryable ? (
-                  <button type="button" className="secondary-button" onClick={() => void runAnalysis()}>
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={() => void runAnalysis()}
+                  >
                     重试分析
                   </button>
                 ) : null}
@@ -255,7 +261,9 @@ export function App({ analyzer = analyzeIntent }: AppProps) {
                     我的理解
                   </h2>
                 </div>
-                <span className={isResultStale ? 'review-status review-status-stale' : 'review-status'}>
+                <span
+                  className={isResultStale ? 'review-status review-status-stale' : 'review-status'}
+                >
                   {isResultStale ? '需要更新' : '已形成理解'}
                 </span>
               </div>
@@ -299,7 +307,11 @@ export function App({ analyzer = analyzeIntent }: AppProps) {
                       : '理解已形成，数据来源已获得只读授权；可以开始准备本次输入。'
                     : '这一步只确认 FlowPilot 对意图的理解，还没有授权数据来源、准备输入或开始执行。'}
                 </p>
-                <button type="button" className="text-button" onClick={() => editorRef.current?.focus()}>
+                <button
+                  type="button"
+                  className="text-button"
+                  onClick={() => editorRef.current?.focus()}
+                >
                   调整意图
                 </button>
               </div>

@@ -1,4 +1,5 @@
 node_modules/
+.flowpilot-package-node-modules/
 .pnpm-store/
 dist/
 out/

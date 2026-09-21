@@ -8,9 +8,9 @@
 
 **E0 — Engineering Foundation**
 
-状态：**进行中（E0.1 已验收；E0 Gate 尚未通过）**
+状态：**进行中（E0.1、E0.2 已验收；下一切片 E0.3；E0 Gate 尚未通过）**
 
-上一阶段 **P0 — Interactive Mock Prototype** 已由独立 Gatekeeper 完成全量验收，P0 Acceptance 1–15 全部 PASS。E0.1 工程基线与缺口审计已由独立 Gatekeeper 验收；E0 的实现切片尚未开始，E0 Gate 仍未通过。当前没有需要 Maintainer 决策的阻塞项。
+上一阶段 **P0 — Interactive Mock Prototype** 已由独立 Gatekeeper 完成全量验收，P0 Acceptance 1–15 全部 PASS。E0.1 工程基线与缺口审计、E0.2 工具链 / CI / Packaging 基线均已由独立 Gatekeeper 验收；E0.3 与 E0.4 尚未开始，E0 Gate 仍未通过。当前没有需要 Maintainer 决策的阻塞项。
 
 已确认的产品方向：
 
@@ -80,7 +80,7 @@
 
 ## 当前交付目标
 
-上一阶段交付目标是构建 **Interactive Mock Prototype**，在不接入生产基础设施前验证 D0 Design Contract 的黄金路径。P0 使用确定性 Mock；P0.1 `Intent → Understanding`、P0.2 `Source resolution → contextual Source connection`、P0.3 `Input Preview → immutable mock input`、P0.4 `Execution → pre-confirmation mock Run`、P0.5 `Confirmation → pre-publication decision`、P0.6 `Result → verified mock outcome`、P0.7 `Result → Inspector provenance` 以及 P0 全量 Gate 均已验收。当前交付目标转为 E0：E0.1 审计已完成，接下来按单切片闭环实现 E0.2–E0.4；在全部实现切片和独立全量 Gate 完成前，不把 E0 写成已完成。
+上一阶段交付目标是构建 **Interactive Mock Prototype**，在不接入生产基础设施前验证 D0 Design Contract 的黄金路径。P0 使用确定性 Mock；P0.1 `Intent → Understanding`、P0.2 `Source resolution → contextual Source connection`、P0.3 `Input Preview → immutable mock input`、P0.4 `Execution → pre-confirmation mock Run`、P0.5 `Confirmation → pre-publication decision`、P0.6 `Result → verified mock outcome`、P0.7 `Result → Inspector provenance` 以及 P0 全量 Gate 均已验收。当前交付目标转为 E0：E0.1 审计和 E0.2 工具链 / CI / Packaging 基线已完成，下一步按单切片实现 E0.3–E0.4；在全部实现切片和独立全量 Gate 完成前，不把 E0 写成已完成。
 
 已验证进展：
 
@@ -130,6 +130,16 @@
   - E0 交付物缺口：preload、最小 typed IPC、third-party WebContentsView 安全边界、GitHub Actions CI、deterministic fixture site、Electron Forge packaging 均缺失；ESLint / Prettier 与 `lint/package` root 命令也缺失。
   - Acceptance 矩阵：1（Renderer 无 Node integration）、2（context isolation）和 8（无未记录生产 credential）在当前 trusted Renderer / P0 基线下已满足；3（最小 typed preload API）、4（third-party WebContentsView 无 privileged preload）、5（CI）和 6（fixture variants）缺失；7（root commands 文档）部分满足；clean clone 不能由当前工作区证据替代。
   - Maintainer 决策：无。P0 产品行为、D0 设计契约、Electron / WebContentsView / BrowserDriver / SQLite 锁定架构和信任边界均未改变。
+
+- **E0.2 — 工具链、CI 与 Packaging 基线：已验收。** 独立 Gatekeeper 已返回 `GATEKEEPER: PASS`。本切片只补齐工程门禁和本机未签名 packaging，不扩展产品行为，也不宣称 E0 完成：
+
+  - 独立 clean copy 验证：`corepack pnpm install --frozen-lockfile`、`corepack pnpm typecheck`、`corepack pnpm lint`、`corepack pnpm format:check`、`corepack pnpm ci:validate`、`corepack pnpm test`、`corepack pnpm build`、`corepack pnpm test:e2e` 和 `corepack pnpm package` 均 PASS。
+  - CI contract 已验证 workflow 使用固定 Node / Corepack / pnpm、frozen lockfile、只读 `contents` 权限，并包含 typecheck、lint、format check、test 和 build；CI 不使用生产账号或真实服务。
+  - dev smoke：`127.0.0.1:43127` 返回 HTTP 200，Electron Renderer 成功加载，停止开发服务后端口已释放；现有 P0 E2E 行为保持通过。
+  - Packaging smoke：生成当前主机平台的本地未签名 Electron Forge 产物；ASAR 必须包含 `dist/main/index.js`、`dist/renderer/index.html` 和 manifest，并明确排除 root `index.html`、源码、测试、`.env` / 密钥、browser profile / auth state、本地数据库和测试结果。
+  - 供应链检查：`corepack pnpm audit --audit-level high` PASS；未发现高严重度已知漏洞。E0.2 仍不包含 code signing、notarization、installer maker 或跨平台发布。
+  - 交付物：ESLint、Prettier、root `lint` / `format:check` / `package` / `ci:validate`、GitHub Actions workflow、Electron Forge packaging 配置及命令文档已存在；E0.3 的 preload / typed IPC / WebContentsView 安全壳和 E0.4 的 fixture site 仍待实现。
+  - Maintainer 决策：无。既有 Electron、React、WebContentsView、BrowserDriver、SQLite 和信任边界未改变。
 
 必须包含：
 
@@ -193,14 +203,13 @@
 
 ## 下一推荐切片
 
-**E0.2 — 工具链、CI 与 Packaging 基线**（`work/E0.2-tooling-ci-packaging.md`）
+**E0.3 — Desktop Shell、typed IPC 与安全边界**（`work/E0.3-desktop-shell-ipc-security.md`）
 
-补齐 ESLint / Prettier、root `lint` / `package` 命令、GitHub Actions 和 Electron Forge packaging，并保留 P0 dev / build / test / E2E 行为与端口 `43127`。该切片完成后必须独立 Gatekeeper 验收，不能把 E0.2 通过写成 E0 完成。
+在 E0.2 已验收的工具链 / CI / Packaging 基线上，补齐最小 typed preload / IPC，以及可信 Renderer 与 third-party WebContentsView 的可验证安全边界；不得把 E0.3 通过写成 E0 完成。
 
 ## 当前短期工作队列
 
-仅保留接下来三个有界 E0 切片；它们不是第二套 Roadmap：
+仅保留接下来两个有界 E0 切片；它们不是第二套 Roadmap：
 
-- **E0.2**：[`work/E0.2-tooling-ci-packaging.md`](../work/E0.2-tooling-ci-packaging.md)（下一切片，未开始）
-- **E0.3**：[`work/E0.3-desktop-shell-ipc-security.md`](../work/E0.3-desktop-shell-ipc-security.md)（等待 E0.2 通过，未开始）
+- **E0.3**：[`work/E0.3-desktop-shell-ipc-security.md`](../work/E0.3-desktop-shell-ipc-security.md)（下一切片，未开始）
 - **E0.4**：[`work/E0.4-deterministic-fixture-site.md`](../work/E0.4-deterministic-fixture-site.md)（等待 E0.3 通过，未开始）

@@ -123,11 +123,7 @@ describe('contextual Source connection', () => {
       connectMockSource(selection, { ...options, delayMs: 0 });
 
     render(
-      <SourceConnectionCard
-        disabled={false}
-        connector={connector}
-        onAnnouncement={vi.fn()}
-      />,
+      <SourceConnectionCard disabled={false} connector={connector} onAnnouncement={vi.fn()} />,
     );
 
     await user.click(screen.getByRole('button', { name: '选择范围' }));
@@ -155,11 +151,7 @@ describe('contextual Source connection', () => {
     );
 
     render(
-      <SourceConnectionCard
-        disabled={false}
-        connector={connector}
-        onAnnouncement={vi.fn()}
-      />,
+      <SourceConnectionCard disabled={false} connector={connector} onAnnouncement={vi.fn()} />,
     );
 
     await user.click(screen.getByRole('button', { name: '选择范围' }));
@@ -179,11 +171,7 @@ describe('contextual Source connection', () => {
       connectMockSource(selection, { ...options, delayMs: 0 });
 
     render(
-      <SourceConnectionCard
-        disabled={false}
-        connector={connector}
-        onAnnouncement={vi.fn()}
-      />,
+      <SourceConnectionCard disabled={false} connector={connector} onAnnouncement={vi.fn()} />,
     );
 
     await user.click(screen.getByRole('button', { name: '选择范围' }));
@@ -200,11 +188,7 @@ describe('contextual Source connection', () => {
       connectMockSource(selection, { ...options, delayMs: 0 });
 
     render(
-      <SourceConnectionCard
-        disabled={false}
-        connector={connector}
-        onAnnouncement={vi.fn()}
-      />,
+      <SourceConnectionCard disabled={false} connector={connector} onAnnouncement={vi.fn()} />,
     );
 
     await user.click(screen.getByRole('button', { name: '暂不授权' }));

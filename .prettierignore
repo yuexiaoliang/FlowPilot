@@ -1,0 +1,11 @@
+node_modules/
+dist/
+out/
+coverage/
+playwright-report/
+test-results/
+evidence/
+pnpm-lock.yaml
+
+# Long-form product and design documents keep their authored Markdown layout.
+**/*.md

@@ -111,7 +111,9 @@
 
 ## 后续有界 Task Packets
 
-1. [`work/E0.2-tooling-ci-packaging.md`](../work/E0.2-tooling-ci-packaging.md)：补齐 lint / format、root commands、CI、Electron Forge packaging 与命令文档。
+审计完成时建议的三个切片如下。E0.2 已于本审计之后通过独立 Gatekeeper 并退休短期 packet；当前状态与证据以 `docs/PROJECT-STATE.md` 为准。
+
+1. E0.2 工具链、CI 与 Packaging 基线：已验收，短期 packet 已退休。
 2. [`work/E0.3-desktop-shell-ipc-security.md`](../work/E0.3-desktop-shell-ipc-security.md)：补齐最小 typed preload / IPC 和 third-party WebContentsView 安全壳及回归测试。
 3. [`work/E0.4-deterministic-fixture-site.md`](../work/E0.4-deterministic-fixture-site.md)：实现本地 fixture variants 和确定性 E2E 入口。
 
@@ -132,7 +134,7 @@
 
 ### 下一推荐切片
 
-`work/E0.2-tooling-ci-packaging.md`
+`work/E0.3-desktop-shell-ipc-security.md`
 
 ### 阻塞项 / 所需 Maintainer 决策
 

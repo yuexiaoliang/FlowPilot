@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  connectMockSource,
-  MockSourceError,
-  resolveMockSource,
-} from './mock-source';
+import { connectMockSource, MockSourceError, resolveMockSource } from './mock-source';
 
 describe('deterministic mock Source service', () => {
   it('connects only the scoped, read-only industry repository fixture', async () => {

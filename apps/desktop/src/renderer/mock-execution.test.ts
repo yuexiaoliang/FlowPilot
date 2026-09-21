@@ -62,9 +62,9 @@ describe('deterministic mock execution', () => {
     const bundle = await createBundle();
     const mutableBundle = { ...bundle } as MockInputBundle;
 
-    await expect(
-      runMockExecution(mutableBundle, { milestoneDelayMs: 0 }),
-    ).rejects.toMatchObject<Partial<MockExecutionError>>({
+    await expect(runMockExecution(mutableBundle, { milestoneDelayMs: 0 })).rejects.toMatchObject<
+      Partial<MockExecutionError>
+    >({
       code: 'INPUT_BUNDLE_UNAVAILABLE',
       retryable: true,
     });

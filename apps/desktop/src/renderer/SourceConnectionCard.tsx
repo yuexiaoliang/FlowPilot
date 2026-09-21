@@ -246,11 +246,7 @@ export function SourceConnectionCard({
           ))}
         </fieldset>
         <div className="source-actions">
-          <button
-            type="button"
-            className="primary-button"
-            onClick={() => void connect(selection)}
-          >
+          <button type="button" className="primary-button" onClick={() => void connect(selection)}>
             授权所选范围
           </button>
           <button

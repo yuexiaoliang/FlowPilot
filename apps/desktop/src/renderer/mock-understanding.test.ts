@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  analyzeIntent,
-  EXAMPLE_INTENT,
-  MockUnderstandingError,
-} from './mock-understanding';
+import { analyzeIntent, EXAMPLE_INTENT, MockUnderstandingError } from './mock-understanding';
 
 describe('deterministic mock understanding service', () => {
   it('maps the example natural-language intent to the fixed review', async () => {

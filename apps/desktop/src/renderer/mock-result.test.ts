@@ -1,9 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import {
-  prepareMockConfirmation,
-  recordMockConfirmationDecision,
-} from './mock-confirmation';
+import { prepareMockConfirmation, recordMockConfirmationDecision } from './mock-confirmation';
 import { prepareMockInputBundle, type MockInputBundle } from './mock-input';
 import {
   createMockCancelledResult,

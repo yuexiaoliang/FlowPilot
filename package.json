@@ -11,7 +11,21 @@
     "dev": "corepack pnpm --filter @flowpilot/desktop dev",
     "build": "corepack pnpm --filter @flowpilot/desktop build",
     "typecheck": "corepack pnpm --filter @flowpilot/desktop typecheck",
+    "lint": "eslint . --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "ci:validate": "node ./scripts/validate-ci.mjs",
     "test": "corepack pnpm --filter @flowpilot/desktop test",
-    "test:e2e": "corepack pnpm --filter @flowpilot/desktop test:e2e"
+    "test:e2e": "corepack pnpm --filter @flowpilot/desktop test:e2e",
+    "package": "corepack pnpm --filter @flowpilot/desktop package"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.11.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "globals": "17.12.0",
+    "prettier": "3.9.8",
+    "typescript-eslint": "8.70.0",
+    "yaml": "2.9.1"
   }
 }

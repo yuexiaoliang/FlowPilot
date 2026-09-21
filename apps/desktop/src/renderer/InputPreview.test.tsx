@@ -3,11 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { InputPreview, type InputPreparer } from './InputPreview';
-import {
-  MockInputError,
-  prepareMockInputBundle,
-  type MockInputBundle,
-} from './mock-input';
+import { MockInputError, prepareMockInputBundle, type MockInputBundle } from './mock-input';
 import type { MockSourceResolution } from './mock-source';
 
 const SOURCE: MockSourceResolution = {

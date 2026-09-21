@@ -1,9 +1,7 @@
 import type { MockTerminalResult } from './mock-result';
 
 export type MockInspectorErrorCode =
-  | 'INSPECTOR_LOADING_CANCELLED'
-  | 'INSPECTOR_CONTEXT_UNAVAILABLE'
-  | 'MOCK_PROVENANCE_UNAVAILABLE';
+  'INSPECTOR_LOADING_CANCELLED' | 'INSPECTOR_CONTEXT_UNAVAILABLE' | 'MOCK_PROVENANCE_UNAVAILABLE';
 
 export class MockInspectorError extends Error {
   readonly code: MockInspectorErrorCode;

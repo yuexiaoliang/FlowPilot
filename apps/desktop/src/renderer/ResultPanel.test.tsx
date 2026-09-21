@@ -70,13 +70,7 @@ describe('Result panel', () => {
   it('shows cancellation as a neutral result rather than success', async () => {
     const result = await createResult('CANCELLED');
 
-    render(
-      <ResultPanel
-        result={result}
-        onAnnouncement={vi.fn()}
-        onReturnToInput={vi.fn()}
-      />,
-    );
+    render(<ResultPanel result={result} onAnnouncement={vi.fn()} onReturnToInput={vi.fn()} />);
 
     const heading = screen.getByRole('heading', { name: '本次发布已取消' });
     await waitFor(() => expect(heading).toHaveFocus());

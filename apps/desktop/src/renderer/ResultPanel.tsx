@@ -89,11 +89,7 @@ export function ResultPanel({ result, onAnnouncement, onReturnToInput }: ResultP
       </div>
 
       {inspectorOpen ? (
-        <InspectorPanel
-          result={result}
-          onAnnouncement={onAnnouncement}
-          onClose={closeInspector}
-        />
+        <InspectorPanel result={result} onAnnouncement={onAnnouncement} onClose={closeInspector} />
       ) : null}
     </section>
   );

@@ -1,10 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type MouseEvent,
-} from 'react';
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react';
 
 import {
   isMockInspectorError,
@@ -191,11 +185,7 @@ export function InspectorPanel({
   const succeeded = result.status === 'SUCCEEDED';
 
   return (
-    <div
-      ref={overlayRef}
-      className="inspector-overlay"
-      onMouseDown={handleBackdropClick}
-    >
+    <div ref={overlayRef} className="inspector-overlay" onMouseDown={handleBackdropClick}>
       <aside
         ref={panelRef}
         className={`inspector-panel inspector-panel-${phase}`}
@@ -227,7 +217,8 @@ export function InspectorPanel({
         </div>
 
         <p id="inspector-anchor" className="inspector-anchor">
-          锚定“{result.articleTitle}”的{result.status === 'SUCCEEDED' ? '已验证' : '已取消'}结果和原冻结输入。
+          锚定“{result.articleTitle}”的{result.status === 'SUCCEEDED' ? '已验证' : '已取消'}
+          结果和原冻结输入。
         </p>
 
         {phase === 'loading' ? (
@@ -323,7 +314,9 @@ export function InspectorPanel({
                   </div>
                   <div>
                     <dt>授权范围</dt>
-                    <dd>{provenance.source.scopeSummary} · {provenance.source.permission}</dd>
+                    <dd>
+                      {provenance.source.scopeSummary} · {provenance.source.permission}
+                    </dd>
                   </div>
                   <div>
                     <dt>InputBundle</dt>

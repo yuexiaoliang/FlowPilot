@@ -1,6 +1,6 @@
 :root {
   font-family:
-    -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   color: #17202a;
   background: #f7f9fc;
   font-synthesis: none;
@@ -63,7 +63,7 @@ a {
 button:focus-visible,
 a:focus-visible,
 textarea:focus-visible,
-[tabindex="-1"]:focus-visible {
+[tabindex='-1']:focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
   box-shadow: 0 0 0 2px #ffffff;
@@ -220,7 +220,7 @@ h1 {
 }
 
 .review-status::before {
-  content: "✓";
+  content: '✓';
   margin-right: 5px;
   font-weight: 700;
 }
@@ -231,7 +231,7 @@ h1 {
 }
 
 .review-status-stale::before {
-  content: "!";
+  content: '!';
 }
 
 .editor-label {
@@ -269,7 +269,7 @@ textarea:focus {
   background: #ffffff;
 }
 
-textarea[aria-invalid="true"] {
+textarea[aria-invalid='true'] {
   border-color: var(--color-danger);
 }
 
@@ -979,7 +979,7 @@ textarea[aria-invalid="true"] {
   height: 150px;
   border: 28px solid rgb(255 255 255 / 13%);
   border-radius: 50%;
-  content: "";
+  content: '';
 }
 
 .cover-preview-art span {

@@ -59,9 +59,9 @@ describe('deterministic mock confirmation', () => {
     const bundle = await createBundle();
     const mutableBundle = { ...bundle } as MockInputBundle;
 
-    await expect(
-      prepareMockConfirmation(mutableBundle, { delayMs: 0 }),
-    ).rejects.toMatchObject<Partial<MockConfirmationError>>({
+    await expect(prepareMockConfirmation(mutableBundle, { delayMs: 0 })).rejects.toMatchObject<
+      Partial<MockConfirmationError>
+    >({
       code: 'CONFIRMATION_CONTEXT_UNAVAILABLE',
       retryable: true,
     });

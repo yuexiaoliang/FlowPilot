@@ -46,9 +46,9 @@ describe('deterministic mock InputBundle', () => {
       permission: 'write',
     } as unknown as MockSourceResolution;
 
-    await expect(
-      prepareMockInputBundle(incompatibleSource, { delayMs: 0 }),
-    ).rejects.toMatchObject<Partial<MockInputError>>({
+    await expect(prepareMockInputBundle(incompatibleSource, { delayMs: 0 })).rejects.toMatchObject<
+      Partial<MockInputError>
+    >({
       code: 'SOURCE_NOT_READY',
       retryable: true,
     });
